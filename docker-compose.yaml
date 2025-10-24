@@ -3,10 +3,9 @@ services:
   reschool-app:
     build: .
     ports:
-      - "8080:80"
-    environment:
-      # The API_KEY will be read from a .env file in the same directory
-      # Create a file named .env with the content: API_KEY=your_google_api_key
-      API_KEY: ${API_KEY}
+      - "3000:3000"
+    env_file:
+      - ./.env
     restart: always
     container_name: reschool_frontend
+
