@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ReSchool 校地創生正循環</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              'brand-primary': '#134e4a', // teal-900
+              'brand-secondary': '#0d9488', // teal-600
+              'brand-accent': '#2dd4bf', // teal-400
+              'brand-light': '#f1f5f9', // slate-100
+              'brand-dark': '#18181b', // zinc-900
+              'brand-text': '#e4e4e7', // zinc-200
+              'brand-subtext': '#a1a1aa', // zinc-400
+            },
+          },
+        },
+      }
+    </script>
+    <style>
+      body::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAMAAAAp4XiDAAAAUVBMVEWFhYWDg4N3d3dtbW17e3t1dXVpaWl9fX18fHyAgICJiYmBgYGPj4+jo6Oak5OLi4ubm5uVlZWYmJilpaW8vLzDw8PS0tJwcHCvr69qaqqnp6e4uLgcLY/OAAAAnklEQVRIx+3RSRLDIAxE0QYhAbGZPNu5/z0zrXHiqiz5W72FqhqtVuuXEz80A0DHjdiuzi+bJsi9ZL2sMSMZYMIIyCCyIDAIi4QrbkJqd6vj8i/CATzzU0gGgjbJAZJSCJNBJgkzJgvgEfgCw_8A0Cbds73CQADu3se_eiAAAaAAbkbAmMIAIIOCgM4I+Azo5AI64BUA+Dk55cb6AGiAZgoAAAAASUVORK5CYII=');
+        opacity: 0.03;
+        pointer-events: none;
+        z-index: -1;
+      }
+    </style>
+  <!-- Inject environment variables -->
+  <script src="/env-config.js"></script>
+  <script type="importmap">
+{
+  "imports": {
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.22.0",
+    "recharts": "https://aistudiocdn.com/recharts@^3.2.1",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "jspdf": "https://aistudiocdn.com/jspdf@^2.5.1",
+    "html2canvas": "https://aistudiocdn.com/html2canvas@^1.4.1"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body class="bg-zinc-950 text-brand-text">
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>
