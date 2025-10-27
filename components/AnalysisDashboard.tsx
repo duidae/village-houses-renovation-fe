@@ -1,6 +1,6 @@
 import React, { FC, useState } from 'react';
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip, LineChart, Line, XAxis, YAxis, CartesianGrid, Legend, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
-import { AnalysisData, NewsItem, PopulationDataPoint, SchoolEnrollmentDataPoint, FiveForcesAnalysis, SchoolHealthIndex, PestAnalysis, InternalHealthMetrics, SwotAnalysis, MetricItem, StrategicRecommendation, ImpactAssessment, ImpactMetric } from '../types';
+import { AnalysisData, NewsItem, PopulationDataPoint, SchoolEnrollmentDataPoint, FiveForcesAnalysis, SchoolHealthIndex, PestAnalysis, InternalHealthMetrics, SwotAnalysis, MetricItem, StrategicRecommendation, ImpactAssessment, ImpactMetric, TrendProjection } from '../types';
 import { BuildingIcon, CalendarIcon, AreaIcon, MountainIcon, WaveIcon, RiverIcon, TrainIcon, LightbulbIcon, HistoryIcon, NewspaperIcon, UsersIcon, TrendingUpIcon, ShieldIcon, GlobeIcon, ClipboardListIcon, PuzzleIcon, HeartbeatIcon, MapPinIcon, SparklesIcon, KeyIcon, CpuChipIcon, BuildingOffice2Icon, PaintBrushIcon, ChartBarIcon, LeafIcon } from './icons';
 
 // --- Keyword Highlighting Component & Definitions ---
@@ -131,6 +131,76 @@ const SchoolEnrollmentChart: React.FC<{ data: SchoolEnrollmentDataPoint[] }> = (
                     <Line type="monotone" dataKey="studentCount" stroke="#14b8a6" strokeWidth={2} activeDot={{ r: 8 }} name="全校學生數" />
                 </LineChart>
             </ResponsiveContainer>
+        </div>
+    );
+};
+
+const TrendProjectionChart: React.FC<{
+    cityPopulation: PopulationDataPoint[];
+    schoolEnrollment: SchoolEnrollmentDataPoint[];
+    trendProjection: TrendProjection;
+}> = ({ cityPopulation, schoolEnrollment, trendProjection }) => {
+    // 1. Create a map of historical data
+    const historicalMap = new Map();
+    cityPopulation.forEach(d => historicalMap.set(d.year, { ...historicalMap.get(d.year), population: d.population }));
+    schoolEnrollment.forEach(d => historicalMap.set(d.year, { ...historicalMap.get(d.year), studentCount: d.studentCount }));
+    const historicalData = Array.from(historicalMap.entries()).map(([year, data]) => ({ year, ...data })).sort((a, b) => a.year - b.year);
+
+    // 2. Create projection data for chart, including last historical point for connection
+    const lastHistoricalPoint = historicalData[historicalData.length-1];
+
+    const projectionForChart = [
+        {
+            year: lastHistoricalPoint.year,
+            projectedPopulation: lastHistoricalPoint.population,
+            projectedStudentCount: lastHistoricalPoint.studentCount,
+        },
+        ...trendProjection.projectionData.map(p => ({
+            year: p.year,
+            projectedPopulation: p.projectedPopulation,
+            projectedStudentCount: p.projectedStudentCount,
+        }))
+    ];
+
+    // 3. Merge historical and projection data
+    const finalDataMap = new Map();
+    historicalData.forEach(d => finalDataMap.set(d.year, {
+        year: d.year,
+        population: d.population,
+        studentCount: d.studentCount,
+    }));
+    projectionForChart.forEach(p => {
+        const existing = finalDataMap.get(p.year) || { year: p.year };
+        finalDataMap.set(p.year, {
+            ...existing,
+            projectedPopulation: p.projectedPopulation,
+            projectedStudentCount: p.projectedStudentCount,
+        });
+    });
+
+    const finalChartData = Array.from(finalDataMap.values()).sort((a, b) => a.year - b.year);
+
+    return (
+        <div className="space-y-6">
+            <div className="w-full h-96 bg-zinc-900/50 p-4 rounded-lg">
+                <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={finalChartData} margin={{ top: 5, right: 30, left: 30, bottom: 5 }}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#3f3f46" />
+                        <XAxis dataKey="year" stroke="#a1a1aa" />
+                        <YAxis yAxisId="left" stroke="#14b8a6" label={{ value: '城市人口', angle: -90, position: 'insideLeft', fill: '#14b8a6', style: {textAnchor: 'middle'} }} tickFormatter={(value) => new Intl.NumberFormat('en-US', { notation: 'compact', compactDisplay: 'short' }).format(value as number)} />
+                        <YAxis yAxisId="right" orientation="right" stroke="#f59e0b" label={{ value: '學生人數', angle: 90, position: 'insideRight', fill: '#f59e0b', style: {textAnchor: 'middle'} }} tickFormatter={(value) => new Intl.NumberFormat('en-US', { notation: 'compact', compactDisplay: 'short' }).format(value as number)} />
+                        <Tooltip contentStyle={{ backgroundColor: '#18181b', borderColor: '#27272a', color: '#e4e4e7' }} />
+                        <Legend wrapperStyle={{ color: '#a1a1aa', paddingTop: '10px' }} />
+
+                        <Line yAxisId="left" type="monotone" dataKey="population" stroke="#14b8a6" strokeWidth={2} activeDot={{ r: 6 }} name="歷史人口" connectNulls />
+                        <Line yAxisId="left" type="monotone" dataKey="projectedPopulation" stroke="#14b8a6" strokeWidth={2} strokeDasharray="5 5" name="預估人口" connectNulls />
+
+                        <Line yAxisId="right" type="monotone" dataKey="studentCount" stroke="#f59e0b" strokeWidth={2} activeDot={{ r: 6 }} name="歷史學生數" connectNulls />
+                        <Line yAxisId="right" type="monotone" dataKey="projectedStudentCount" stroke="#f59e0b" strokeWidth={2} strokeDasharray="5 5" name="預估學生數" connectNulls />
+                    </LineChart>
+                </ResponsiveContainer>
+            </div>
+            <p className="text-brand-subtext text-center max-w-3xl mx-auto leading-relaxed"><HighlightedText text={trendProjection.analysis} /></p>
         </div>
     );
 };
@@ -425,7 +495,7 @@ export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id }
   const {
       basicInfo, environmentalAnalysis, potentialIndex, recommendations, strategicRecommendations,
       impactAssessment, pastCases, recentNews, cityPopulation, schoolEnrollment, pestAnalysis,
-      fiveForcesAnalysis, internalHealthMetrics, swotAnalysis, schoolHealthIndex
+      fiveForcesAnalysis, internalHealthMetrics, swotAnalysis, schoolHealthIndex, trendProjection
   } = data;
   const mapSrc = `https://maps.google.com/maps?q=${encodeURIComponent(basicInfo.address)}&t=k&z=18&output=embed&hl=zh-TW`;
 
@@ -519,6 +589,15 @@ export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id }
         <Section title="學校近年學生人數趨勢" icon={<TrendingUpIcon className="w-6 h-6"/>}>
             <SchoolEnrollmentChart data={schoolEnrollment} />
             <p className="text-xs text-zinc-600 text-center mt-2">資料來源：中華民國教育部統計處</p>
+        </Section>
+    )},
+     { condition: trendProjection && trendProjection.projectionData.length > 0, component: (
+        <Section title="未來 5 年趨勢推估" icon={<ChartBarIcon className="w-6 h-6"/>}>
+            <TrendProjectionChart
+                cityPopulation={cityPopulation}
+                schoolEnrollment={schoolEnrollment}
+                trendProjection={trendProjection}
+            />
         </Section>
     )},
     { condition: true, component: <Section title="外部宏觀環境 (PEST) 分析" icon={<GlobeIcon className="w-6 h-6"/>}><PestAnalysisDisplay data={pestAnalysis} /></Section> },

@@ -136,6 +136,27 @@ const responseSchema = {
       type: Type.ARRAY,
       items: { type: Type.OBJECT, properties: { year: { type: Type.INTEGER }, studentCount: { type: Type.INTEGER } }, required: ["year", "studentCount"] },
     },
+    trendProjection: {
+        type: Type.OBJECT,
+        description: "基於歷史數據，對未來5年的城市人口與學校學生人數的趨勢推估與分析 (A 5-year projection and analysis of city population and school enrollment trends based on historical data).",
+        properties: {
+            projectionData: {
+                type: Type.ARRAY,
+                description: "未來5年的年度推估數據 (Annual projection data for the next 5 years).",
+                items: {
+                    type: Type.OBJECT,
+                    properties: {
+                        year: { type: Type.INTEGER },
+                        projectedPopulation: { type: Type.INTEGER },
+                        projectedStudentCount: { type: Type.INTEGER },
+                    },
+                    required: ["year", "projectedPopulation", "projectedStudentCount"],
+                },
+            },
+            analysis: { type: Type.STRING, description: "對此趨勢推估的綜合文字分析，說明增長或下降的原因，並點出關鍵轉折點。 (A comprehensive textual analysis of the trend projection, explaining reasons for growth or decline and pointing out key turning points.)" }
+        },
+        required: ["projectionData", "analysis"],
+    },
     pestAnalysis: {
         type: Type.OBJECT,
         description: "外部宏觀環境 PEST 分析 (PEST analysis of the macro environment).",
@@ -192,7 +213,7 @@ const responseSchema = {
         required: ["score", "level", "summary"]
     },
   },
-  required: ["basicInfo", "environmentalAnalysis", "potentialIndex", "recommendations", "strategicRecommendations", "impactAssessment", "pastCases", "recentNews", "cityPopulation", "schoolEnrollment", "pestAnalysis", "fiveForcesAnalysis", "internalHealthMetrics", "swotAnalysis", "schoolHealthIndex"],
+  required: ["basicInfo", "environmentalAnalysis", "potentialIndex", "recommendations", "strategicRecommendations", "impactAssessment", "pastCases", "recentNews", "cityPopulation", "schoolEnrollment", "trendProjection", "pestAnalysis", "fiveForcesAnalysis", "internalHealthMetrics", "swotAnalysis", "schoolHealthIndex"],
 };
 
 
@@ -266,6 +287,11 @@ export const fetchAnalysisData = async (schoolName: string): Promise<AnalysisDat
 *   **人口趨勢**: 該地區過去10-15年人口趨勢。
 *   **學校學生人數趨勢**: 該校過去10-15年學生人數趨勢。
 
+**趨勢推估任務 (新增):**
+*   **未來趨勢推估 (trendProjection)**: 基於你找到的「該地區過去10-15年人口趨勢」與「該校過去10-15年學生人數趨勢」數據，請進行一個簡單的線性回歸或趨勢外插，推估 **未來 5 年** 的城市人口與學校學生人數。
+    *   提供一個 \`projectionData\` 陣列，包含未來 5 年每年的 \`year\`, \`projectedPopulation\`, \`projectedStudentCount\`。
+    *   提供一段綜合的文字 \`analysis\`，說明你對這個趨勢的看法，例如是持續下降、趨緩、或是有可能反轉，並 **大膽預測** 關鍵的轉折點或挑戰。
+
 請嚴格按照指定的 JSON 結構生成完整的報告。`;
 
   try {
@@ -282,7 +308,7 @@ export const fetchAnalysisData = async (schoolName: string): Promise<AnalysisDat
     const data = JSON.parse(jsonText);
 
     // Simple validation
-    if (!data.basicInfo || !data.pestAnalysis || !data.fiveForcesAnalysis || !data.internalHealthMetrics || !data.swotAnalysis || !data.schoolHealthIndex || !data.strategicRecommendations || !data.impactAssessment) {
+    if (!data.basicInfo || !data.pestAnalysis || !data.fiveForcesAnalysis || !data.internalHealthMetrics || !data.swotAnalysis || !data.schoolHealthIndex || !data.strategicRecommendations || !data.impactAssessment || !data.trendProjection) {
         throw new Error("Invalid data structure received from API.");
     }
 

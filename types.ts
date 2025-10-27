@@ -60,6 +60,17 @@ export interface SchoolEnrollmentDataPoint {
   studentCount: number;
 }
 
+export interface ProjectionDataPoint {
+  year: number;
+  projectedPopulation: number;
+  projectedStudentCount: number;
+}
+
+export interface TrendProjection {
+    projectionData: ProjectionDataPoint[];
+    analysis: string;
+}
+
 // --- New Strategic Analysis Framework ---
 
 export interface PestAnalysis {
@@ -108,15 +119,39 @@ export interface SchoolHealthIndex {
   summary: string;
 }
 
+export interface StrategicRecommendation {
+  type: '產業升級型' | '社會需求型' | '地方再生型';
+  project: string;
+  reason: string;
+  policyAlignment: string[];
+}
+
+export interface ImpactMetric {
+  metric: string;
+  value: string;
+  description: string;
+}
+
+export interface ImpactAssessment {
+  economic: ImpactMetric[];
+  social: ImpactMetric[];
+  sustainability: ImpactMetric[];
+  summary: string;
+}
+
+
 export interface AnalysisData {
   basicInfo: BasicInfo;
   environmentalAnalysis: EnvironmentalAnalysis;
   potentialIndex: PotentialIndex;
   recommendations: Recommendation[];
+  strategicRecommendations: StrategicRecommendation[];
+  impactAssessment: ImpactAssessment;
   pastCases: PastCase[];
   recentNews: RecentNews;
   cityPopulation: PopulationDataPoint[];
   schoolEnrollment: SchoolEnrollmentDataPoint[];
+  trendProjection: TrendProjection;
   pestAnalysis: PestAnalysis;
   fiveForcesAnalysis: FiveForcesAnalysis;
   internalHealthMetrics: InternalHealthMetrics;
