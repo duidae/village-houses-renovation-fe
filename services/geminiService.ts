@@ -1,4 +1,3 @@
-
 import { GoogleGenAI, Type } from "@google/genai";
 import { AnalysisData } from '../types';
 
@@ -19,6 +18,17 @@ const metricItemSchema = {
   },
   required: ["metric", "value", "analysis"],
 };
+
+const impactMetricSchema = {
+    type: Type.OBJECT,
+    properties: {
+        metric: { type: Type.STRING, description: "效益指標的名稱 (Name of the impact metric)." },
+        value: { type: Type.STRING, description: "該指標的預估數值，可以是數字、範圍或質性描述 (Estimated value of the metric, can be a number, range, or qualitative description)." },
+        description: { type: Type.STRING, description: "對此指標的簡要說明及其重要性 (Brief description of this metric and its importance)." },
+    },
+    required: ["metric", "value", "description"],
+};
+
 
 const responseSchema = {
   type: Type.OBJECT,
@@ -60,6 +70,7 @@ const responseSchema = {
     },
     recommendations: {
       type: Type.ARRAY,
+      description: "3個初步、概念性的活化方向建議 (3 initial, conceptual recommendations).",
       items: {
         type: Type.OBJECT,
         properties: {
@@ -69,6 +80,31 @@ const responseSchema = {
         },
         required: ["title", "description", "reason"],
       },
+    },
+    strategicRecommendations: {
+      type: Type.ARRAY,
+      description: "2-3個深入的、政策導向的策略性活化建議 (2-3 in-depth, policy-oriented strategic recommendations).",
+      items: {
+        type: Type.OBJECT,
+        properties: {
+            type: { type: Type.STRING, description: "建議的類型，必須是 '產業升級型', '社會需求型', 或 '地方再生型' 其中之一。" },
+            project: { type: Type.STRING, description: "具體的活化專案名稱 (Specific project name)." },
+            reason: { type: Type.STRING, description: "選擇此專案的詳細理由，結合校地條件、地方特性與政策趨勢 (Detailed reason for this project, combining campus conditions, local features, and policy trends)." },
+            policyAlignment: { type: Type.ARRAY, items: { type: Type.STRING }, description: "此專案能對接的具體政府政策或計畫名稱 (Specific government policies or plans this project aligns with)." },
+        },
+        required: ["type", "project", "reason", "policyAlignment"],
+      }
+    },
+    impactAssessment: {
+        type: Type.OBJECT,
+        description: "對策略性活化方案的預期效益與影響力評估 (Assessment of the expected benefits and impact of the strategic revitalization plans).",
+        properties: {
+            economic: { type: Type.ARRAY, items: impactMetricSchema, description: "經濟效益指標 (Economic impact metrics)." },
+            social: { type: Type.ARRAY, items: impactMetricSchema, description: "社會效益指標 (Social impact metrics)." },
+            sustainability: { type: Type.ARRAY, items: impactMetricSchema, description: "永續與環境效益指標 (Sustainability and environmental impact metrics)." },
+            summary: { type: Type.STRING, description: "對整體效益的綜合總結 (An overall summary of the total impact)." },
+        },
+        required: ["economic", "social", "sustainability", "summary"],
     },
     pastCases: {
       type: Type.ARRAY,
@@ -100,7 +136,6 @@ const responseSchema = {
       type: Type.ARRAY,
       items: { type: Type.OBJECT, properties: { year: { type: Type.INTEGER }, studentCount: { type: Type.INTEGER } }, required: ["year", "studentCount"] },
     },
-    // New strategic analysis schema
     pestAnalysis: {
         type: Type.OBJECT,
         description: "外部宏觀環境 PEST 分析 (PEST analysis of the macro environment).",
@@ -157,12 +192,14 @@ const responseSchema = {
         required: ["score", "level", "summary"]
     },
   },
-  required: ["basicInfo", "environmentalAnalysis", "potentialIndex", "recommendations", "pastCases", "recentNews", "cityPopulation", "schoolEnrollment", "pestAnalysis", "fiveForcesAnalysis", "internalHealthMetrics", "swotAnalysis", "schoolHealthIndex"],
+  required: ["basicInfo", "environmentalAnalysis", "potentialIndex", "recommendations", "strategicRecommendations", "impactAssessment", "pastCases", "recentNews", "cityPopulation", "schoolEnrollment", "pestAnalysis", "fiveForcesAnalysis", "internalHealthMetrics", "swotAnalysis", "schoolHealthIndex"],
 };
 
 
 export const fetchAnalysisData = async (schoolName: string): Promise<AnalysisData> => {
-  const prompt = `請針對台灣的「${schoolName}」進行一份深入的校園永續經營潛力與健康度綜合分析報告。請遵循以下多層次分析框架，並確保所有數據和分析都基於公開資料與合理推斷，聽起來非常真實。
+  const prompt = `請你扮演一位頂尖的國土規劃與地方創生顧問，為政府決策幕僚，針對台灣的「${schoolName}」進行一份深入的校園永續經營潛力與健康度綜合分析報告。
+
+**重要指令：** 在你所有的文字分析中（例如 PEST、SWOT、各項理由與總結），請找出對決策者最重要的 2-3 個關鍵字詞或短數據，並用 Markdown 的粗體語法 \`**關鍵字**\` 將其標示出來。請專注於具體的優勢、地點、政策名稱、關鍵數據或核心問題，**絕對避免**標示'政策'、'資源'、'優勢'、'劣勢'等通用名詞。
 
 **分析框架:**
 
@@ -172,14 +209,8 @@ export const fetchAnalysisData = async (schoolName: string): Promise<AnalysisDat
     *   **經濟(E)**: 分析家庭可支配收入、學費壓力、就業市場對學校的影響。
     *   **社會(S)**: 分析家長價值觀、人口結構、城鄉差距、留學傾向對學校的影響。
     *   **技術(T)**: 分析線上教育、AI 教學、遠距競爭對學校的影響。
-
 2.  **競爭強度：波特五力分析**:
-    *   **同業競爭**: 分析同區域或同類型學校的競爭強度。
-    *   **新進者威脅**: 分析私校轉型、外國學校設分校等潛在威脅。
-    *   **買方議價能力**: 分析學生與家長的選擇權與議價能力。
-    *   **供應商議價能力**: 分析教師、人力、教材等成本壓力。
-    *   **替代品威脅**: 分析線上課程、職業訓練、海外留學等替代品的威脅。
-    *   (每項力量請給予 1-10 分的評分，分數越高代表該力量越強/威脅越大)
+    *   **同業競爭**, **新進者威脅**, **買方議價能力**, **供應商議價能力**, **替代品威脅**。(每項力量請給予 1-10 分的評分，分數越高代表該力量越強/威脅越大)
 
 **第二層：內部營運健康度**
 請提供以下四大面向的關鍵指標分析，每個面向提供 2-3 個指標：
@@ -189,28 +220,51 @@ export const fetchAnalysisData = async (schoolName: string): Promise<AnalysisDat
 4.  **營運能力指標**: 行政效率、產學合作量、師資流動率等。
 
 **第三層：SWOT 整合分析**
-基於以上內外部環境分析，總結出學校的：
-*   **優勢 (Strengths)**
-*   **劣勢 (Weaknesses)**
-*   **機會 (Opportunities)**
-*   **威脅 (Threats)**
+基於以上內外部環境分析，總結出學校的 **優勢 (Strengths)**, **劣勢 (Weaknesses)**, **機會 (Opportunities)**, **威脅 (Threats)**。
 
 **第四層：量化健康指數**
 1.  **綜合評估健康指數 (School Health Index)**:
-    *   綜合以上所有資訊，評估出一個「學校健康度指數」。
-    *   提供一個 0-100 的分數（100為最健康）。
+    *   綜合所有資訊，評估出一個 0-100 的「學校健康度指數」。
     *   提供一個健康度等級（'Excellent', 'Good', 'Fair', 'Critical'）。
-    *   提供一段總結說明，解釋分數的意義。
+    *   提供一段總結說明。
+
+**第五層：策略性活化方向分析 (此為重點)**
+請基於以下「雙主軸」邏輯，進行深入的策略建議。校地活化必須同時考慮「議題導向 × 區域需求 × 政策目標」。
+*   **地方產業導向**: 振興在地經濟、文化、觀光。
+*   **議題導向（政策導向）**: 回應社會或國家發展議題。
+
+請根據以下分類，提出 2-3 個具體的、可操作的 **策略性活化建議 (strategicRecommendations)**：
+
+1.  **產業升級型** (以「政策導向」+「高科技/新興產業」為核心。配對條件：交通便利 + 面積完整 + 可快速佈線)
+    *   政策主題範例: AI園區 / 智慧製造, 綠能轉型 / ESG基地, 數位教育 / 新創孵化器。
+    *   可轉換方向範例: 研發實驗區、AI創新中心, 設置太陽能板、永續示範校園, 創業育成空間。
+
+2.  **社會需求型** (回應人力、居住、教育、長照等社會議題)
+    *   政策主題範例: 外勞宿舍 / 技能培訓中心, 青年社宅 / 共居空間, 長照中心 / 銀髮樂齡學苑, 幼兒 / 特教 / 共融園區。
+    *   可轉換方向範例: 提供住宿與職訓空間, 改為青年住宅, 改為長照設施, 改為社區教育基地。
+
+3.  **地方再生型** (與地方產業鏈、文化資源、人口結構結合)
+    *   政策主題範例: 農村再生 / 農業培力, 文創、觀光、地方品牌再生, 社區共學 / 公共空間再利用。
+    *   可轉換方向範例: 食農教育基地、農創中心, 文創展館、青年旅館, 社區活動中心。
+
+每個建議都必須包含：**類型 (type)**、**專案名稱 (project)**、**理由 (reason)** (需結合校地、地方與政策)、以及**可對接的政策 (policyAlignment)**。
+
+**第六層：預期效益與影響力評估 (此為關鍵決策依據)**
+基於你提出的「策略性活化方向分析」，請量化並質化評估這些方案**整合起來**的預期效益與影響力。這份評估是給政府決策者看的，需清晰呈現可達成的「政績」。請提供三大面向的評估，每個面向提供 2-3 個最關鍵的指標：
+1.  **經濟效益 (economic)**: 預估可創造的就業機會、帶動的年產值或觀光收入、吸引的投資金額等。
+2.  **社會效益 (social)**: 預估可服務的人次（如長照床位、社宅單元、培訓學員數）、提升的社區滿意度、保存的文化資產價值等。
+3.  **永續與環境效益 (sustainability)**: 預估的減碳量、綠化面積增加、對 ESG 目標的貢獻等。
+最後，提供一段**總結 (summary)**，說明此活化方案的整體戰略價值與對地方發展的長遠影響。
 
 **附加數據任務 (維持不變):**
 *   **基本資訊**: 學校名稱、地址、創校年份等。
 *   **環境分析**: 地形、交通等。也請包含該校所在地區的 **3-5個特色景點** 與 **3-5個特色美食**。
 *   **校地潛力指數 (CPI)**: 評估校地本身活化潛力。
-*   **建議活化方向**: 3個具體建議。
+*   **建議活化方向 (recommendations)**: 提供 3 個**初步的、概念性的**建議。
 *   **過往案例**: 2-3個相似案例。
 *   **近期動態**: 學校與城市的正負面新聞。
-*   **人口趨勢**: 根據內政部資料，提供該地區過去10-15年人口趨勢。
-*   **學校學生人數趨勢**: 根據教育部資料，提供該校過去10-15年學生人數趨勢。
+*   **人口趨勢**: 該地區過去10-15年人口趨勢。
+*   **學校學生人數趨勢**: 該校過去10-15年學生人數趨勢。
 
 請嚴格按照指定的 JSON 結構生成完整的報告。`;
 
@@ -228,7 +282,7 @@ export const fetchAnalysisData = async (schoolName: string): Promise<AnalysisDat
     const data = JSON.parse(jsonText);
 
     // Simple validation
-    if (!data.basicInfo || !data.pestAnalysis || !data.fiveForcesAnalysis || !data.internalHealthMetrics || !data.swotAnalysis || !data.schoolHealthIndex) {
+    if (!data.basicInfo || !data.pestAnalysis || !data.fiveForcesAnalysis || !data.internalHealthMetrics || !data.swotAnalysis || !data.schoolHealthIndex || !data.strategicRecommendations || !data.impactAssessment) {
         throw new Error("Invalid data structure received from API.");
     }
 

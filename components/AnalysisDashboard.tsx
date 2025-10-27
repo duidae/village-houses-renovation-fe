@@ -1,8 +1,42 @@
-
 import React, { FC, useState } from 'react';
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip, LineChart, Line, XAxis, YAxis, CartesianGrid, Legend, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
-import { AnalysisData, NewsItem, PopulationDataPoint, SchoolEnrollmentDataPoint, FiveForcesAnalysis, SchoolHealthIndex, PestAnalysis, InternalHealthMetrics, SwotAnalysis, MetricItem } from '../types';
-import { BuildingIcon, CalendarIcon, AreaIcon, MountainIcon, WaveIcon, RiverIcon, TrainIcon, LightbulbIcon, HistoryIcon, NewspaperIcon, UsersIcon, TrendingUpIcon, ShieldIcon, GlobeIcon, ClipboardListIcon, PuzzleIcon, HeartbeatIcon, MapPinIcon, SparklesIcon } from './icons';
+import { AnalysisData, NewsItem, PopulationDataPoint, SchoolEnrollmentDataPoint, FiveForcesAnalysis, SchoolHealthIndex, PestAnalysis, InternalHealthMetrics, SwotAnalysis, MetricItem, StrategicRecommendation, ImpactAssessment, ImpactMetric } from '../types';
+import { BuildingIcon, CalendarIcon, AreaIcon, MountainIcon, WaveIcon, RiverIcon, TrainIcon, LightbulbIcon, HistoryIcon, NewspaperIcon, UsersIcon, TrendingUpIcon, ShieldIcon, GlobeIcon, ClipboardListIcon, PuzzleIcon, HeartbeatIcon, MapPinIcon, SparklesIcon, KeyIcon, CpuChipIcon, BuildingOffice2Icon, PaintBrushIcon, ChartBarIcon, LeafIcon } from './icons';
+
+// --- Keyword Highlighting Component & Definitions ---
+
+const LABEL_STYLE = 'bg-teal-500/10 text-teal-300 ring-1 ring-teal-500/20';
+const UNDERLINE_STYLE = 'no-underline border-b-2 border-teal-500/50 font-medium text-teal-300';
+
+
+const HighlightedText: React.FC<{ text: string | undefined | null; styleType?: 'label' | 'underline'; customLabelClass?: string }> = ({ text, styleType = 'underline', customLabelClass }) => {
+  if (!text) return null;
+  const regex = /(\*\*.*?\*\*)/g;
+
+  const getStyleClass = () => {
+    if (styleType === 'label') {
+        return `px-1.5 py-0.5 rounded-md font-medium ${customLabelClass || LABEL_STYLE}`;
+    }
+    return UNDERLINE_STYLE;
+  };
+
+  return (
+    <>
+      {text.split(regex).map((part, index) => {
+        if (part.startsWith('**') && part.endsWith('**')) {
+          const keyword = part.slice(2, -2);
+          return (
+            <span key={index} className={getStyleClass()}>
+              {keyword}
+            </span>
+          );
+        }
+        return part;
+      })}
+    </>
+  );
+};
+
 
 interface AnalysisDashboardProps {
   data: AnalysisData;
@@ -57,7 +91,7 @@ const NewsSection: React.FC<{news: NewsItem[]}> = ({ news }) => {
                             <h5 className="font-semibold text-brand-text">{item.title}</h5>
                             <span className="text-xs text-zinc-500 ml-4 whitespace-nowrap">{item.date}</span>
                         </div>
-                        <p className="text-sm text-brand-subtext mt-1">{item.summary}</p>
+                        <p className="text-sm text-brand-subtext mt-1"><HighlightedText text={item.summary} /></p>
                     </div>
                 </div>
             ))}
@@ -115,7 +149,7 @@ const PestAnalysisDisplay: React.FC<{ data: PestAnalysis }> = ({ data }) => {
             {items.map(item => (
                 <div key={item.title} className="bg-zinc-800/50 p-4 rounded-lg">
                     <h4 className={`font-bold text-lg ${item.color}`}>{item.title}</h4>
-                    <p className="text-brand-subtext text-sm mt-2">{item.content}</p>
+                    <p className="text-brand-subtext text-sm mt-2 leading-relaxed"><HighlightedText text={item.content} /></p>
                 </div>
             ))}
         </div>
@@ -158,7 +192,7 @@ const FiveForcesAnalysisChart: React.FC<{ data: FiveForcesAnalysis }> = ({ data 
                         <p className="font-semibold text-brand-text">
                             {force.name}: <span className="font-bold text-brand-accent">{force.score} / 10</span>
                         </p>
-                        <p className="text-sm text-brand-subtext">{force.analysis}</p>
+                        <p className="text-sm text-brand-subtext leading-relaxed"><HighlightedText text={force.analysis} /></p>
                     </div>
                 ))}
             </div>
@@ -180,7 +214,7 @@ const InternalHealthDisplay: React.FC<{ data: InternalHealthMetrics }> = ({ data
                 <p className="text-sm font-semibold text-brand-text">{item.metric}</p>
                 <p className="text-sm font-bold text-brand-accent bg-zinc-700 px-2 py-0.5 rounded">{item.value}</p>
             </div>
-            <p className="text-xs text-brand-subtext mt-1">{item.analysis}</p>
+            <p className="text-xs text-brand-subtext mt-1 leading-relaxed"><HighlightedText text={item.analysis} /></p>
         </div>
     );
 
@@ -210,8 +244,8 @@ const SwotAnalysisDisplay: React.FC<{ data: SwotAnalysis }> = ({ data }) => {
             {items.map(item => (
                 <div key={item.title} className={`p-4 rounded-lg ${item.bgColor}`}>
                     <h4 className={`font-bold text-lg mb-2 ${item.textColor}`}>{item.title}</h4>
-                    <ul className="list-disc list-inside space-y-1 text-brand-subtext text-sm">
-                        {item.items.map((point, index) => <li key={index}>{point}</li>)}
+                    <ul className="list-disc list-inside space-y-1 text-brand-subtext text-sm leading-relaxed">
+                        {item.items.map((point, index) => <li key={index}><HighlightedText text={point} /></li>)}
                     </ul>
                 </div>
             ))}
@@ -262,10 +296,120 @@ const SchoolHealthIndexGauge: React.FC<{ data: SchoolHealthIndex }> = ({ data })
                 <p className="text-4xl font-bold text-brand-text my-1">{score} <span className="text-2xl">/ 100</span></p>
                 <p className={`text-xl font-semibold ${getLevelTextColor(level)}`}>{getLevelText(level)}</p>
             </div>
-            <p className="text-brand-subtext text-center max-w-2xl mx-auto">{summary}</p>
+            <p className="text-brand-subtext text-center max-w-2xl mx-auto"><HighlightedText text={summary} /></p>
         </div>
     );
 };
+
+const StrategicRecommendationsDisplay: React.FC<{ recommendations: StrategicRecommendation[] }> = ({ recommendations }) => {
+    const getCardStyle = (type: StrategicRecommendation['type']) => {
+        switch (type) {
+            case '產業升級型':
+                return {
+                    icon: <CpuChipIcon className="w-6 h-6 text-sky-400" />,
+                    borderColor: 'border-sky-800/50',
+                    bgColor: 'bg-sky-900/10',
+                    textColor: 'text-sky-400',
+                    labelClass: 'bg-sky-500/10 text-sky-300 ring-1 ring-sky-500/20',
+                };
+            case '社會需求型':
+                return {
+                    icon: <BuildingOffice2Icon className="w-6 h-6 text-emerald-400" />,
+                    borderColor: 'border-emerald-800/50',
+                    bgColor: 'bg-emerald-900/10',
+                    textColor: 'text-emerald-400',
+                    labelClass: 'bg-emerald-500/10 text-emerald-300 ring-1 ring-emerald-500/20',
+                };
+            case '地方再生型':
+                return {
+                    icon: <PaintBrushIcon className="w-6 h-6 text-amber-400" />,
+                    borderColor: 'border-amber-800/50',
+                    bgColor: 'bg-amber-900/10',
+                    textColor: 'text-amber-400',
+                    labelClass: 'bg-amber-500/10 text-amber-300 ring-1 ring-amber-500/20',
+                };
+            default:
+                return {
+                    icon: <LightbulbIcon className="w-6 h-6 text-zinc-400" />,
+                    borderColor: 'border-zinc-700',
+                    bgColor: 'bg-zinc-800/50',
+                    textColor: 'text-zinc-400',
+                    labelClass: LABEL_STYLE,
+                };
+        }
+    };
+
+    const policyTagStyle = "bg-brand-secondary/30 text-brand-accent border border-brand-secondary/50 hover:bg-brand-secondary/50";
+
+    return (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {recommendations.map((rec, index) => {
+                const style = getCardStyle(rec.type);
+                return (
+                    <div key={index} className={`p-5 rounded-lg border ${style.borderColor} ${style.bgColor} flex flex-col space-y-4`}>
+                        <div className="flex items-center space-x-3">
+                            {style.icon}
+                            <span className={`font-semibold text-sm px-3 py-1 rounded-full ${style.bgColor} border ${style.borderColor} ${style.textColor}`}>{rec.type}</span>
+                        </div>
+                        <h4 className="font-bold text-lg text-brand-text">{rec.project}</h4>
+                        <p className="text-brand-subtext text-sm flex-grow leading-relaxed"><span className="font-semibold text-zinc-400">理由：</span><HighlightedText text={rec.reason} styleType="label" customLabelClass={style.labelClass} /></p>
+                        {rec.policyAlignment && rec.policyAlignment.length > 0 && (
+                            <div>
+                                <h5 className="text-sm font-semibold text-zinc-400 mb-2">可對接政策：</h5>
+                                <div className="flex flex-wrap gap-2">
+                                    {rec.policyAlignment.map((policy, pIndex) => (
+                                        <span key={pIndex} className={`text-xs py-1 px-3 rounded-full transition-colors cursor-default ${policyTagStyle}`}>
+                                            {policy}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                );
+            })}
+        </div>
+    );
+};
+
+const ImpactAssessmentDisplay: React.FC<{ data: ImpactAssessment }> = ({ data }) => {
+    const { economic, social, sustainability, summary } = data;
+
+    const categories = [
+        { title: "經濟效益", metrics: economic, icon: <TrendingUpIcon className="w-8 h-8 text-sky-400" />, color: "border-sky-500", textColor: "text-sky-400" },
+        { title: "社會效益", metrics: social, icon: <UsersIcon className="w-8 h-8 text-emerald-400" />, color: "border-emerald-500", textColor: "text-emerald-400" },
+        { title: "永續效益", metrics: sustainability, icon: <LeafIcon className="w-8 h-8 text-amber-400" />, color: "border-amber-500", textColor: "text-amber-400" }
+    ];
+
+    const MetricCard: React.FC<{ item: ImpactMetric }> = ({ item }) => (
+        <div className="bg-zinc-800/50 p-4 rounded-lg transform transition-transform hover:scale-105">
+            <p className="font-semibold text-brand-text">{item.metric}</p>
+            <p className="text-2xl font-bold text-brand-accent my-1">{item.value}</p>
+            <p className="text-xs text-brand-subtext leading-relaxed"><HighlightedText text={item.description} /></p>
+        </div>
+    );
+
+    return (
+        <div className="space-y-8">
+            <p className="text-center text-brand-subtext text-lg max-w-3xl mx-auto leading-relaxed border-t border-b border-zinc-700 py-4"><HighlightedText text={summary} /></p>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {categories.map(cat => (
+                    <div key={cat.title} className={`p-5 rounded-xl bg-zinc-900/50 border-2 ${cat.color}/30`}>
+                        <div className="flex items-center space-x-3 mb-4">
+                            {cat.icon}
+                            <h4 className={`text-xl font-bold ${cat.textColor}`}>{cat.title}</h4>
+                        </div>
+                        <div className="space-y-4">
+                            {cat.metrics.map((metric, index) => <MetricCard key={index} item={metric} />)}
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+};
+
 
 const Section: React.FC<{title: string, icon: React.ReactNode, children: React.ReactNode}> = ({ title, icon, children }) => (
     <div className="bg-zinc-900 p-6 rounded-xl border border-zinc-800">
@@ -279,8 +423,9 @@ const Section: React.FC<{title: string, icon: React.ReactNode, children: React.R
 
 export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id }) => {
   const {
-      basicInfo, environmentalAnalysis, potentialIndex, recommendations, pastCases, recentNews,
-      cityPopulation, schoolEnrollment, pestAnalysis, fiveForcesAnalysis, internalHealthMetrics, swotAnalysis, schoolHealthIndex
+      basicInfo, environmentalAnalysis, potentialIndex, recommendations, strategicRecommendations,
+      impactAssessment, pastCases, recentNews, cityPopulation, schoolEnrollment, pestAnalysis,
+      fiveForcesAnalysis, internalHealthMetrics, swotAnalysis, schoolHealthIndex
   } = data;
   const mapSrc = `https://maps.google.com/maps?q=${encodeURIComponent(basicInfo.address)}&t=k&z=18&output=embed&hl=zh-TW`;
 
@@ -346,7 +491,7 @@ export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id }
                   <h3 className="text-xl font-semibold mb-2 text-center text-brand-text">3. 潛力指標 (CPI)</h3>
                   <CpiGauge score={potentialIndex.cpiScore} />
                 </div>
-                <p className="text-center text-brand-subtext mt-2 px-2">{potentialIndex.summary}</p>
+                <p className="text-center text-brand-subtext mt-2 px-2"><HighlightedText text={potentialIndex.summary} /></p>
                  <p className="text-center text-sm text-zinc-500 mt-4 px-2">* 指數為模型估算，計算參考公式：<br/><span className="font-mono text-brand-accent">CPI = (交通x0.4) + (環境x0.3) + (面積x0.2) + (校齡x0.1)</span></p>
             </div>
         </div>
@@ -381,8 +526,8 @@ export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id }
     { condition: true, component: <Section title="內部營運健康度指標" icon={<ClipboardListIcon className="w-6 h-6"/>}><InternalHealthDisplay data={internalHealthMetrics} /></Section> },
     { condition: true, component: <Section title="策略定位 (SWOT) 整合分析" icon={<PuzzleIcon className="w-6 h-6"/>}><SwotAnalysisDisplay data={swotAnalysis} /></Section> },
     { condition: true, component: <Section title="綜合評估健康指數" icon={<HeartbeatIcon className="w-6 h-6"/>}><SchoolHealthIndexGauge data={schoolHealthIndex} /></Section> },
-    { condition: true, component: (
-        <Section title="建議活化方向" icon={<LightbulbIcon className="w-6 h-6"/>}>
+    { condition: recommendations && recommendations.length > 0, component: (
+        <Section title="初步活化方向建議" icon={<LightbulbIcon className="w-6 h-6"/>}>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {recommendations.map((rec, index) => (
                     <div key={index} className="bg-teal-900/20 p-5 rounded-lg border border-teal-800/50 transform hover:scale-105 hover:border-teal-700 transition-all duration-300">
@@ -390,8 +535,8 @@ export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id }
                             <LightbulbIcon className="w-6 h-6 text-amber-300 mr-3"/>
                             <h4 className="font-bold text-lg text-brand-text">{rec.title}</h4>
                         </div>
-                        <p className="text-brand-subtext text-sm mb-3">{rec.description}</p>
-                        <p className="text-xs text-brand-accent bg-teal-500/10 p-2 rounded-md"><span className="font-semibold">理由：</span>{rec.reason}</p>
+                        <p className="text-brand-subtext text-sm mb-3 leading-relaxed"><HighlightedText text={rec.description} styleType="label" /></p>
+                        <div className="text-xs text-brand-accent bg-teal-500/10 p-2 rounded-md leading-relaxed"><span className="font-semibold">理由：</span><HighlightedText text={rec.reason} styleType="label" /></div>
                     </div>
                 ))}
             </div>
@@ -409,19 +554,30 @@ export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id }
                                 <p className="text-xs text-brand-subtext">{pcase.location}</p>
                             </div>
                         </div>
-                        <div className="text-sm space-y-2 text-brand-subtext">
-                            <p><span className="font-semibold text-zinc-400">原始條件：</span>{pcase.originalCondition}</p>
-                            <p><span className="font-semibold text-zinc-400">活化主題：</span><span className="font-semibold text-amber-400">{pcase.revitalizationTheme}</span></p>
-                            <p><span className="font-semibold text-zinc-400">最終成果：</span>{pcase.outcome}</p>
+                        <div className="text-sm space-y-2 text-brand-subtext leading-relaxed">
+                            <p><span className="font-semibold text-zinc-400">原始條件：</span><HighlightedText text={pcase.originalCondition} styleType="label" /></p>
+                            <p><span className="font-semibold text-zinc-400">活化主題：</span><span className="font-semibold text-amber-400"><HighlightedText text={pcase.revitalizationTheme} styleType="label" /></span></p>
+                            <p><span className="font-semibold text-zinc-400">最終成果：</span><HighlightedText text={pcase.outcome} styleType="label" /></p>
                         </div>
                     </div>
                 ))}
             </div>
         </Section>
     )},
+    { condition: strategicRecommendations && strategicRecommendations.length > 0, component: (
+        <Section title="策略性活化方向分析" icon={<KeyIcon className="w-6 h-6"/>}>
+            <StrategicRecommendationsDisplay recommendations={strategicRecommendations} />
+        </Section>
+    )},
+    { condition: impactAssessment && (impactAssessment.economic.length > 0 || impactAssessment.social.length > 0 || impactAssessment.sustainability.length > 0), component: (
+        <Section title="預期效益與影響力評估" icon={<ChartBarIcon className="w-6 h-6"/>}>
+            <ImpactAssessmentDisplay data={impactAssessment} />
+        </Section>
+    )},
   ];
 
-  let visibleSectionCounter = 3;
+  const visibleSections = sections.filter(s => s.condition);
+  let sectionCounter = 0;
 
   return (
     <div id={id} className="space-y-6 animate-fade-in">
@@ -445,20 +601,24 @@ export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id }
             </div>
         </div>
 
-      {sections.map((section, index) => {
-          if (!section.condition) return null;
+      {visibleSections.map((section, index) => {
+          const component = section.component;
 
-          if (index > 0) {
-            visibleSectionCounter++;
+          // The first visible section is the block with 1, 2, 3.
+          // This block doesn't have a `title` prop at its root.
+          // Its internal components have hardcoded numbers.
+          if (component.props.title === undefined) {
+              sectionCounter = 3;
+              return <React.Fragment key={index}>{component}</React.Fragment>;
           }
 
-          // Inject dynamic section numbers into titles
-          if (typeof section.component.props.title === 'string' && index > 0) {
-            const newTitle = `${visibleSectionCounter}. ${section.component.props.title}`;
-            return React.cloneElement(section.component, { key: index, title: newTitle });
-          }
+          // For all subsequent visible sections, increment counter and inject title.
+          sectionCounter++;
+          const originalTitle = component.props.title;
+          const titleWithoutNumber = originalTitle.replace(/^\d+\.\s*/, '');
+          const newTitle = `${sectionCounter}. ${titleWithoutNumber}`;
 
-          return React.cloneElement(section.component, { key: index });
+          return React.cloneElement(component, { key: index, title: newTitle });
       })}
     </div>
   );

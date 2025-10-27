@@ -135,3 +135,43 @@ export const TaiwanIcon: React.FC<IconProps> = ({ className }) => (
     <path strokeLinecap="round" strokeLinejoin="round" d="M11.94,3.43 C10.97,3.63 10.33,4.63 9.41,5.23 C8.48,5.83 7.07,6.07 6.25,6.93 C5.43,7.78 5.67,9.3 5.43,10.27 C5.18,11.23 4.22,12.04 4.1,13.21 C3.98,14.38 4.74,15.79 5.23,16.75 C5.71,17.72 6.1,19.26 7.15,19.98 C8.2,20.7 9.94,20.46 10.9,20.22 C11.86,19.98 12.67,18.98 13.64,18.5 C14.6,18.02 15.82,18.26 16.78,17.78 C17.75,17.3 18.23,16.18 18.58,15.22 C18.92,14.26 18.8,12.94 18.46,12 C18.12,11.06 17.58,10.25 17.46,9.28 C17.34,8.32 17.74,7.27 17.25,6.47 C16.76,5.67 15.65,5.35 14.86,4.74 C14.07,4.13 13.19,3.17 11.94,3.43 Z" />
   </svg>
 );
+
+export const KeyIcon: React.FC<IconProps> = ({ className }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z" />
+    </svg>
+);
+
+export const CpuChipIcon: React.FC<IconProps> = ({ className }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 3v1.5M4.5 8.25H3m18 0h-1.5M4.5 12H3m18 0h-1.5m-15 3.75H3m18 0h-1.5M8.25 21v-1.5M15.75 3v1.5m0 16.5v-1.5m-3.75-16.5v1.5m0 16.5v-1.5M12 5.25v13.5" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M15 6.75h3.75V12h-3.75V6.75zm-9 0H9V12H6V6.75zm9 5.25h3.75v5.25h-3.75v-5.25zm-9 0H9v5.25H6v-5.25z" />
+    </svg>
+);
+
+export const BuildingOffice2Icon: React.FC<IconProps> = ({ className }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M16 4h2a2 2 0 012 2v12a2 2 0 01-2 2h-2m-4-16h2a2 2 0 012 2v12a2 2 0 01-2 2h-2m-4-16h2a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2" />
+    </svg>
+);
+
+export const PaintBrushIcon: React.FC<IconProps> = ({ className }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12.75 21a.75.75 0 01-.75-.75v-6a.75.75 0 01.75-.75h.008a.75.75 0 01.75.75v6a.75.75 0 01-.75.75h-.008zM12.75 9a.75.75 0 01-.75-.75V3a.75.75 0 01.75-.75h.008a.75.75 0 01.75.75v5.25a.75.75 0 01-.75.75h-.008zM9 15a.75.75 0 01-.75-.75v-3a.75.75 0 01.75-.75h.008a.75.75 0 01.75.75v3a.75.75 0 01-.75.75H9zM15 15a.75.75 0 01-.75-.75v-3a.75.75 0 01.75-.75h.008a.75.75 0 01.75.75v3a.75.75 0 01-.75.75h-.008zM9 9a.75.75 0 01-.75-.75V6a.75.75 0 01.75-.75h.008a.75.75 0 01.75.75v2.25a.75.75 0 01-.75.75H9zM15 9a.75.75 0 01-.75-.75V6a.75.75 0 01.75-.75h.008a.75.75 0 01.75.75v2.25a.75.75 0 01-.75.75h-.008z" />
+    </svg>
+);
+
+export const ChartBarIcon: React.FC<IconProps> = ({ className }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
+  </svg>
+);
+
+export const LeafIcon: React.FC<IconProps> = ({ className }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" className={className} width="24" height="24" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
+   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+   <path d="M5 21c.5 -4.5 2.5 -8 7 -10"></path>
+   <path d="M9 18c6.218 0 10.5 -3.288 11 -12v-2h-4.014c-9 0 -11.986 4 -12.986 13c0 0 0 0 0 0"></path>
+  </svg>
+);
