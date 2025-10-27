@@ -45,8 +45,10 @@ const responseSchema = {
         riverDistanceKm: { type: Type.NUMBER, description: "距離河川距離 (Distance to river)." },
         nearestStation: { type: Type.STRING, description: "最近車站 (Nearest station)." },
         transportationScore: { type: Type.NUMBER, description: "交通分數 (Transportation score 1-10)." },
+        localAttractions: { type: Type.ARRAY, items: { type: Type.STRING }, description: "所在地區的3-5個特色景點 (3-5 local attractions)." },
+        localSpecialtyFoods: { type: Type.ARRAY, items: { type: Type.STRING }, description: "所在地區的3-5個特色美食 (3-5 local specialty foods)." },
       },
-      required: ["terrain", "avgElevationM", "coastDistanceKm", "riverDistanceKm", "nearestStation", "transportationScore"],
+      required: ["terrain", "avgElevationM", "coastDistanceKm", "riverDistanceKm", "nearestStation", "transportationScore", "localAttractions", "localSpecialtyFoods"],
     },
     potentialIndex: {
       type: Type.OBJECT,
@@ -202,7 +204,7 @@ export const fetchAnalysisData = async (schoolName: string): Promise<AnalysisDat
 
 **附加數據任務 (維持不變):**
 *   **基本資訊**: 學校名稱、地址、創校年份等。
-*   **環境分析**: 地形、交通等。
+*   **環境分析**: 地形、交通等。也請包含該校所在地區的 **3-5個特色景點** 與 **3-5個特色美食**。
 *   **校地潛力指數 (CPI)**: 評估校地本身活化潛力。
 *   **建議活化方向**: 3個具體建議。
 *   **過往案例**: 2-3個相似案例。
@@ -224,7 +226,7 @@ export const fetchAnalysisData = async (schoolName: string): Promise<AnalysisDat
 
     const jsonText = response.text.trim();
     const data = JSON.parse(jsonText);
-    
+
     // Simple validation
     if (!data.basicInfo || !data.pestAnalysis || !data.fiveForcesAnalysis || !data.internalHealthMetrics || !data.swotAnalysis || !data.schoolHealthIndex) {
         throw new Error("Invalid data structure received from API.");

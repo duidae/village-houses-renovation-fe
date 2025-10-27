@@ -16,6 +16,8 @@ export interface EnvironmentalAnalysis {
   riverDistanceKm: number;
   nearestStation: string;
   transportationScore: number;
+  localAttractions: string[];
+  localSpecialtyFoods: string[];
 }
 
 export interface PotentialIndex {

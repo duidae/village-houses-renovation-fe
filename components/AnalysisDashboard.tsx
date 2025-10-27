@@ -1,7 +1,8 @@
+
 import React, { FC, useState } from 'react';
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip, LineChart, Line, XAxis, YAxis, CartesianGrid, Legend, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
 import { AnalysisData, NewsItem, PopulationDataPoint, SchoolEnrollmentDataPoint, FiveForcesAnalysis, SchoolHealthIndex, PestAnalysis, InternalHealthMetrics, SwotAnalysis, MetricItem } from '../types';
-import { BuildingIcon, CalendarIcon, AreaIcon, MountainIcon, WaveIcon, RiverIcon, TrainIcon, LightbulbIcon, HistoryIcon, NewspaperIcon, UsersIcon, TrendingUpIcon, ShieldIcon, GlobeIcon, ClipboardListIcon, PuzzleIcon, HeartbeatIcon } from './icons';
+import { BuildingIcon, CalendarIcon, AreaIcon, MountainIcon, WaveIcon, RiverIcon, TrainIcon, LightbulbIcon, HistoryIcon, NewspaperIcon, UsersIcon, TrendingUpIcon, ShieldIcon, GlobeIcon, ClipboardListIcon, PuzzleIcon, HeartbeatIcon, MapPinIcon, SparklesIcon } from './icons';
 
 interface AnalysisDashboardProps {
   data: AnalysisData;
@@ -129,7 +130,7 @@ const FiveForcesAnalysisChart: React.FC<{ data: FiveForcesAnalysis }> = ({ data 
         { subject: '供應商議價力', score: data.bargainingPowerOfSuppliers.score, fullMark: 10 },
         { subject: '替代品威脅', score: data.threatOfSubstituteProducts.score, fullMark: 10 },
     ];
-    
+
     const forceDetails = [
       { name: '同業競爭', ...data.industryRivalry },
       { name: '新進者威脅', ...data.threatOfNewEntrants },
@@ -237,7 +238,7 @@ const SchoolHealthIndexGauge: React.FC<{ data: SchoolHealthIndex }> = ({ data })
             default: return 'text-brand-text';
         }
     }
-    
+
     const getLevelText = (l: string) => {
         switch(l) {
             case 'Excellent': return '極佳';
@@ -251,7 +252,7 @@ const SchoolHealthIndexGauge: React.FC<{ data: SchoolHealthIndex }> = ({ data })
     return (
         <div className="space-y-4">
             <div className="w-full bg-zinc-700 rounded-full h-6">
-                <div 
+                <div
                     className={`h-6 rounded-full transition-all duration-1000 ease-out ${getHealthColor(score)}`}
                     style={{ width: `${score}%` }}
                 />
@@ -277,14 +278,14 @@ const Section: React.FC<{title: string, icon: React.ReactNode, children: React.R
 
 
 export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id }) => {
-  const { 
-      basicInfo, environmentalAnalysis, potentialIndex, recommendations, pastCases, recentNews, 
-      cityPopulation, schoolEnrollment, pestAnalysis, fiveForcesAnalysis, internalHealthMetrics, swotAnalysis, schoolHealthIndex 
+  const {
+      basicInfo, environmentalAnalysis, potentialIndex, recommendations, pastCases, recentNews,
+      cityPopulation, schoolEnrollment, pestAnalysis, fiveForcesAnalysis, internalHealthMetrics, swotAnalysis, schoolHealthIndex
   } = data;
   const mapSrc = `https://maps.google.com/maps?q=${encodeURIComponent(basicInfo.address)}&t=k&z=18&output=embed&hl=zh-TW`;
 
   const [activeTab, setActiveTab] = useState<'school' | 'city'>('school');
-  
+
   const sections = [
     { condition: true, component: (
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -304,6 +305,39 @@ export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id }
                     <InfoItem icon={<TrainIcon className="w-6 h-6"/>} label="最近車站" value={environmentalAnalysis.nearestStation} />
                     <InfoItem icon={<TrainIcon className="w-6 h-6"/>} label="交通分數" value={`${environmentalAnalysis.transportationScore} / 10`} />
                 </div>
+                {(environmentalAnalysis.localAttractions?.length > 0 || environmentalAnalysis.localSpecialtyFoods?.length > 0) && (
+                    <div className="mt-6 pt-6 border-t border-zinc-800">
+                        <h4 className="text-md font-semibold text-brand-text mb-4">區域特色</h4>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {environmentalAnalysis.localAttractions?.length > 0 && (
+                                <div>
+                                    <div className="flex items-center mb-2">
+                                        <MapPinIcon className="w-5 h-5 text-sky-400 mr-2" />
+                                        <h5 className="font-semibold text-brand-subtext">特色景點</h5>
+                                    </div>
+                                    <div className="flex flex-wrap gap-2">
+                                        {environmentalAnalysis.localAttractions.map((item, index) => (
+                                            <span key={index} className="text-sm bg-sky-900/50 text-sky-300 py-1 px-3 rounded-full">{item}</span>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                            {environmentalAnalysis.localSpecialtyFoods?.length > 0 && (
+                                <div>
+                                    <div className="flex items-center mb-2">
+                                        <SparklesIcon className="w-5 h-5 text-amber-400 mr-2" />
+                                        <h5 className="font-semibold text-brand-subtext">特色美食</h5>
+                                    </div>
+                                    <div className="flex flex-wrap gap-2">
+                                        {environmentalAnalysis.localSpecialtyFoods.map((item, index) => (
+                                            <span key={index} className="text-sm bg-amber-900/50 text-amber-300 py-1 px-3 rounded-full">{item}</span>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                )}
             </Section>
         </div>
         <div className="space-y-6">
@@ -410,20 +444,20 @@ export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id }
                 <iframe title="School Location" src={mapSrc} width="100%" height="100%" style={{ border: 0 }} allowFullScreen={false} loading="lazy" referrerPolicy="no-referrer-when-downgrade"></iframe>
             </div>
         </div>
-        
+
       {sections.map((section, index) => {
           if (!section.condition) return null;
-          
+
           if (index > 0) {
             visibleSectionCounter++;
           }
-          
+
           // Inject dynamic section numbers into titles
           if (typeof section.component.props.title === 'string' && index > 0) {
             const newTitle = `${visibleSectionCounter}. ${section.component.props.title}`;
             return React.cloneElement(section.component, { key: index, title: newTitle });
           }
-          
+
           return React.cloneElement(section.component, { key: index });
       })}
     </div>
