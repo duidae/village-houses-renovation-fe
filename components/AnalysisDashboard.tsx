@@ -465,7 +465,7 @@ const ImpactAssessmentDisplay: React.FC<{ data: ImpactAssessment }> = ({ data })
         <div className="space-y-8">
             <p className="text-center text-brand-subtext text-lg max-w-3xl mx-auto leading-relaxed border-t border-b border-zinc-700 py-4"><HighlightedText text={summary} /></p>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {categories.map(cat => (
                     <div key={cat.title} className={`p-5 rounded-xl bg-zinc-900/50 border-2 ${cat.color}/30`}>
                         <div className="flex items-center space-x-3 mb-4">
@@ -491,7 +491,7 @@ const TransformationAlternativesDisplay: React.FC<{ alternatives: Transformation
             <SparklesIcon className="w-6 h-6 text-amber-400 mr-3 flex-shrink-0" />
             <h4 className="font-bold text-lg text-brand-text">{alt.title}</h4>
           </div>
-          
+
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-6">
             {/* Left Column: Descriptions */}
             <div className="space-y-4">
@@ -521,7 +521,7 @@ const TransformationAlternativesDisplay: React.FC<{ alternatives: Transformation
               </div>
             </div>
           </div>
-          
+
           <div className="mt-6 pt-4 border-t border-zinc-700/50">
             <h5 className="text-md font-semibold text-brand-text mb-3">潛在效益</h5>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -588,9 +588,9 @@ const Section: React.FC<{title: string, icon: React.ReactNode, children: React.R
 
 
 export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id }) => {
-  const { 
-      basicInfo, environmentalAnalysis, potentialIndex, recommendations, strategicRecommendations, 
-      impactAssessment, pastCases, recentNews, cityPopulation, schoolEnrollment, pestAnalysis, 
+  const {
+      basicInfo, environmentalAnalysis, potentialIndex, recommendations, strategicRecommendations,
+      impactAssessment, pastCases, recentNews, cityPopulation, schoolEnrollment, pestAnalysis,
       fiveForcesAnalysis, internalHealthMetrics, swotAnalysis, schoolHealthIndex, trendProjection,
       transformationAlternatives
   } = data;
@@ -598,10 +598,10 @@ export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id }
 
   const [activeTab, setActiveTab] = useState<'school' | 'city'>('school');
   const [activeStrategyTab, setActiveStrategyTab] = useState<'revitalization' | 'transformation'>('revitalization');
-  
+
   const hasRevitalizationData = (strategicRecommendations && strategicRecommendations.length > 0) || (impactAssessment && (impactAssessment.economic.length > 0 || impactAssessment.social.length > 0 || impactAssessment.sustainability.length > 0)) || (recommendations && recommendations.length > 0) || (pastCases && pastCases.length > 0);
   const hasTransformationData = transformationAlternatives && transformationAlternatives.length > 0;
-  
+
   const sections = [
     { condition: true, component: (
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -694,7 +694,7 @@ export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id }
     )},
      { condition: trendProjection && trendProjection.projectionData.length > 0, component: (
         <Section title="未來 5 年趨勢推估" icon={<ChartBarIcon className="w-6 h-6"/>}>
-            <TrendProjectionChart 
+            <TrendProjectionChart
                 cityPopulation={cityPopulation}
                 schoolEnrollment={schoolEnrollment}
                 trendProjection={trendProjection}
@@ -765,7 +765,7 @@ export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id }
       ),
     },
   ];
-  
+
   const visibleSections = sections.filter(s => s.condition);
   let sectionCounter = 0;
 
@@ -790,10 +790,10 @@ export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id }
                 <iframe title="School Location" src={mapSrc} width="100%" height="100%" style={{ border: 0 }} allowFullScreen={false} loading="lazy" referrerPolicy="no-referrer-when-downgrade"></iframe>
             </div>
         </div>
-        
+
       {visibleSections.map((section, index) => {
           const component = section.component;
-          
+
           // The first visible section is the block with 1, 2, 3.
           // This block doesn't have a `title` prop at its root.
           // Its internal components have hardcoded numbers.
@@ -807,7 +807,7 @@ export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id }
           const originalTitle = component.props.title;
           const titleWithoutNumber = originalTitle.replace(/^\d+\.\s*/, '');
           const newTitle = `${sectionCounter}. ${titleWithoutNumber}`;
-          
+
           return React.cloneElement(component, { key: index, title: newTitle });
       })}
     </div>

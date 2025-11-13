@@ -1,5 +1,4 @@
 
-
 import React, { useState, useCallback, useEffect } from 'react';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
@@ -68,11 +67,11 @@ const App: React.FC = () => {
       setError('請輸入學校名稱。');
       return;
     }
-    
+
     setIsLoading(true);
     setError(null);
     setAnalysisData(null);
-    
+
     // Check cache first
     const cacheKey = CACHE_PREFIX + trimmedSchoolName;
     const cachedItem = localStorage.getItem(cacheKey);
@@ -120,7 +119,7 @@ const App: React.FC = () => {
       handleSearch();
     }
   };
-  
+
   const exampleSchools = [
     "新北市石門區老梅國民小學",
     "南投縣仁愛鄉清境國民小學",
@@ -131,6 +130,7 @@ const App: React.FC = () => {
   const handleHistoryOrExampleClick = (school: string) => {
     setSchoolName(school);
     handleSearch(school);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   const handleDownloadPdf = async () => {
@@ -147,24 +147,24 @@ const App: React.FC = () => {
                 document.body.style.backgroundColor = '#09090b';
             }
         });
-        
+
         const imgData = canvas.toDataURL('image/png');
         const pdf = new jsPDF('p', 'mm', 'a4');
         const pdfWidth = pdf.internal.pageSize.getWidth();
         const pdfHeight = pdf.internal.pageSize.getHeight();
-        
+
         const canvasWidth = canvas.width;
         const canvasHeight = canvas.height;
-        
+
         const ratio = canvasWidth / pdfWidth;
         const scaledCanvasHeight = canvasHeight / ratio;
-        
+
         let heightLeft = scaledCanvasHeight;
         let position = 0;
-        
+
         pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, scaledCanvasHeight);
         heightLeft -= pdfHeight;
-        
+
         while (heightLeft > 0) {
             position = position - pdfHeight;
             pdf.addPage();
@@ -191,93 +191,86 @@ const App: React.FC = () => {
           <p className="text-lg text-brand-subtext">校園創生地理潛能分析平台</p>
         </header>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 items-start">
-            <div className="lg:col-span-3">
-                <div className="bg-zinc-900/50 p-4 sm:p-6 rounded-xl shadow-lg border border-zinc-800 backdrop-blur-sm">
-                  <div className="flex flex-col sm:flex-row gap-4">
-                    <input
-                      type="text"
-                      value={schoolName}
-                      onChange={(e) => setSchoolName(e.target.value)}
-                      onKeyPress={handleKeyPress}
-                      placeholder="請輸入學校全名..."
-                      className="flex-grow bg-zinc-800 border border-zinc-700 rounded-md py-3 px-4 text-brand-text placeholder-brand-subtext/70 focus:ring-2 focus:ring-brand-accent focus:outline-none transition"
-                      disabled={isLoading || isGeneratingPdf}
-                    />
+        <div className="bg-zinc-900/50 p-4 sm:p-6 rounded-xl shadow-lg border border-zinc-800 backdrop-blur-sm">
+          <div className="flex flex-col sm:flex-row gap-4">
+            <input
+              type="text"
+              value={schoolName}
+              onChange={(e) => setSchoolName(e.target.value)}
+              onKeyPress={handleKeyPress}
+              placeholder="請輸入學校全名..."
+              className="flex-grow bg-zinc-800 border border-zinc-700 rounded-md py-3 px-4 text-brand-text placeholder-brand-subtext/70 focus:ring-2 focus:ring-brand-accent focus:outline-none transition"
+              disabled={isLoading || isGeneratingPdf}
+            />
+            <button
+              id="search-button"
+              onClick={() => handleSearch()}
+              disabled={isLoading || isGeneratingPdf}
+              className="bg-brand-secondary hover:bg-teal-500 text-white font-bold py-3 px-6 rounded-md transition-colors duration-300 disabled:bg-zinc-700 disabled:cursor-not-allowed flex items-center justify-center"
+            >
+              {isLoading ? (
+                <>
+                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  分析中...
+                </>
+              ) : '開始分析'}
+            </button>
+          </div>
+          <div className="text-center mt-4">
+            <p className="text-sm text-brand-subtext">或試試範例：</p>
+            <div className="flex flex-wrap justify-center gap-2 mt-2">
+                {exampleSchools.map(school => (
                     <button
-                      id="search-button"
-                      onClick={() => handleSearch()}
-                      disabled={isLoading || isGeneratingPdf}
-                      className="bg-brand-secondary hover:bg-teal-500 text-white font-bold py-3 px-6 rounded-md transition-colors duration-300 disabled:bg-zinc-700 disabled:cursor-not-allowed flex items-center justify-center"
-                    >
-                      {isLoading ? (
-                        <>
-                          <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                          </svg>
-                          分析中...
-                        </>
-                      ) : '開始分析'}
+                        key={school}
+                        onClick={() => handleHistoryOrExampleClick(school)}
+                        disabled={isLoading || isGeneratingPdf}
+                        className="text-xs bg-zinc-800 hover:bg-zinc-700 text-zinc-300 py-1 px-3 rounded-full transition-colors disabled:opacity-50">
+                        {school}
                     </button>
-                  </div>
-                  <div className="text-center mt-4">
-                    <p className="text-sm text-brand-subtext">或試試範例：</p>
-                    <div className="flex flex-wrap justify-center gap-2 mt-2">
-                        {exampleSchools.map(school => (
-                            <button 
-                                key={school} 
-                                onClick={() => handleHistoryOrExampleClick(school)}
-                                disabled={isLoading || isGeneratingPdf}
-                                className="text-xs bg-zinc-800 hover:bg-zinc-700 text-zinc-300 py-1 px-3 rounded-full transition-colors disabled:opacity-50">
-                                {school}
-                            </button>
-                        ))}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mt-10">
-                  {isLoading && <LoadingSpinner />}
-                  {error && <div className="text-center text-red-400 bg-red-900/50 p-4 rounded-lg max-w-2xl mx-auto border border-red-800">{error}</div>}
-                  {analysisData && <AnalysisDashboard id="analysis-report" data={analysisData} />}
-                  {!isLoading && !error && !analysisData && (
-                    <div className="text-center text-brand-subtext max-w-2xl mx-auto mt-16">
-                        <TaiwanIcon className="w-16 h-16 text-brand-accent/50 mx-auto mb-4"/>
-                        <h2 className="text-2xl font-semibold text-brand-text mb-2">準備好探索校園新潛力了嗎？</h2>
-                        <p>輸入一所學校的名稱，ReSchool 將為您生成一份完整的地理潛力分析報告，包含校地資訊、環境評估、潛力指數與活化建議，為您的決策提供數據支持。</p>
-                    </div>
-                  )}
-                </div>
+                ))}
             </div>
+          </div>
+        </div>
 
-            <div className="lg:col-span-1 sticky top-8">
-                <div className="bg-zinc-900/50 p-4 sm:p-5 rounded-xl border border-zinc-800">
-                    <h3 className="text-lg font-semibold mb-4 text-brand-text flex items-center">
-                        <HistoryIcon className="w-5 h-5 mr-2 text-brand-accent"/>
+        <div className="mt-10">
+          {isLoading && <LoadingSpinner />}
+          {error && <div className="text-center text-red-400 bg-red-900/50 p-4 rounded-lg max-w-2xl mx-auto border border-red-800">{error}</div>}
+          {analysisData && <AnalysisDashboard id="analysis-report" data={analysisData} />}
+          {!isLoading && !error && !analysisData && (
+            <div className="text-center text-brand-subtext max-w-2xl mx-auto mt-16">
+                <TaiwanIcon className="w-16 h-16 text-brand-accent/50 mx-auto mb-4"/>
+                <h2 className="text-2xl font-semibold text-brand-text mb-2">準備好探索校園新潛力了嗎？</h2>
+                <p>輸入一所學校的名稱，ReSchool 將為您生成一份完整的地理潛力分析報告，包含校地資訊、環境評估、潛力指數與活化建議，為您的決策提供數據支持。</p>
+            </div>
+          )}
+        </div>
+
+        {searchHistory.length > 0 && (
+            <div className="mt-12">
+                <div className="bg-zinc-900/50 p-6 rounded-xl border border-zinc-800">
+                    <h3 className="text-xl font-semibold mb-4 text-brand-text flex items-center">
+                        <HistoryIcon className="w-6 h-6 mr-3 text-brand-accent"/>
                         最近搜尋紀錄
                     </h3>
-                    {searchHistory.length > 0 ? (
-                        <ul className="space-y-2 max-h-[60vh] overflow-y-auto pr-2 -mr-2">
-                        {searchHistory.map(item => (
-                            <li key={item.schoolName}>
-                            <button 
-                                onClick={() => handleHistoryOrExampleClick(item.schoolName)}
-                                disabled={isLoading || isGeneratingPdf}
-                                className="w-full text-left p-3 rounded-lg bg-zinc-800/70 hover:bg-zinc-700/90 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                                <p className="font-medium text-brand-text text-sm">{item.schoolName}</p>
-                                <p className="text-xs text-brand-subtext mt-1">分析日期：{item.date}</p>
-                            </button>
-                            </li>
-                        ))}
-                        </ul>
-                    ) : (
-                        <p className="text-brand-subtext text-sm text-center py-4">尚無搜尋紀錄。</p>
-                    )}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    {searchHistory.map(item => (
+                        <button
+                            key={item.schoolName}
+                            onClick={() => handleHistoryOrExampleClick(item.schoolName)}
+                            disabled={isLoading || isGeneratingPdf}
+                            className="w-full text-left p-4 rounded-lg bg-zinc-800/70 hover:bg-zinc-700/90 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            <p className="font-medium text-brand-text text-sm">{item.schoolName}</p>
+                            <p className="text-xs text-brand-subtext mt-1">分析日期：{item.date}</p>
+                        </button>
+                    ))}
+                    </div>
                 </div>
             </div>
-        </div>
+        )}
 
         {analysisData && !isLoading && (
             <button
