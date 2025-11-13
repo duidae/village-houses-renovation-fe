@@ -1,4 +1,5 @@
 
+
 export interface BasicInfo {
   name: string;
   address: string;
@@ -139,6 +140,16 @@ export interface ImpactAssessment {
   summary: string;
 }
 
+export interface TransformationAlternative {
+  title: string;
+  description: string;
+  alignment: string;
+  potentialImpact: ImpactMetric[];
+  implementationSteps: string[];
+  keyPartners: string[];
+  riskAnalysis: string;
+}
+
 
 export interface AnalysisData {
   basicInfo: BasicInfo;
@@ -147,6 +158,7 @@ export interface AnalysisData {
   recommendations: Recommendation[];
   strategicRecommendations: StrategicRecommendation[];
   impactAssessment: ImpactAssessment;
+  transformationAlternatives: TransformationAlternative[];
   pastCases: PastCase[];
   recentNews: RecentNews;
   cityPopulation: PopulationDataPoint[];
@@ -157,4 +169,16 @@ export interface AnalysisData {
   internalHealthMetrics: InternalHealthMetrics;
   swotAnalysis: SwotAnalysis;
   schoolHealthIndex: SchoolHealthIndex;
+}
+
+// --- Caching and History ---
+
+export interface CacheEntry {
+  data: AnalysisData;
+  timestamp: number;
+}
+
+export interface SearchHistoryItem {
+  schoolName: string;
+  date: string;
 }

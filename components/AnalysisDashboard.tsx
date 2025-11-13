@@ -1,7 +1,9 @@
+
+
 import React, { FC, useState } from 'react';
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip, LineChart, Line, XAxis, YAxis, CartesianGrid, Legend, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
-import { AnalysisData, NewsItem, PopulationDataPoint, SchoolEnrollmentDataPoint, FiveForcesAnalysis, SchoolHealthIndex, PestAnalysis, InternalHealthMetrics, SwotAnalysis, MetricItem, StrategicRecommendation, ImpactAssessment, ImpactMetric, TrendProjection } from '../types';
-import { BuildingIcon, CalendarIcon, AreaIcon, MountainIcon, WaveIcon, RiverIcon, TrainIcon, LightbulbIcon, HistoryIcon, NewspaperIcon, UsersIcon, TrendingUpIcon, ShieldIcon, GlobeIcon, ClipboardListIcon, PuzzleIcon, HeartbeatIcon, MapPinIcon, SparklesIcon, KeyIcon, CpuChipIcon, BuildingOffice2Icon, PaintBrushIcon, ChartBarIcon, LeafIcon } from './icons';
+import { AnalysisData, NewsItem, PopulationDataPoint, SchoolEnrollmentDataPoint, FiveForcesAnalysis, SchoolHealthIndex, PestAnalysis, InternalHealthMetrics, SwotAnalysis, MetricItem, StrategicRecommendation, ImpactAssessment, ImpactMetric, TrendProjection, TransformationAlternative, PastCase, Recommendation } from '../types';
+import { BuildingIcon, CalendarIcon, AreaIcon, MountainIcon, WaveIcon, RiverIcon, TrainIcon, LightbulbIcon, HistoryIcon, NewspaperIcon, UsersIcon, TrendingUpIcon, ShieldIcon, GlobeIcon, ClipboardListIcon, PuzzleIcon, HeartbeatIcon, MapPinIcon, SparklesIcon, KeyIcon, CpuChipIcon, BuildingOffice2Icon, PaintBrushIcon, ChartBarIcon, LeafIcon, ListBulletIcon, UserGroupIcon, ExclamationTriangleIcon } from './icons';
 
 // --- Keyword Highlighting Component & Definitions ---
 
@@ -194,7 +196,7 @@ const TrendProjectionChart: React.FC<{
 
                         <Line yAxisId="left" type="monotone" dataKey="population" stroke="#14b8a6" strokeWidth={2} activeDot={{ r: 6 }} name="歷史人口" connectNulls />
                         <Line yAxisId="left" type="monotone" dataKey="projectedPopulation" stroke="#14b8a6" strokeWidth={2} strokeDasharray="5 5" name="預估人口" connectNulls />
-
+                        
                         <Line yAxisId="right" type="monotone" dataKey="studentCount" stroke="#f59e0b" strokeWidth={2} activeDot={{ r: 6 }} name="歷史學生數" connectNulls />
                         <Line yAxisId="right" type="monotone" dataKey="projectedStudentCount" stroke="#f59e0b" strokeWidth={2} strokeDasharray="5 5" name="預估學生數" connectNulls />
                     </LineChart>
@@ -234,7 +236,7 @@ const FiveForcesAnalysisChart: React.FC<{ data: FiveForcesAnalysis }> = ({ data 
         { subject: '供應商議價力', score: data.bargainingPowerOfSuppliers.score, fullMark: 10 },
         { subject: '替代品威脅', score: data.threatOfSubstituteProducts.score, fullMark: 10 },
     ];
-
+    
     const forceDetails = [
       { name: '同業競爭', ...data.industryRivalry },
       { name: '新進者威脅', ...data.threatOfNewEntrants },
@@ -342,7 +344,7 @@ const SchoolHealthIndexGauge: React.FC<{ data: SchoolHealthIndex }> = ({ data })
             default: return 'text-brand-text';
         }
     }
-
+    
     const getLevelText = (l: string) => {
         switch(l) {
             case 'Excellent': return '極佳';
@@ -356,7 +358,7 @@ const SchoolHealthIndexGauge: React.FC<{ data: SchoolHealthIndex }> = ({ data })
     return (
         <div className="space-y-4">
             <div className="w-full bg-zinc-700 rounded-full h-6">
-                <div
+                <div 
                     className={`h-6 rounded-full transition-all duration-1000 ease-out ${getHealthColor(score)}`}
                     style={{ width: `${score}%` }}
                 />
@@ -444,7 +446,7 @@ const StrategicRecommendationsDisplay: React.FC<{ recommendations: StrategicReco
 
 const ImpactAssessmentDisplay: React.FC<{ data: ImpactAssessment }> = ({ data }) => {
     const { economic, social, sustainability, summary } = data;
-
+    
     const categories = [
         { title: "經濟效益", metrics: economic, icon: <TrendingUpIcon className="w-8 h-8 text-sky-400" />, color: "border-sky-500", textColor: "text-sky-400" },
         { title: "社會效益", metrics: social, icon: <UsersIcon className="w-8 h-8 text-emerald-400" />, color: "border-emerald-500", textColor: "text-emerald-400" },
@@ -480,6 +482,100 @@ const ImpactAssessmentDisplay: React.FC<{ data: ImpactAssessment }> = ({ data })
     );
 };
 
+const TransformationAlternativesDisplay: React.FC<{ alternatives: TransformationAlternative[] }> = ({ alternatives }) => {
+  return (
+    <div className="space-y-8">
+      {alternatives.map((alt, index) => (
+        <div key={index} className="bg-zinc-800/50 p-5 rounded-lg border border-zinc-700 transition-shadow hover:shadow-lg hover:border-zinc-600">
+          <div className="flex items-center mb-4">
+            <SparklesIcon className="w-6 h-6 text-amber-400 mr-3 flex-shrink-0" />
+            <h4 className="font-bold text-lg text-brand-text">{alt.title}</h4>
+          </div>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-6">
+            {/* Left Column: Descriptions */}
+            <div className="space-y-4">
+              <p className="text-brand-subtext text-sm leading-relaxed"><span className="font-semibold text-zinc-400">描述：</span><HighlightedText text={alt.description} /></p>
+              <p className="text-brand-subtext text-sm leading-relaxed"><span className="font-semibold text-zinc-400">對接分析：</span><HighlightedText text={alt.alignment} /></p>
+            </div>
+
+            {/* Right Column: Steps, Partners, Risks */}
+            <div className="space-y-4">
+              <div>
+                <h5 className="text-md font-semibold text-brand-text mb-2 flex items-center"><ListBulletIcon className="w-5 h-5 mr-2 text-sky-400"/>執行步驟</h5>
+                <ol className="list-decimal list-inside space-y-1 text-sm text-brand-subtext pl-2">
+                  {alt.implementationSteps.map((step, i) => <li key={i}><HighlightedText text={step}/></li>)}
+                </ol>
+              </div>
+               <div>
+                <h5 className="text-md font-semibold text-brand-text mb-2 flex items-center"><UserGroupIcon className="w-5 h-5 mr-2 text-emerald-400"/>關鍵合作夥伴</h5>
+                <div className="flex flex-wrap gap-2">
+                    {alt.keyPartners.map((partner, i) => (
+                        <span key={i} className="text-xs bg-emerald-900/50 text-emerald-300 py-1 px-3 rounded-full">{partner}</span>
+                    ))}
+                </div>
+              </div>
+               <div>
+                <h5 className="text-md font-semibold text-brand-text mb-2 flex items-center"><ExclamationTriangleIcon className="w-5 h-5 mr-2 text-red-400"/>風險與對策</h5>
+                 <p className="text-sm text-brand-subtext leading-relaxed"><HighlightedText text={alt.riskAnalysis}/></p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="mt-6 pt-4 border-t border-zinc-700/50">
+            <h5 className="text-md font-semibold text-brand-text mb-3">潛在效益</h5>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {alt.potentialImpact.map((impact, i) => (
+                <div key={i} className="bg-zinc-900/50 p-3 rounded-md">
+                  <p className="font-semibold text-sm text-brand-text">{impact.metric}</p>
+                  <p className="text-xl font-bold text-brand-accent my-1">{impact.value}</p>
+                  <p className="text-xs text-brand-subtext"><HighlightedText text={impact.description} /></p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+const RecommendationsDisplay: React.FC<{ recommendations: Recommendation[] }> = ({ recommendations }) => (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {recommendations.map((rec, index) => (
+            <div key={index} className="bg-teal-900/20 p-5 rounded-lg border border-teal-800/50 transform hover:scale-105 hover:border-teal-700 transition-all duration-300">
+                <div className="flex items-center mb-3">
+                    <LightbulbIcon className="w-6 h-6 text-amber-300 mr-3"/>
+                    <h4 className="font-bold text-lg text-brand-text">{rec.title}</h4>
+                </div>
+                <p className="text-brand-subtext text-sm mb-3 leading-relaxed"><HighlightedText text={rec.description} styleType="label" /></p>
+                <div className="text-xs text-brand-accent bg-teal-500/10 p-2 rounded-md leading-relaxed"><span className="font-semibold">理由：</span><HighlightedText text={rec.reason} styleType="label" /></div>
+            </div>
+        ))}
+    </div>
+);
+
+const PastCasesDisplay: React.FC<{ pastCases: PastCase[] }> = ({ pastCases }) => (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {pastCases.map((pcase, index) => (
+            <div key={index} className="bg-zinc-800/50 p-5 rounded-lg border border-zinc-700 flex flex-col space-y-3">
+                <div className="flex items-center">
+                    <HistoryIcon className="w-6 h-6 text-brand-accent mr-3 flex-shrink-0"/>
+                    <div>
+                        <h4 className="font-bold text-lg text-brand-text">{pcase.schoolName}</h4>
+                        <p className="text-xs text-brand-subtext">{pcase.location}</p>
+                    </div>
+                </div>
+                <div className="text-sm space-y-2 text-brand-subtext leading-relaxed">
+                    <p><span className="font-semibold text-zinc-400">原始條件：</span><HighlightedText text={pcase.originalCondition} styleType="label" /></p>
+                    <p><span className="font-semibold text-zinc-400">活化主題：</span><span className="font-semibold text-amber-400"><HighlightedText text={pcase.revitalizationTheme} styleType="label" /></span></p>
+                    <p><span className="font-semibold text-zinc-400">最終成果：</span><HighlightedText text={pcase.outcome} styleType="label" /></p>
+                </div>
+            </div>
+        ))}
+    </div>
+);
+
 
 const Section: React.FC<{title: string, icon: React.ReactNode, children: React.ReactNode}> = ({ title, icon, children }) => (
     <div className="bg-zinc-900 p-6 rounded-xl border border-zinc-800">
@@ -492,15 +588,20 @@ const Section: React.FC<{title: string, icon: React.ReactNode, children: React.R
 
 
 export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id }) => {
-  const {
-      basicInfo, environmentalAnalysis, potentialIndex, recommendations, strategicRecommendations,
-      impactAssessment, pastCases, recentNews, cityPopulation, schoolEnrollment, pestAnalysis,
-      fiveForcesAnalysis, internalHealthMetrics, swotAnalysis, schoolHealthIndex, trendProjection
+  const { 
+      basicInfo, environmentalAnalysis, potentialIndex, recommendations, strategicRecommendations, 
+      impactAssessment, pastCases, recentNews, cityPopulation, schoolEnrollment, pestAnalysis, 
+      fiveForcesAnalysis, internalHealthMetrics, swotAnalysis, schoolHealthIndex, trendProjection,
+      transformationAlternatives
   } = data;
   const mapSrc = `https://maps.google.com/maps?q=${encodeURIComponent(basicInfo.address)}&t=k&z=18&output=embed&hl=zh-TW`;
 
   const [activeTab, setActiveTab] = useState<'school' | 'city'>('school');
-
+  const [activeStrategyTab, setActiveStrategyTab] = useState<'revitalization' | 'transformation'>('revitalization');
+  
+  const hasRevitalizationData = (strategicRecommendations && strategicRecommendations.length > 0) || (impactAssessment && (impactAssessment.economic.length > 0 || impactAssessment.social.length > 0 || impactAssessment.sustainability.length > 0)) || (recommendations && recommendations.length > 0) || (pastCases && pastCases.length > 0);
+  const hasTransformationData = transformationAlternatives && transformationAlternatives.length > 0;
+  
   const sections = [
     { condition: true, component: (
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -593,7 +694,7 @@ export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id }
     )},
      { condition: trendProjection && trendProjection.projectionData.length > 0, component: (
         <Section title="未來 5 年趨勢推估" icon={<ChartBarIcon className="w-6 h-6"/>}>
-            <TrendProjectionChart
+            <TrendProjectionChart 
                 cityPopulation={cityPopulation}
                 schoolEnrollment={schoolEnrollment}
                 trendProjection={trendProjection}
@@ -605,56 +706,66 @@ export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id }
     { condition: true, component: <Section title="內部營運健康度指標" icon={<ClipboardListIcon className="w-6 h-6"/>}><InternalHealthDisplay data={internalHealthMetrics} /></Section> },
     { condition: true, component: <Section title="策略定位 (SWOT) 整合分析" icon={<PuzzleIcon className="w-6 h-6"/>}><SwotAnalysisDisplay data={swotAnalysis} /></Section> },
     { condition: true, component: <Section title="綜合評估健康指數" icon={<HeartbeatIcon className="w-6 h-6"/>}><SchoolHealthIndexGauge data={schoolHealthIndex} /></Section> },
-    { condition: recommendations && recommendations.length > 0, component: (
-        <Section title="初步活化方向建議" icon={<LightbulbIcon className="w-6 h-6"/>}>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {recommendations.map((rec, index) => (
-                    <div key={index} className="bg-teal-900/20 p-5 rounded-lg border border-teal-800/50 transform hover:scale-105 hover:border-teal-700 transition-all duration-300">
-                        <div className="flex items-center mb-3">
-                            <LightbulbIcon className="w-6 h-6 text-amber-300 mr-3"/>
-                            <h4 className="font-bold text-lg text-brand-text">{rec.title}</h4>
-                        </div>
-                        <p className="text-brand-subtext text-sm mb-3 leading-relaxed"><HighlightedText text={rec.description} styleType="label" /></p>
-                        <div className="text-xs text-brand-accent bg-teal-500/10 p-2 rounded-md leading-relaxed"><span className="font-semibold">理由：</span><HighlightedText text={rec.reason} styleType="label" /></div>
-                    </div>
-                ))}
-            </div>
+    { condition: hasRevitalizationData || hasTransformationData, component: (
+        <Section title="策略與轉型建議" icon={<KeyIcon className="w-6 h-6" />}>
+          <div className="flex space-x-2 border-b border-zinc-700 mb-6">
+            {hasRevitalizationData && (
+              <button
+                onClick={() => setActiveStrategyTab('revitalization')}
+                className={`px-4 py-2 text-sm font-medium rounded-t-lg transition-colors ${activeStrategyTab === 'revitalization' ? 'bg-brand-secondary text-white' : 'text-brand-subtext hover:bg-zinc-700'}`}
+              >
+                策略性活化建議
+              </button>
+            )}
+            {hasTransformationData && (
+              <button
+                onClick={() => setActiveStrategyTab('transformation')}
+                className={`px-4 py-2 text-sm font-medium rounded-t-lg transition-colors ${activeStrategyTab === 'transformation' ? 'bg-brand-secondary text-white' : 'text-brand-subtext hover:bg-zinc-700'}`}
+              >
+                多元轉型營運建議
+              </button>
+            )}
+          </div>
+          <div key={activeStrategyTab}>
+            {activeStrategyTab === 'revitalization' && hasRevitalizationData && (
+              <div className="space-y-12">
+                {strategicRecommendations && strategicRecommendations.length > 0 && (
+                  <div>
+                    <h4 className="text-lg font-semibold text-brand-text mb-4 border-l-4 border-sky-500 pl-3">策略性活化方向分析</h4>
+                    <StrategicRecommendationsDisplay recommendations={strategicRecommendations} />
+                  </div>
+                )}
+                {impactAssessment && (impactAssessment.economic.length > 0 || impactAssessment.social.length > 0 || impactAssessment.sustainability.length > 0) && (
+                  <div>
+                    <h4 className="text-lg font-semibold text-brand-text mb-4 border-l-4 border-emerald-500 pl-3">預期效益與影響力評估</h4>
+                    <ImpactAssessmentDisplay data={impactAssessment} />
+                  </div>
+                )}
+                {recommendations && recommendations.length > 0 && (
+                  <div>
+                    <h4 className="text-lg font-semibold text-brand-text mb-4 border-l-4 border-amber-500 pl-3">初步活化方向建議</h4>
+                    <RecommendationsDisplay recommendations={recommendations} />
+                  </div>
+                )}
+                {pastCases && pastCases.length > 0 && (
+                  <div>
+                    <h4 className="text-lg font-semibold text-brand-text mb-4 border-l-4 border-violet-500 pl-3">相似條件活化案例</h4>
+                    <PastCasesDisplay pastCases={pastCases} />
+                  </div>
+                )}
+              </div>
+            )}
+            {activeStrategyTab === 'transformation' && hasTransformationData && (
+              <div>
+                <TransformationAlternativesDisplay alternatives={transformationAlternatives} />
+              </div>
+            )}
+          </div>
         </Section>
-    )},
-    { condition: pastCases && pastCases.length > 0, component: (
-        <Section title="相似條件活化案例" icon={<HistoryIcon className="w-6 h-6"/>}>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {pastCases.map((pcase, index) => (
-                    <div key={index} className="bg-zinc-800/50 p-5 rounded-lg border border-zinc-700 flex flex-col space-y-3">
-                        <div className="flex items-center">
-                            <HistoryIcon className="w-6 h-6 text-brand-accent mr-3 flex-shrink-0"/>
-                            <div>
-                                <h4 className="font-bold text-lg text-brand-text">{pcase.schoolName}</h4>
-                                <p className="text-xs text-brand-subtext">{pcase.location}</p>
-                            </div>
-                        </div>
-                        <div className="text-sm space-y-2 text-brand-subtext leading-relaxed">
-                            <p><span className="font-semibold text-zinc-400">原始條件：</span><HighlightedText text={pcase.originalCondition} styleType="label" /></p>
-                            <p><span className="font-semibold text-zinc-400">活化主題：</span><span className="font-semibold text-amber-400"><HighlightedText text={pcase.revitalizationTheme} styleType="label" /></span></p>
-                            <p><span className="font-semibold text-zinc-400">最終成果：</span><HighlightedText text={pcase.outcome} styleType="label" /></p>
-                        </div>
-                    </div>
-                ))}
-            </div>
-        </Section>
-    )},
-    { condition: strategicRecommendations && strategicRecommendations.length > 0, component: (
-        <Section title="策略性活化方向分析" icon={<KeyIcon className="w-6 h-6"/>}>
-            <StrategicRecommendationsDisplay recommendations={strategicRecommendations} />
-        </Section>
-    )},
-    { condition: impactAssessment && (impactAssessment.economic.length > 0 || impactAssessment.social.length > 0 || impactAssessment.sustainability.length > 0), component: (
-        <Section title="預期效益與影響力評估" icon={<ChartBarIcon className="w-6 h-6"/>}>
-            <ImpactAssessmentDisplay data={impactAssessment} />
-        </Section>
-    )},
+      ),
+    },
   ];
-
+  
   const visibleSections = sections.filter(s => s.condition);
   let sectionCounter = 0;
 
@@ -679,10 +790,10 @@ export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id }
                 <iframe title="School Location" src={mapSrc} width="100%" height="100%" style={{ border: 0 }} allowFullScreen={false} loading="lazy" referrerPolicy="no-referrer-when-downgrade"></iframe>
             </div>
         </div>
-
+        
       {visibleSections.map((section, index) => {
           const component = section.component;
-
+          
           // The first visible section is the block with 1, 2, 3.
           // This block doesn't have a `title` prop at its root.
           // Its internal components have hardcoded numbers.
@@ -696,7 +807,7 @@ export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id }
           const originalTitle = component.props.title;
           const titleWithoutNumber = originalTitle.replace(/^\d+\.\s*/, '');
           const newTitle = `${sectionCounter}. ${titleWithoutNumber}`;
-
+          
           return React.cloneElement(component, { key: index, title: newTitle });
       })}
     </div>

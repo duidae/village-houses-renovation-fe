@@ -1,3 +1,5 @@
+
+
 import { GoogleGenAI, Type } from "@google/genai";
 import { AnalysisData } from '../types';
 
@@ -27,6 +29,20 @@ const impactMetricSchema = {
         description: { type: Type.STRING, description: "對此指標的簡要說明及其重要性 (Brief description of this metric and its importance)." },
     },
     required: ["metric", "value", "description"],
+};
+
+const transformationAlternativeSchema = {
+  type: Type.OBJECT,
+  properties: {
+    title: { type: Type.STRING, description: "轉型方向的具體標題 (Specific title for the transformation direction)." },
+    description: { type: Type.STRING, description: "對此轉型方向的詳細描述 (Detailed description of this transformation direction)." },
+    alignment: { type: Type.STRING, description: "分析此方向如何與周邊產業、社區需求或未來趨勢對接 (Analysis of how this direction aligns with surrounding industries, community needs, or future trends)." },
+    potentialImpact: { type: Type.ARRAY, items: impactMetricSchema, description: "此轉型方向的潛在效益評估 (Potential impact assessment for this transformation direction)." },
+    implementationSteps: { type: Type.ARRAY, items: { type: Type.STRING }, description: "具體的執行步驟，3-5個步驟 (Specific implementation steps, 3-5 steps)." },
+    keyPartners: { type: Type.ARRAY, items: { type: Type.STRING }, description: "建議的關鍵合作夥伴，例如地方企業、政府單位或非營利組織 (Suggested key partners, e.g., local businesses, government units, or NPOs)." },
+    riskAnalysis: { type: Type.STRING, description: "潛在的風險與應對策略分析 (Analysis of potential risks and mitigation strategies)." },
+  },
+  required: ["title", "description", "alignment", "potentialImpact", "implementationSteps", "keyPartners", "riskAnalysis"],
 };
 
 
@@ -105,6 +121,11 @@ const responseSchema = {
             summary: { type: Type.STRING, description: "對整體效益的綜合總結 (An overall summary of the total impact)." },
         },
         required: ["economic", "social", "sustainability", "summary"],
+    },
+    transformationAlternatives: {
+      type: Type.ARRAY,
+      description: "3個在「不進行大規模硬體改造」前提下的多元轉型營運建議 (3 diverse operational transformation recommendations assuming no large-scale hardware revitalization).",
+      items: transformationAlternativeSchema,
     },
     pastCases: {
       type: Type.ARRAY,
@@ -213,7 +234,7 @@ const responseSchema = {
         required: ["score", "level", "summary"]
     },
   },
-  required: ["basicInfo", "environmentalAnalysis", "potentialIndex", "recommendations", "strategicRecommendations", "impactAssessment", "pastCases", "recentNews", "cityPopulation", "schoolEnrollment", "trendProjection", "pestAnalysis", "fiveForcesAnalysis", "internalHealthMetrics", "swotAnalysis", "schoolHealthIndex"],
+  required: ["basicInfo", "environmentalAnalysis", "potentialIndex", "recommendations", "strategicRecommendations", "impactAssessment", "transformationAlternatives", "pastCases", "recentNews", "cityPopulation", "schoolEnrollment", "trendProjection", "pestAnalysis", "fiveForcesAnalysis", "internalHealthMetrics", "swotAnalysis", "schoolHealthIndex"],
 };
 
 
@@ -277,6 +298,24 @@ export const fetchAnalysisData = async (schoolName: string): Promise<AnalysisDat
 3.  **永續與環境效益 (sustainability)**: 預估的減碳量、綠化面積增加、對 ESG 目標的貢獻等。
 最後，提供一段**總結 (summary)**，說明此活化方案的整體戰略價值與對地方發展的長遠影響。
 
+**第七層：多元轉型營運建議 (校長的轉型顧問)**
+請你轉換角色，作為該校校長的**首席轉型顧問**。在「維持現有校舍，不進行大規模硬體改造」的前提下，為學校的永續經營提出 3 個具體、多元、可操作的營運轉型建議。請提供**顧問級別**的深度分析。
+
+*   **思考角度 (請多元發想)**:
+    *   **產業深化**: 針對在地企業需求（例如科學園區、工業區），成立「客製化企業大學」或「在職技術訓練中心」。
+    *   **社會創新**: 發展高齡長照結合幼兒共學的「青銀共創基地」，或成為「地方社會企業孵化器」。
+    *   **地方特色**: 結合地方農業或文化特色，打造「食農教育與觀光工坊」或「數位文史典藏中心」。
+    *   **國際連結**: 利用閒置校舍，打造「數位遊牧民族共居共作空間」或「主題式國際營隊基地」（如華語、生態）。
+
+每個建議都必須包含以下**完整的顧問方案**:
+1.  **轉型標題 (title)**: 一個清晰且吸引人的建議名稱。
+2.  **具體描述 (description)**: 詳細說明此方案的內容與執行方式。
+3.  **對接分析 (alignment)**: 精準分析此方向如何與周邊產業、社區需求、政策趨勢對接。
+4.  **潛在效益 (potentialImpact)**: 使用與「預期效益評估」相同的 \`ImpactMetric\` 格式，評估其經濟、社會等方面的潛在影響。
+5.  **具體執行步驟 (implementationSteps)**: 提供 3-5 個清晰、可操作的執行步驟，作為行動藍圖。
+6.  **關鍵合作夥伴 (keyPartners)**: 點名建議合作的具體單位類型，例如「鄰近的XX科學園區廠商」、「XX縣市政府的勞工局與社會局」、「地方XX農會」。
+7.  **風險與對策 (riskAnalysis)**: 分析此方案可能遇到的主要風險（如招生不足、資金問題、法規限制），並提出具體的應對策略。
+
 **附加數據任務 (維持不變):**
 *   **基本資訊**: 學校名稱、地址、創校年份等。
 *   **環境分析**: 地形、交通等。也請包含該校所在地區的 **3-5個特色景點** 與 **3-5個特色美食**。
@@ -306,9 +345,9 @@ export const fetchAnalysisData = async (schoolName: string): Promise<AnalysisDat
 
     const jsonText = response.text.trim();
     const data = JSON.parse(jsonText);
-
+    
     // Simple validation
-    if (!data.basicInfo || !data.pestAnalysis || !data.fiveForcesAnalysis || !data.internalHealthMetrics || !data.swotAnalysis || !data.schoolHealthIndex || !data.strategicRecommendations || !data.impactAssessment || !data.trendProjection) {
+    if (!data.basicInfo || !data.pestAnalysis || !data.fiveForcesAnalysis || !data.internalHealthMetrics || !data.swotAnalysis || !data.schoolHealthIndex || !data.strategicRecommendations || !data.impactAssessment || !data.trendProjection || !data.transformationAlternatives) {
         throw new Error("Invalid data structure received from API.");
     }
 
