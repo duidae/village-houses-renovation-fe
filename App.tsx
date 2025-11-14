@@ -6,7 +6,10 @@ import { fetchAnalysisData } from './services/geminiService';
 import type { AnalysisData, CacheEntry, SearchHistoryItem } from './types';
 import { AnalysisDashboard } from './components/AnalysisDashboard';
 import { LoadingSpinner } from './components/LoadingSpinner';
-import { TaiwanIcon, DownloadIcon, HistoryIcon } from './components/icons';
+import { DownloadIcon, HistoryIcon } from './components/icons';
+
+// Vite: resolve static asset URL so it is included in production build
+const twSvgUrl = new URL('./tw.svg', import.meta.url).href;
 
 const CACHE_PREFIX = 'reschool_cache_';
 const CACHE_DURATION_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
@@ -241,7 +244,7 @@ const App: React.FC = () => {
           {analysisData && <AnalysisDashboard id="analysis-report" data={analysisData} />}
           {!isLoading && !error && !analysisData && (
             <div className="text-center text-brand-subtext max-w-2xl mx-auto mt-16 flex flex-col items-center">
-                <img height="400" width="400" src="/tw.svg" alt="My SVG image" />
+                <img height="400" width="400" src={twSvgUrl} alt="My SVG image" />
                 <h2 className="text-2xl font-semibold text-brand-text mb-2">準備好探索校園新潛力了嗎？</h2>
                 <p>輸入一所學校的名稱，ReSchool 將為您生成一份完整的地理潛力分析報告，包含校地資訊、環境評估、潛力指數與活化建議，為您的決策提供數據支持。</p>
             </div>
