@@ -114,12 +114,6 @@ export interface SwotAnalysis {
   threats: string[];
 }
 
-export interface SchoolHealthIndex {
-  score: number;
-  level: 'Excellent' | 'Good' | 'Fair' | 'Critical';
-  summary: string;
-}
-
 export interface StrategicRecommendation {
   type: '產業升級型' | '社會需求型' | '地方再生型';
   project: string;
@@ -168,7 +162,6 @@ export interface AnalysisData {
   fiveForcesAnalysis: FiveForcesAnalysis;
   internalHealthMetrics: InternalHealthMetrics;
   swotAnalysis: SwotAnalysis;
-  schoolHealthIndex: SchoolHealthIndex;
 }
 
 // --- Caching and History ---

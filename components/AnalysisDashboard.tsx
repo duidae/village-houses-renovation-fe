@@ -2,7 +2,7 @@
 
 import React, { FC, useState } from 'react';
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip, LineChart, Line, XAxis, YAxis, CartesianGrid, Legend, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
-import { AnalysisData, NewsItem, PopulationDataPoint, SchoolEnrollmentDataPoint, FiveForcesAnalysis, SchoolHealthIndex, PestAnalysis, InternalHealthMetrics, SwotAnalysis, MetricItem, StrategicRecommendation, ImpactAssessment, ImpactMetric, TrendProjection, TransformationAlternative, PastCase, Recommendation } from '../types';
+import { AnalysisData, NewsItem, PopulationDataPoint, SchoolEnrollmentDataPoint, FiveForcesAnalysis, PestAnalysis, InternalHealthMetrics, SwotAnalysis, MetricItem, StrategicRecommendation, ImpactAssessment, ImpactMetric, TrendProjection, TransformationAlternative, PastCase, Recommendation } from '../types';
 import { BuildingIcon, CalendarIcon, AreaIcon, MountainIcon, WaveIcon, RiverIcon, TrainIcon, LightbulbIcon, HistoryIcon, NewspaperIcon, UsersIcon, TrendingUpIcon, ShieldIcon, GlobeIcon, ClipboardListIcon, PuzzleIcon, HeartbeatIcon, MapPinIcon, SparklesIcon, KeyIcon, CpuChipIcon, BuildingOffice2Icon, PaintBrushIcon, ChartBarIcon, LeafIcon, ListBulletIcon, UserGroupIcon, ExclamationTriangleIcon } from './icons';
 
 // --- Keyword Highlighting Component & Definitions ---
@@ -325,54 +325,6 @@ const SwotAnalysisDisplay: React.FC<{ data: SwotAnalysis }> = ({ data }) => {
     );
 };
 
-const SchoolHealthIndexGauge: React.FC<{ data: SchoolHealthIndex }> = ({ data }) => {
-    const { score, level, summary } = data;
-
-    const getHealthColor = (s: number) => {
-        if (s >= 75) return 'bg-teal-500';
-        if (s >= 50) return 'bg-amber-500';
-        if (s >= 25) return 'bg-orange-500';
-        return 'bg-red-500';
-    };
-
-    const getLevelTextColor = (l: string) => {
-        switch(l) {
-            case 'Excellent': return 'text-teal-400';
-            case 'Good': return 'text-amber-400';
-            case 'Fair': return 'text-orange-400';
-            case 'Critical': return 'text-red-400';
-            default: return 'text-brand-text';
-        }
-    }
-    
-    const getLevelText = (l: string) => {
-        switch(l) {
-            case 'Excellent': return '極佳';
-            case 'Good': return '良好';
-            case 'Fair': return '普通';
-            case 'Critical': return '危險';
-            default: return l;
-        }
-    }
-
-    return (
-        <div className="space-y-4">
-            <div className="w-full bg-zinc-700 rounded-full h-6">
-                <div 
-                    className={`h-6 rounded-full transition-all duration-1000 ease-out ${getHealthColor(score)}`}
-                    style={{ width: `${score}%` }}
-                />
-            </div>
-            <div className="text-center">
-                <p className="text-brand-subtext">健康度指數</p>
-                <p className="text-4xl font-bold text-brand-text my-1">{score} <span className="text-2xl">/ 100</span></p>
-                <p className={`text-xl font-semibold ${getLevelTextColor(level)}`}>{getLevelText(level)}</p>
-            </div>
-            <p className="text-brand-subtext text-center max-w-2xl mx-auto"><HighlightedText text={summary} /></p>
-        </div>
-    );
-};
-
 const StrategicRecommendationsDisplay: React.FC<{ recommendations: StrategicRecommendation[] }> = ({ recommendations }) => {
     const getCardStyle = (type: StrategicRecommendation['type']) => {
         switch (type) {
@@ -491,7 +443,7 @@ const TransformationAlternativesDisplay: React.FC<{ alternatives: Transformation
             <SparklesIcon className="w-6 h-6 text-amber-400 mr-3 flex-shrink-0" />
             <h4 className="font-bold text-lg text-brand-text">{alt.title}</h4>
           </div>
-
+          
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-6">
             {/* Left Column: Descriptions */}
             <div className="space-y-4">
@@ -521,7 +473,7 @@ const TransformationAlternativesDisplay: React.FC<{ alternatives: Transformation
               </div>
             </div>
           </div>
-
+          
           <div className="mt-6 pt-4 border-t border-zinc-700/50">
             <h5 className="text-md font-semibold text-brand-text mb-3">潛在效益</h5>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -588,20 +540,23 @@ const Section: React.FC<{title: string, icon: React.ReactNode, children: React.R
 
 
 export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id }) => {
-  const {
-      basicInfo, environmentalAnalysis, potentialIndex, recommendations, strategicRecommendations,
-      impactAssessment, pastCases, recentNews, cityPopulation, schoolEnrollment, pestAnalysis,
-      fiveForcesAnalysis, internalHealthMetrics, swotAnalysis, schoolHealthIndex, trendProjection,
+  const { 
+      basicInfo, environmentalAnalysis, potentialIndex, recommendations, strategicRecommendations, 
+      impactAssessment, pastCases, recentNews, cityPopulation, schoolEnrollment, pestAnalysis, 
+      fiveForcesAnalysis, internalHealthMetrics, swotAnalysis, trendProjection,
       transformationAlternatives
   } = data;
   const mapSrc = `https://maps.google.com/maps?q=${encodeURIComponent(basicInfo.address)}&t=k&z=18&output=embed&hl=zh-TW`;
 
   const [activeTab, setActiveTab] = useState<'school' | 'city'>('school');
-  const [activeStrategyTab, setActiveStrategyTab] = useState<'revitalization' | 'transformation'>('revitalization');
-
+  
   const hasRevitalizationData = (strategicRecommendations && strategicRecommendations.length > 0) || (impactAssessment && (impactAssessment.economic.length > 0 || impactAssessment.social.length > 0 || impactAssessment.sustainability.length > 0)) || (recommendations && recommendations.length > 0) || (pastCases && pastCases.length > 0);
   const hasTransformationData = transformationAlternatives && transformationAlternatives.length > 0;
-
+  
+  const [activeStrategyTab, setActiveStrategyTab] = useState<'revitalization' | 'transformation'>(
+    hasTransformationData ? 'transformation' : 'revitalization'
+  );
+  
   const sections = [
     { condition: true, component: (
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -694,7 +649,7 @@ export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id }
     )},
      { condition: trendProjection && trendProjection.projectionData.length > 0, component: (
         <Section title="未來 5 年趨勢推估" icon={<ChartBarIcon className="w-6 h-6"/>}>
-            <TrendProjectionChart
+            <TrendProjectionChart 
                 cityPopulation={cityPopulation}
                 schoolEnrollment={schoolEnrollment}
                 trendProjection={trendProjection}
@@ -705,18 +660,9 @@ export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id }
     { condition: true, component: <Section title="產業競爭環境 (Five Forces) 分析" icon={<ShieldIcon className="w-6 h-6"/>}><FiveForcesAnalysisChart data={fiveForcesAnalysis} /></Section> },
     { condition: true, component: <Section title="內部營運健康度指標" icon={<ClipboardListIcon className="w-6 h-6"/>}><InternalHealthDisplay data={internalHealthMetrics} /></Section> },
     { condition: true, component: <Section title="策略定位 (SWOT) 整合分析" icon={<PuzzleIcon className="w-6 h-6"/>}><SwotAnalysisDisplay data={swotAnalysis} /></Section> },
-    { condition: true, component: <Section title="綜合評估健康指數" icon={<HeartbeatIcon className="w-6 h-6"/>}><SchoolHealthIndexGauge data={schoolHealthIndex} /></Section> },
     { condition: hasRevitalizationData || hasTransformationData, component: (
         <Section title="策略與轉型建議" icon={<KeyIcon className="w-6 h-6" />}>
           <div className="flex space-x-2 border-b border-zinc-700 mb-6">
-            {hasRevitalizationData && (
-              <button
-                onClick={() => setActiveStrategyTab('revitalization')}
-                className={`px-4 py-2 text-sm font-medium rounded-t-lg transition-colors ${activeStrategyTab === 'revitalization' ? 'bg-brand-secondary text-white' : 'text-brand-subtext hover:bg-zinc-700'}`}
-              >
-                策略性活化建議
-              </button>
-            )}
             {hasTransformationData && (
               <button
                 onClick={() => setActiveStrategyTab('transformation')}
@@ -725,22 +671,18 @@ export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id }
                 多元轉型營運建議
               </button>
             )}
+            {hasRevitalizationData && (
+              <button
+                onClick={() => setActiveStrategyTab('revitalization')}
+                className={`px-4 py-2 text-sm font-medium rounded-t-lg transition-colors ${activeStrategyTab === 'revitalization' ? 'bg-brand-secondary text-white' : 'text-brand-subtext hover:bg-zinc-700'}`}
+              >
+                策略性活化建議
+              </button>
+            )}
           </div>
           <div key={activeStrategyTab}>
             {activeStrategyTab === 'revitalization' && hasRevitalizationData && (
               <div className="space-y-12">
-                {strategicRecommendations && strategicRecommendations.length > 0 && (
-                  <div>
-                    <h4 className="text-lg font-semibold text-brand-text mb-4 border-l-4 border-sky-500 pl-3">策略性活化方向分析</h4>
-                    <StrategicRecommendationsDisplay recommendations={strategicRecommendations} />
-                  </div>
-                )}
-                {impactAssessment && (impactAssessment.economic.length > 0 || impactAssessment.social.length > 0 || impactAssessment.sustainability.length > 0) && (
-                  <div>
-                    <h4 className="text-lg font-semibold text-brand-text mb-4 border-l-4 border-emerald-500 pl-3">預期效益與影響力評估</h4>
-                    <ImpactAssessmentDisplay data={impactAssessment} />
-                  </div>
-                )}
                 {recommendations && recommendations.length > 0 && (
                   <div>
                     <h4 className="text-lg font-semibold text-brand-text mb-4 border-l-4 border-amber-500 pl-3">初步活化方向建議</h4>
@@ -751,6 +693,18 @@ export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id }
                   <div>
                     <h4 className="text-lg font-semibold text-brand-text mb-4 border-l-4 border-violet-500 pl-3">相似條件活化案例</h4>
                     <PastCasesDisplay pastCases={pastCases} />
+                  </div>
+                )}
+                {strategicRecommendations && strategicRecommendations.length > 0 && (
+                  <div>
+                    <h4 className="text-lg font-semibold text-brand-text mb-4 border-l-4 border-sky-500 pl-3">策略性活化方向分析</h4>
+                    <StrategicRecommendationsDisplay recommendations={strategicRecommendations} />
+                  </div>
+                )}
+                {impactAssessment && (impactAssessment.economic.length > 0 || impactAssessment.social.length > 0 || impactAssessment.sustainability.length > 0) && (
+                  <div>
+                    <h4 className="text-lg font-semibold text-brand-text mb-4 border-l-4 border-emerald-500 pl-3">預期效益與影響力評估</h4>
+                    <ImpactAssessmentDisplay data={impactAssessment} />
                   </div>
                 )}
               </div>
@@ -765,7 +719,7 @@ export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id }
       ),
     },
   ];
-
+  
   const visibleSections = sections.filter(s => s.condition);
   let sectionCounter = 0;
 
@@ -790,10 +744,10 @@ export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id }
                 <iframe title="School Location" src={mapSrc} width="100%" height="100%" style={{ border: 0 }} allowFullScreen={false} loading="lazy" referrerPolicy="no-referrer-when-downgrade"></iframe>
             </div>
         </div>
-
+        
       {visibleSections.map((section, index) => {
           const component = section.component;
-
+          
           // The first visible section is the block with 1, 2, 3.
           // This block doesn't have a `title` prop at its root.
           // Its internal components have hardcoded numbers.
@@ -807,7 +761,7 @@ export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id }
           const originalTitle = component.props.title;
           const titleWithoutNumber = originalTitle.replace(/^\d+\.\s*/, '');
           const newTitle = `${sectionCounter}. ${titleWithoutNumber}`;
-
+          
           return React.cloneElement(component, { key: index, title: newTitle });
       })}
     </div>

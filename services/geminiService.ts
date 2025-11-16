@@ -223,18 +223,8 @@ const responseSchema = {
         },
         required: ["strengths", "weaknesses", "opportunities", "threats"],
     },
-    schoolHealthIndex: {
-        type: Type.OBJECT,
-        description: "綜合所有分析得出的學校健康度指數 (A composite School Health Index based on all analyses).",
-        properties: {
-            score: { type: Type.INTEGER, description: "健康度分數 (0-100，100為最健康) (Health score, 0-100, 100 is healthiest)." },
-            level: { type: Type.STRING, description: "健康度等級 ('Excellent', 'Good', 'Fair', 'Critical')." },
-            summary: { type: Type.STRING, description: "對此健康度等級的簡要總結 (A brief summary of this health level)." }
-        },
-        required: ["score", "level", "summary"]
-    },
   },
-  required: ["basicInfo", "environmentalAnalysis", "potentialIndex", "recommendations", "strategicRecommendations", "impactAssessment", "transformationAlternatives", "pastCases", "recentNews", "cityPopulation", "schoolEnrollment", "trendProjection", "pestAnalysis", "fiveForcesAnalysis", "internalHealthMetrics", "swotAnalysis", "schoolHealthIndex"],
+  required: ["basicInfo", "environmentalAnalysis", "potentialIndex", "recommendations", "strategicRecommendations", "impactAssessment", "transformationAlternatives", "pastCases", "recentNews", "cityPopulation", "schoolEnrollment", "trendProjection", "pestAnalysis", "fiveForcesAnalysis", "internalHealthMetrics", "swotAnalysis"],
 };
 
 
@@ -264,13 +254,7 @@ export const fetchAnalysisData = async (schoolName: string): Promise<AnalysisDat
 **第三層：SWOT 整合分析**
 基於以上內外部環境分析，總結出學校的 **優勢 (Strengths)**, **劣勢 (Weaknesses)**, **機會 (Opportunities)**, **威脅 (Threats)**。
 
-**第四層：量化健康指數**
-1.  **綜合評估健康指數 (School Health Index)**:
-    *   綜合所有資訊，評估出一個 0-100 的「學校健康度指數」。
-    *   提供一個健康度等級（'Excellent', 'Good', 'Fair', 'Critical'）。
-    *   提供一段總結說明。
-
-**第五層：策略性活化方向分析 (此為重點)**
+**第四層：策略性活化方向分析 (此為重點)**
 請基於以下「雙主軸」邏輯，進行深入的策略建議。校地活化必須同時考慮「議題導向 × 區域需求 × 政策目標」。
 *   **地方產業導向**: 振興在地經濟、文化、觀光。
 *   **議題導向（政策導向）**: 回應社會或國家發展議題。
@@ -291,14 +275,14 @@ export const fetchAnalysisData = async (schoolName: string): Promise<AnalysisDat
 
 每個建議都必須包含：**類型 (type)**、**專案名稱 (project)**、**理由 (reason)** (需結合校地、地方與政策)、以及**可對接的政策 (policyAlignment)**。
 
-**第六層：預期效益與影響力評估 (此為關鍵決策依據)**
+**第五層：預期效益與影響力評估 (此為關鍵決策依據)**
 基於你提出的「策略性活化方向分析」，請量化並質化評估這些方案**整合起來**的預期效益與影響力。這份評估是給政府決策者看的，需清晰呈現可達成的「政績」。請提供三大面向的評估，每個面向提供 2-3 個最關鍵的指標：
 1.  **經濟效益 (economic)**: 預估可創造的就業機會、帶動的年產值或觀光收入、吸引的投資金額等。
 2.  **社會效益 (social)**: 預估可服務的人次（如長照床位、社宅單元、培訓學員數）、提升的社區滿意度、保存的文化資產價值等。
 3.  **永續與環境效益 (sustainability)**: 預估的減碳量、綠化面積增加、對 ESG 目標的貢獻等。
 最後，提供一段**總結 (summary)**，說明此活化方案的整體戰略價值與對地方發展的長遠影響。
 
-**第七層：多元轉型營運建議 (校長的轉型顧問)**
+**第六層：多元轉型營運建議 (校長的轉型顧問)**
 請你轉換角色，作為該校校長的**首席轉型顧問**。在「維持現有校舍，不進行大規模硬體改造」的前提下，為學校的永續經營提出 3 個具體、多元、可操作的營運轉型建議。請提供**顧問級別**的深度分析。
 
 *   **思考角度 (請多元發想)**:
@@ -347,7 +331,7 @@ export const fetchAnalysisData = async (schoolName: string): Promise<AnalysisDat
     const data = JSON.parse(jsonText);
     
     // Simple validation
-    if (!data.basicInfo || !data.pestAnalysis || !data.fiveForcesAnalysis || !data.internalHealthMetrics || !data.swotAnalysis || !data.schoolHealthIndex || !data.strategicRecommendations || !data.impactAssessment || !data.trendProjection || !data.transformationAlternatives) {
+    if (!data.basicInfo || !data.pestAnalysis || !data.fiveForcesAnalysis || !data.internalHealthMetrics || !data.swotAnalysis || !data.strategicRecommendations || !data.impactAssessment || !data.trendProjection || !data.transformationAlternatives) {
         throw new Error("Invalid data structure received from API.");
     }
 
