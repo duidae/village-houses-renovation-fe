@@ -189,9 +189,9 @@ const App: React.FC = () => {
       <main className="container mx-auto px-4 py-8 md:py-12">
         <header className="text-center mb-8">
           <h1 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-zinc-100 to-zinc-400 mb-2">
-            ReSchool 校地創生正循環
+            ReVillage
           </h1>
-          <p className="text-lg text-brand-subtext">校園創生地理潛能分析平台</p>
+          <p className="text-lg text-brand-subtext">農村個別宅院整建潛能分析平台</p>
         </header>
 
         <div className="bg-zinc-900/50 p-4 sm:p-6 rounded-xl shadow-lg border border-zinc-800 backdrop-blur-sm">
