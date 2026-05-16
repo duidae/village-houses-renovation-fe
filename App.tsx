@@ -2,7 +2,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
-import { fetchAnalysisData } from './services/geminiService';
+//import { fetchAnalysisData } from './services/geminiService';
 import type { AnalysisData, CacheEntry, SearchHistoryItem } from './types';
 import { AnalysisDashboard } from './components/AnalysisDashboard';
 import { LoadingSpinner } from './components/LoadingSpinner';
@@ -100,6 +100,7 @@ const App: React.FC = () => {
     }
 
     // If not in cache or expired, fetch from API
+    /*
     try {
       const data = await fetchAnalysisData(trimmedSchoolName);
       setAnalysisData(data);
@@ -115,6 +116,7 @@ const App: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
+    */
   }, [schoolName, loadSearchHistory]);
 
   const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -124,10 +126,10 @@ const App: React.FC = () => {
   };
 
   const exampleSchools = [
-    "新北市石門區老梅國民小學",
-    "南投縣仁愛鄉清境國民小學",
-    "台北市大安區龍安國民小學",
-    "臺東縣蘭嶼鄉蘭嶼高級中學",
+    "嘉義好宅1",
+    "嘉義好宅2",
+    "嘉義好宅3",
+    "嘉義好宅4",
   ];
 
   const handleHistoryOrExampleClick = (school: string) => {
@@ -201,7 +203,7 @@ const App: React.FC = () => {
               value={schoolName}
               onChange={(e) => setSchoolName(e.target.value)}
               onKeyPress={handleKeyPress}
-              placeholder="請輸入學校全名..."
+              placeholder="請輸入農村好宅..."
               className="flex-grow bg-zinc-800 border border-zinc-700 rounded-md py-3 px-4 text-brand-text placeholder-brand-subtext/70 focus:ring-2 focus:ring-brand-accent focus:outline-none transition"
               disabled={isLoading || isGeneratingPdf}
             />
@@ -242,7 +244,7 @@ const App: React.FC = () => {
           {isLoading && <LoadingSpinner />}
           {error && <div className="text-center text-red-400 bg-red-900/50 p-4 rounded-lg max-w-2xl mx-auto border border-red-800">{error}</div>}
           {analysisData && <AnalysisDashboard id="analysis-report" data={analysisData} />}
-          {!isLoading && !error && !analysisData && (
+          {false && !isLoading && !error && !analysisData && (
             <div className="text-center text-brand-subtext max-w-2xl mx-auto mt-16 flex flex-col items-center">
                 <img height="400" width="400" src={twSvgUrl} alt="My SVG image" />
                 <h2 className="text-2xl font-semibold text-brand-text mb-2">準備好探索校園新潛力了嗎？</h2>
