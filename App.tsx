@@ -7,6 +7,7 @@ import type { AnalysisData, CacheEntry, SearchHistoryItem } from './types';
 import { AnalysisDashboard } from './components/AnalysisDashboard';
 import { LoadingSpinner } from './components/LoadingSpinner';
 import { DownloadIcon, HistoryIcon } from './components/icons';
+import MapBlock from './components/MapBlock';
 
 // Vite: resolve static asset URL so it is included in production build
 const twSvgUrl = new URL('./tw.svg', import.meta.url).href;
@@ -252,6 +253,8 @@ const App: React.FC = () => {
             </div>
           )}
         </div>
+
+        <MapBlock />
 
         {searchHistory.length > 0 && (
             <div className="mt-12">
