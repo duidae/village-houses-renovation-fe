@@ -8,6 +8,7 @@ import { AnalysisDashboard } from './components/AnalysisDashboard';
 import { LoadingSpinner } from './components/LoadingSpinner';
 import { DownloadIcon, HistoryIcon } from './components/icons';
 import MapBlock from './components/MapBlock';
+import FiveForces from './components/FiveForces';
 
 // Vite: resolve static asset URL so it is included in production build
 const twSvgUrl = new URL('./tw.svg', import.meta.url).href;
@@ -255,6 +256,8 @@ const App: React.FC = () => {
         </div>
 
         <MapBlock />
+
+        <FiveForces />
 
         {searchHistory.length > 0 && (
             <div className="mt-12">
