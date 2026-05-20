@@ -12,6 +12,9 @@ import {
   YAxis,
   Tooltip,
   Cell,
+  RadialBarChart,
+  RadialBar,
+  Legend,
 } from 'recharts';
 
 interface Force {
@@ -102,6 +105,13 @@ const FiveForces: React.FC = () => {
   // Bar chart uses full names so labels are clearer
   const barData = radarData.map((d) => ({ name: d.fullName, value: d.value }));
 
+  // Composite score: simple average of force scores (0-100)
+  const compositeScore = Math.round(barData.reduce((acc, cur) => acc + (cur.value || 0), 0) / Math.max(1, barData.length));
+  const radialData = [
+    { name: 'score', value: compositeScore, fill: '#14b8a6' },
+    { name: 'remaining', value: Math.max(0, 100 - compositeScore), fill: '#1f2937' },
+  ];
+
   const getImpactColor = (impact: string) => {
     switch (impact) {
       case 'high':
@@ -179,24 +189,44 @@ const FiveForces: React.FC = () => {
                 />
               </RadarChart>
             </ResponsiveContainer>
-            {/* Score bar chart (compact) */}
+            {/* Composite score + Score bar chart */}
             <div className="mt-6">
-              <p className="text-center text-xs font-bold text-brand-accent uppercase mb-2">每項力量得分</p>
-              <div className="w-full h-48">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart layout="vertical" data={barData} margin={{ top: 6, right: 12, left: 12, bottom: 6 }}>
-                    <XAxis type="number" domain={[0, 100]} hide />
-                    <YAxis type="category" dataKey="name" width={120} tick={{ fontSize: 12, fill: '#a1a1aa' }} />
-                    <Tooltip formatter={(value: number) => `${value}%`} />
-                    <Bar dataKey="value" barSize={12} isAnimationActive={true}>
-                      {barData.map((entry, idx) => {
-                        const impact = forces[idx].impact;
-                        const color = impact === 'high' ? '#ef4444' : impact === 'medium' ? '#f59e0b' : '#10b981';
-                        return <Cell key={`cell-${idx}`} fill={color} />;
-                      })}
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
+              <div className="flex flex-col md:flex-row items-center justify-center gap-6">
+                {/* Composite score visual */}
+                <div className="flex items-center gap-4">
+                  <div className="w-28 h-28">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <RadialBarChart innerRadius="80%" outerRadius="100%" data={radialData} startAngle={90} endAngle={-270}>
+                        <RadialBar minAngle={15} background clockWise dataKey="value" cornerRadius={8} />
+                      </RadialBarChart>
+                    </ResponsiveContainer>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-3xl font-extrabold text-brand-text">{compositeScore}%</div>
+                    <div className="text-xs text-brand-subtext">整體風險/影響評分</div>
+                  </div>
+                </div>
+
+                {/* Bar chart */}
+                <div className="w-full max-w-2xl">
+                  <p className="text-center text-xs font-bold text-brand-accent uppercase mb-2">每項力量得分</p>
+                  <div className="w-full h-48">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart layout="vertical" data={barData} margin={{ top: 6, right: 12, left: 12, bottom: 6 }}>
+                        <XAxis type="number" domain={[0, 100]} hide />
+                        <YAxis type="category" dataKey="name" width={120} tick={{ fontSize: 12, fill: '#a1a1aa' }} />
+                        <Tooltip formatter={(value: number) => `${value}%`} />
+                        <Bar dataKey="value" barSize={12} isAnimationActive={true}>
+                          {barData.map((entry, idx) => {
+                            const impact = forces[idx].impact;
+                            const color = impact === 'high' ? '#ef4444' : impact === 'medium' ? '#f59e0b' : '#10b981';
+                            return <Cell key={`cell-${idx}`} fill={color} />;
+                          })}
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
               </div>
             </div>
             <p className="text-center text-sm text-brand-subtext mt-4">
