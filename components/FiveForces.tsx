@@ -6,6 +6,12 @@ import {
   PolarRadiusAxis,
   Radar,
   ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  Cell,
 } from 'recharts';
 
 interface Force {
@@ -80,12 +86,21 @@ const FiveForces: React.FC = () => {
     },
   ];
 
-  // Convert forces to radar chart data
-  const radarData = forces.map((force) => ({
-    name: force.title.substring(0, 8), // Shorten for display
-    value: force.impact === 'high' ? 85 : force.impact === 'medium' ? 60 : 35,
-    fullName: force.title,
-  }));
+  // Compute numeric score per force and convert to chart data
+  const radarData = forces.map((force) => {
+    const base = force.impact === 'high' ? 85 : force.impact === 'medium' ? 60 : 35;
+    // Slightly adjust score based on number of listed factors (more factors -> slightly higher score)
+    const factorBonus = Math.min(10, Math.max(0, (force.factors.length - 3) * 3));
+    const value = Math.min(100, Math.max(0, Math.round(base + factorBonus)));
+    return {
+      name: force.title.substring(0, 8), // Shorten for display
+      value,
+      fullName: force.title,
+    };
+  });
+
+  // Bar chart uses full names so labels are clearer
+  const barData = radarData.map((d) => ({ name: d.fullName, value: d.value }));
 
   const getImpactColor = (impact: string) => {
     switch (impact) {
@@ -164,6 +179,26 @@ const FiveForces: React.FC = () => {
                 />
               </RadarChart>
             </ResponsiveContainer>
+            {/* Score bar chart (compact) */}
+            <div className="mt-6">
+              <p className="text-center text-xs font-bold text-brand-accent uppercase mb-2">每項力量得分</p>
+              <div className="w-full h-48">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart layout="vertical" data={barData} margin={{ top: 6, right: 12, left: 12, bottom: 6 }}>
+                    <XAxis type="number" domain={[0, 100]} hide />
+                    <YAxis type="category" dataKey="name" width={120} tick={{ fontSize: 12, fill: '#a1a1aa' }} />
+                    <Tooltip formatter={(value: number) => `${value}%`} />
+                    <Bar dataKey="value" barSize={12} isAnimationActive={true}>
+                      {barData.map((entry, idx) => {
+                        const impact = forces[idx].impact;
+                        const color = impact === 'high' ? '#ef4444' : impact === 'medium' ? '#f59e0b' : '#10b981';
+                        return <Cell key={`cell-${idx}`} fill={color} />;
+                      })}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
             <p className="text-center text-sm text-brand-subtext mt-4">
               五邊形面積越大，表示該力量對市場的影響力越強
             </p>
@@ -176,6 +211,7 @@ const FiveForces: React.FC = () => {
         {forces.map((force, index) => {
           const badgeStyle = getImpactBadge(force.impact);
           const borderStyle = getImpactColor(force.impact);
+          const score = radarData[index]?.value ?? (force.impact === 'high' ? 85 : force.impact === 'medium' ? 60 : 35);
 
           return (
             <div
@@ -185,11 +221,14 @@ const FiveForces: React.FC = () => {
               {/* Icon and Title */}
               <div className="flex items-start justify-between mb-3">
                 <span className="text-3xl">{force.icon}</span>
-                <span
-                  className={`text-xs font-bold text-white px-2 py-1 rounded ${badgeStyle.color}`}
-                >
-                  {badgeStyle.text}
-                </span>
+                <div className="flex flex-col items-end gap-2">
+                  <span className={`text-xs font-bold text-white px-2 py-1 rounded ${badgeStyle.color}`}>
+                    {badgeStyle.text}
+                  </span>
+                  <span className="text-xs font-mono text-brand-accent bg-zinc-800/60 px-2 py-0.5 rounded">
+                    {score}%
+                  </span>
+                </div>
               </div>
 
               <h3 className="font-bold text-brand-text text-sm mb-2">
