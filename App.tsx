@@ -155,7 +155,7 @@ const App: React.FC = () => {
             useCORS: true,
             backgroundColor: '#09090b',
             onclone: (document) => {
-                document.body.style.backgroundColor = '#09090b';
+                document.body.style.backgroundColor = '#ffffff';
             }
         });
 
@@ -251,22 +251,22 @@ const App: React.FC = () => {
 
         <div className="mt-10">
           {isLoading && <LoadingSpinner />}
-          {error && <div className="text-center text-red-400 bg-red-900/50 p-4 rounded-lg max-w-2xl mx-auto border border-red-800">{error}</div>}
+          {error && <div className="text-center text-red-700 bg-red-100 p-4 rounded-lg max-w-2xl mx-auto border border-red-200">{error}</div>}
           {analysisData && <AnalysisDashboard id="analysis-report" data={analysisData} />}
           {!analysisData && !isLoading && !error && (
             <section className="mt-10 grid gap-8">
-              <div className="relative overflow-hidden rounded-3xl border border-zinc-800 bg-zinc-900/70 p-6 shadow-2xl">
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(56,189,248,0.16),_transparent_20%),radial-gradient(circle_at_bottom_right,_rgba(16,185,129,0.14),_transparent_24%)] pointer-events-none" />
+              <div className="relative overflow-hidden rounded-3xl border border-slate-200 bg-slate-50 p-6 shadow-2xl">
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(56,189,248,0.08),_transparent_20%),radial-gradient(circle_at_bottom_right,_rgba(16,185,129,0.07),_transparent_24%)] pointer-events-none" />
                 <div className="relative">
                   <div className="flex flex-col lg:flex-row items-start justify-between gap-6">
                     <div className="max-w-2xl">
                       <p className="text-sm uppercase tracking-[0.32em] text-brand-accent/80 mb-3">農村好宅整建活化平台</p>
-                      <h2 className="text-4xl md:text-5xl font-extrabold text-white leading-tight">農村好##</h2>
-                      <p className="mt-4 text-zinc-300 max-w-2xl">輸入地點或宅院名稱，並以區位、建築條件與再利用方向篩選，快速找到最具價值的活化標的。</p>
+                      <h2 className="text-4xl md:text-5xl font-extrabold text-slate-900 leading-tight">農村好##</h2>
+                      <p className="mt-4 text-slate-600 max-w-2xl">輸入地點或宅院名稱，並以區位、建築條件與再利用方向篩選，快速找到最具價值的活化標的。</p>
                     </div>
                     <div className="w-full lg:w-[420px]">
-                      <div className="rounded-3xl border border-zinc-800 bg-zinc-950/90 p-5 shadow-inner">
-                        <label className="block text-sm font-medium text-brand-subtext mb-3">搜尋農村好宅</label>
+                      <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-inner">
+                        <label className="block text-sm font-medium text-slate-700 mb-3">搜尋農村好宅</label>
                         <div className="flex gap-3">
                           <input
                             type="text"
@@ -274,7 +274,7 @@ const App: React.FC = () => {
                             onChange={(e) => setSchoolName(e.target.value)}
                             onKeyPress={handleKeyPress}
                             placeholder="輸入縣市、村里或宅院名稱"
-                            className="flex-1 rounded-2xl border border-zinc-800 bg-zinc-900 px-4 py-3 text-brand-text placeholder-brand-subtext/70 focus:outline-none focus:ring-2 focus:ring-brand-accent"
+                            className="flex-1 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-accent"
                           />
                           <button
                             onClick={() => handleSearch()}
@@ -284,20 +284,20 @@ const App: React.FC = () => {
                             搜尋
                           </button>
                         </div>
-                        <div className="mt-4 text-xs text-zinc-400">可輸入範例：嘉義好宅1、嘉義好宅2。</div>
+                        <div className="mt-4 text-xs text-slate-500">可輸入範例：嘉義好宅1、嘉義好宅2。</div>
                       </div>
                     </div>
                   </div>
 
                   <div className="mt-8 grid gap-4 lg:grid-cols-4">
-                    <div className="rounded-3xl border border-zinc-800 bg-zinc-950/90 p-5">
-                      <h3 className="text-sm font-semibold text-brand-text uppercase tracking-[0.15em] mb-4">整建潛力</h3>
+                    <div className="rounded-3xl border border-slate-200 bg-white p-5">
+                      <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-[0.15em] mb-4">整建潛力</h3>
                       <div className="space-y-2">
                         {['高', '中', '低'].map((option) => (
                           <button
                             key={option}
                             onClick={() => setSelectedPotential(option as '高' | '中' | '低')}
-                            className={`w-full rounded-2xl border px-3 py-2 text-left text-sm transition ${selectedPotential === option ? 'border-brand-accent bg-brand-accent/10 text-white' : 'border-zinc-800 text-zinc-300 hover:border-zinc-600'}`}
+                            className={`w-full rounded-2xl border px-3 py-2 text-left text-sm transition ${selectedPotential === option ? 'border-brand-accent bg-brand-accent/10 text-slate-900' : 'border-slate-200 text-slate-700 hover:border-slate-300'}`}
                           >
                             {option}
                           </button>
@@ -305,14 +305,14 @@ const App: React.FC = () => {
                       </div>
                     </div>
 
-                    <div className="rounded-3xl border border-zinc-800 bg-zinc-950/90 p-5">
-                      <h3 className="text-sm font-semibold text-brand-text uppercase tracking-[0.15em] mb-4">區位與生活機能</h3>
+                    <div className="rounded-3xl border border-slate-200 bg-white p-5">
+                      <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-[0.15em] mb-4">區位與生活機能</h3>
                       <div className="space-y-2">
                         {['主幹道上', '周邊有公共設施'].map((option) => (
                           <button
                             key={option}
                             onClick={() => setSelectedLocation(option as '主幹道上' | '周邊有公共設施')}
-                            className={`w-full rounded-2xl border px-3 py-2 text-left text-sm transition ${selectedLocation === option ? 'border-brand-accent bg-brand-accent/10 text-white' : 'border-zinc-800 text-zinc-300 hover:border-zinc-600'}`}
+                            className={`w-full rounded-2xl border px-3 py-2 text-left text-sm transition ${selectedLocation === option ? 'border-brand-accent bg-brand-accent/10 text-slate-900' : 'border-slate-200 text-slate-700 hover:border-slate-300'}`}
                           >
                             {option}
                           </button>
@@ -320,14 +320,14 @@ const App: React.FC = () => {
                       </div>
                     </div>
 
-                    <div className="rounded-3xl border border-zinc-800 bg-zinc-950/90 p-5">
-                      <h3 className="text-sm font-semibold text-brand-text uppercase tracking-[0.15em] mb-4">建築條件</h3>
+                    <div className="rounded-3xl border border-slate-200 bg-white p-5">
+                      <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-[0.15em] mb-4">建築條件</h3>
                       <div className="space-y-2">
                         {['一條龍', '單伸手', '三合院', '水泥連棟式', '具歷史價值'].map((option) => (
                           <button
                             key={option}
                             onClick={() => setSelectedBuilding(option as '一條龍' | '單伸手' | '三合院' | '水泥連棟式' | '具歷史價值')}
-                            className={`w-full rounded-2xl border px-3 py-2 text-left text-sm transition ${selectedBuilding === option ? 'border-brand-accent bg-brand-accent/10 text-white' : 'border-zinc-800 text-zinc-300 hover:border-zinc-600'}`}
+                            className={`w-full rounded-2xl border px-3 py-2 text-left text-sm transition ${selectedBuilding === option ? 'border-brand-accent bg-brand-accent/10 text-slate-900' : 'border-slate-200 text-slate-700 hover:border-slate-300'}`}
                           >
                             {option}
                           </button>
@@ -335,14 +335,14 @@ const App: React.FC = () => {
                       </div>
                     </div>
 
-                    <div className="rounded-3xl border border-zinc-800 bg-zinc-950/90 p-5">
-                      <h3 className="text-sm font-semibold text-brand-text uppercase tracking-[0.15em] mb-4">再利用類型方向</h3>
+                    <div className="rounded-3xl border border-slate-200 bg-white p-5">
+                      <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-[0.15em] mb-4">再利用類型方向</h3>
                       <div className="space-y-2">
                         {['綠色照顧據點', '戶外開放空間', '地方文化展示館', '農村體驗空間', '青年創業基地'].map((option) => (
                           <button
                             key={option}
                             onClick={() => setSelectedReuse(option as '綠色照顧據點' | '戶外開放空間' | '地方文化展示館' | '農村體驗空間' | '青年創業基地')}
-                            className={`w-full rounded-2xl border px-3 py-2 text-left text-sm transition ${selectedReuse === option ? 'border-brand-accent bg-brand-accent/10 text-white' : 'border-zinc-800 text-zinc-300 hover:border-zinc-600'}`}
+                            className={`w-full rounded-2xl border px-3 py-2 text-left text-sm transition ${selectedReuse === option ? 'border-brand-accent bg-brand-accent/10 text-slate-900' : 'border-slate-200 text-slate-700 hover:border-slate-300'}`}
                           >
                             {option}
                           </button>
@@ -403,8 +403,8 @@ const App: React.FC = () => {
 
         {searchHistory.length > 0 && (
             <div className="mt-12">
-                <div className="bg-zinc-900/50 p-6 rounded-xl border border-zinc-800">
-                    <h3 className="text-xl font-semibold mb-4 text-brand-text flex items-center">
+                <div className="bg-slate-100 p-6 rounded-xl border border-slate-200">
+                    <h3 className="text-xl font-semibold mb-4 text-slate-900 flex items-center">
                         <HistoryIcon className="w-6 h-6 mr-3 text-brand-accent"/>
                         最近搜尋紀錄
                     </h3>
@@ -414,10 +414,10 @@ const App: React.FC = () => {
                             key={item.schoolName}
                             onClick={() => handleHistoryOrExampleClick(item.schoolName)}
                             disabled={isLoading || isGeneratingPdf}
-                            className="w-full text-left p-4 rounded-lg bg-zinc-800/70 hover:bg-zinc-700/90 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="w-full text-left p-4 rounded-lg bg-slate-100 hover:bg-slate-200 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            <p className="font-medium text-brand-text text-sm">{item.schoolName}</p>
-                            <p className="text-xs text-brand-subtext mt-1">分析日期：{item.date}</p>
+                            <p className="font-medium text-slate-900 text-sm">{item.schoolName}</p>
+                            <p className="text-xs text-slate-500 mt-1">分析日期：{item.date}</p>
                         </button>
                     ))}
                     </div>
