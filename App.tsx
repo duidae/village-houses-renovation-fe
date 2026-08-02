@@ -2,16 +2,25 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
-//import { fetchAnalysisData } from './services/geminiService';
 import type { AnalysisData, CacheEntry, SearchHistoryItem } from './types';
 import { AnalysisDashboard } from './components/AnalysisDashboard';
 import { LoadingSpinner } from './components/LoadingSpinner';
-import { DownloadIcon, HistoryIcon } from './components/icons';
 import MapBlock from './components/MapBlock';
 import FiveForces from './components/FiveForces';
-
-// Vite: resolve static asset URL so it is included in production build
-const twSvgUrl = new URL('./tw.svg', import.meta.url).href;
+import Box from '@mui/material/Box';
+import Container from '@mui/material/Container';
+import Typography from '@mui/material/Typography';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
+import Alert from '@mui/material/Alert';
+import Grid from '@mui/material/Grid';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import Stack from '@mui/material/Stack';
 
 const CACHE_PREFIX = 'reschool_cache_';
 const CACHE_DURATION_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
@@ -43,24 +52,23 @@ const App: React.FC = () => {
                 date: new Date(entry.timestamp).toLocaleDateString(),
               });
             } else {
-              // Clean up expired cache item
               localStorage.removeItem(key);
             }
           }
         } catch (e) {
-          console.error("Error parsing cache item:", e);
-          if(key) localStorage.removeItem(key); // Remove corrupted item
+          console.error('Error parsing cache item:', e);
+          if (key) localStorage.removeItem(key);
         }
       }
     }
-    // Sort by most recent
+
     history.sort((a, b) => {
-        const aEntryItem = localStorage.getItem(CACHE_PREFIX + a.schoolName);
-        const bEntryItem = localStorage.getItem(CACHE_PREFIX + b.schoolName);
-        if (!aEntryItem || !bEntryItem) return 0;
-        const aEntry = JSON.parse(aEntryItem);
-        const bEntry = JSON.parse(bEntryItem);
-        return (bEntry.timestamp || 0) - (aEntry.timestamp || 0);
+      const aEntryItem = localStorage.getItem(CACHE_PREFIX + a.schoolName);
+      const bEntryItem = localStorage.getItem(CACHE_PREFIX + b.schoolName);
+      if (!aEntryItem || !bEntryItem) return 0;
+      const aEntry = JSON.parse(aEntryItem);
+      const bEntry = JSON.parse(bEntryItem);
+      return (bEntry.timestamp || 0) - (aEntry.timestamp || 0);
     });
 
     setSearchHistory(history);
@@ -81,42 +89,37 @@ const App: React.FC = () => {
     setError(null);
     setAnalysisData(null);
 
-    // Check cache first
     const cacheKey = CACHE_PREFIX + trimmedSchoolName;
     const cachedItem = localStorage.getItem(cacheKey);
+
     if (cachedItem) {
       try {
         const entry: CacheEntry = JSON.parse(cachedItem);
         if (Date.now() - entry.timestamp < CACHE_DURATION_MS) {
-          console.log(`Loading "${trimmedSchoolName}" from cache.`);
           setAnalysisData(entry.data);
           setIsLoading(false);
-          // Update timestamp to make it the most recent
           entry.timestamp = Date.now();
           localStorage.setItem(cacheKey, JSON.stringify(entry));
-          loadSearchHistory(); // Refresh history order
+          loadSearchHistory();
           return;
-        } else {
-            localStorage.removeItem(cacheKey); // Expired
         }
-      } catch(e) {
-          console.error("Error parsing cache, fetching fresh data:", e);
-          localStorage.removeItem(cacheKey); // Corrupted
+        localStorage.removeItem(cacheKey);
+      } catch (e) {
+        console.error('Error parsing cache, fetching fresh data:', e);
+        localStorage.removeItem(cacheKey);
       }
     }
 
-    // If not in cache or expired, fetch from API
     /*
     try {
       const data = await fetchAnalysisData(trimmedSchoolName);
       setAnalysisData(data);
-      // Save to cache
       const newCacheEntry: CacheEntry = {
-        data: data,
+        data,
         timestamp: Date.now(),
       };
       localStorage.setItem(cacheKey, JSON.stringify(newCacheEntry));
-      loadSearchHistory(); // Update history list
+      loadSearchHistory();
     } catch (err: any) {
       setError(err.message || '發生未知錯誤。');
     } finally {
@@ -131,175 +134,217 @@ const App: React.FC = () => {
     }
   };
 
-  const exampleSchools = [
-    "嘉義好宅1",
-    "嘉義好宅2",
-    "嘉義好宅3",
-    "嘉義好宅4",
-  ];
+  const exampleSchools = ['嘉義好宅1', '嘉義好宅2', '嘉義好宅3', '嘉義好宅4'];
 
   const handleHistoryOrExampleClick = (school: string) => {
     setSchoolName(school);
     handleSearch(school);
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
+  };
 
   const handleDownloadPdf = async () => {
     const reportElement = document.getElementById('analysis-report');
     if (!reportElement || !analysisData) return;
 
     setIsGeneratingPdf(true);
+
     try {
-        const canvas = await html2canvas(reportElement, {
-            scale: 2,
-            useCORS: true,
-            backgroundColor: '#09090b',
-            onclone: (document) => {
-                document.body.style.backgroundColor = '#ffffff';
-            }
-        });
+      const canvas = await html2canvas(reportElement, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: '#09090b',
+        onclone: (document) => {
+          document.body.style.backgroundColor = '#ffffff';
+        },
+      });
 
-        const imgData = canvas.toDataURL('image/png');
-        const pdf = new jsPDF('p', 'mm', 'a4');
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = pdf.internal.pageSize.getHeight();
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      const canvasWidth = canvas.width;
+      const canvasHeight = canvas.height;
+      const ratio = canvasWidth / pdfWidth;
+      const scaledCanvasHeight = canvasHeight / ratio;
 
-        const canvasWidth = canvas.width;
-        const canvasHeight = canvas.height;
+      let heightLeft = scaledCanvasHeight;
+      let position = 0;
 
-        const ratio = canvasWidth / pdfWidth;
-        const scaledCanvasHeight = canvasHeight / ratio;
+      pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, scaledCanvasHeight);
+      heightLeft -= pdfHeight;
 
-        let heightLeft = scaledCanvasHeight;
-        let position = 0;
-
+      while (heightLeft > 0) {
+        position = position - pdfHeight;
+        pdf.addPage();
         pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, scaledCanvasHeight);
         heightLeft -= pdfHeight;
+      }
 
-        while (heightLeft > 0) {
-            position = position - pdfHeight;
-            pdf.addPage();
-            pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, scaledCanvasHeight);
-            heightLeft -= pdfHeight;
-        }
-
-        pdf.save(`ReSchool 分析報告 - ${analysisData.basicInfo.name}.pdf`);
+      pdf.save(`ReSchool 分析報告 - ${analysisData.basicInfo.name}.pdf`);
     } catch (err) {
-        console.error("Error generating PDF:", err);
-        setError("無法生成 PDF 報告，請稍後再試。");
+      console.error('Error generating PDF:', err);
+      setError('無法生成 PDF 報告，請稍後再試。');
     } finally {
-        setIsGeneratingPdf(false);
+      setIsGeneratingPdf(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-white text-brand-text font-sans">
-      <main className="container mx-auto px-4 py-8 md:py-12">
-        <div className="mt-10">
-          {isLoading && <LoadingSpinner />}
-          {error && <div className="text-center text-red-700 bg-red-100 p-4 rounded-lg max-w-2xl mx-auto border border-red-200">{error}</div>}
-          {analysisData && <AnalysisDashboard id="analysis-report" data={analysisData} />}
-          {!analysisData && !isLoading && !error && (
-            <section className="mt-10 grid gap-8">
-              <div className="relative overflow-hidden rounded-3xl border border-slate-200 bg-slate-50 p-6 shadow-2xl">
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(56,189,248,0.08),_transparent_20%),radial-gradient(circle_at_bottom_right,_rgba(16,185,129,0.07),_transparent_24%)] pointer-events-none" />
-                <div className="relative">
-                  <div className="flex flex-col lg:flex-row items-start justify-between gap-6">
-                    <div className="max-w-2xl">
-                      <p className="text-sm uppercase tracking-[0.32em] text-brand-accent/80 mb-3">農村好宅整建活化平台</p>
-                      <h2 className="text-4xl md:text-5xl font-extrabold text-slate-900 leading-tight">農村好##</h2>
-                      <p className="mt-4 text-slate-600 max-w-2xl">輸入地點或宅院名稱，並以區位、建築條件與再利用方向篩選，快速找到最具價值的活化標的。</p>
-                    </div>
-                    <div className="w-full lg:w-[420px]">
-                      <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-inner">
-                        <label className="block text-sm font-medium text-slate-700 mb-3">搜尋農村好宅</label>
-                        <div className="flex gap-3">
-                          <input
-                            type="text"
-                            value={schoolName}
-                            onChange={(e) => setSchoolName(e.target.value)}
-                            onKeyPress={handleKeyPress}
-                            placeholder="輸入縣市、村里或宅院名稱"
-                            className="flex-1 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-accent"
-                          />
-                          <button
-                            onClick={() => handleSearch()}
-                            disabled={isLoading || isGeneratingPdf}
-                            className="rounded-2xl bg-brand-secondary px-5 py-3 text-white font-semibold transition hover:bg-teal-500 disabled:opacity-60"
-                          >
-                            搜尋
-                          </button>
-                        </div>
-                        <div className="mt-4 text-xs text-slate-500">可輸入範例：嘉義好宅1、嘉義好宅2。</div>
-                      </div>
-                    </div>
-                  </div>
+    <Box sx={{ minHeight: '100vh', bgcolor: 'background.default', color: 'text.primary', py: 2 }}>
+      <Container maxWidth="lg">
+        {isLoading && <LoadingSpinner />}
 
-                  <div className="mt-8 grid gap-4 lg:grid-cols-4">
-                    <div className="rounded-3xl border border-slate-200 bg-white p-5">
-                      <label className="block text-sm font-semibold text-slate-900 uppercase tracking-[0.15em] mb-4">整建潛力</label>
-                      <select
-                        value={selectedPotential}
-                        onChange={(e) => setSelectedPotential(e.target.value as '高' | '中' | '低')}
-                        className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-accent"
-                      >
-                        <option value="高">高</option>
-                        <option value="中">中</option>
-                        <option value="低">低</option>
-                      </select>
-                    </div>
+        {error && (
+          <Alert severity="error" sx={{ mb: 4 }}>
+            {error}
+          </Alert>
+        )}
 
-                    <div className="rounded-3xl border border-slate-200 bg-white p-5">
-                      <label className="block text-sm font-semibold text-slate-900 uppercase tracking-[0.15em] mb-4">區位與生活機能</label>
-                      <select
-                        value={selectedLocation}
-                        onChange={(e) => setSelectedLocation(e.target.value as '主幹道上' | '周邊有公共設施')}
-                        className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-accent"
-                      >
-                        <option value="主幹道上">主幹道上</option>
-                        <option value="周邊有公共設施">周邊有公共設施</option>
-                      </select>
-                    </div>
+        {analysisData ? (
+          <AnalysisDashboard id="analysis-report" data={analysisData} />
+        ) : (
+          <Card sx={{ position: 'relative', overflow: 'hidden', bgcolor: 'background.paper', boxShadow: 5, borderRadius: 4, p: 3, mb: 4 }}>
+            <Box
+              sx={{
+                position: 'absolute',
+                inset: 0,
+                bgcolor: 'transparent',
+                backgroundImage:
+                  'radial-gradient(circle at top left, rgba(56,189,248,0.08), transparent 20%), radial-gradient(circle at bottom right, rgba(16,185,129,0.07), transparent 24%)',
+                pointerEvents: 'none',
+              }}
+            />
 
-                    <div className="rounded-3xl border border-slate-200 bg-white p-5">
-                      <label className="block text-sm font-semibold text-slate-900 uppercase tracking-[0.15em] mb-4">建築條件</label>
-                      <select
-                        value={selectedBuilding}
-                        onChange={(e) => setSelectedBuilding(e.target.value as '一條龍' | '單伸手' | '三合院' | '水泥連棟式' | '具歷史價值')}
-                        className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-accent"
-                      >
-                        <option value="一條龍">一條龍</option>
-                        <option value="單伸手">單伸手</option>
-                        <option value="三合院">三合院</option>
-                        <option value="水泥連棟式">水泥連棟式</option>
-                        <option value="具歷史價值">具歷史價值</option>
-                      </select>
-                    </div>
+            <CardContent sx={{ position: 'relative' }}>
+              <Grid container spacing={4} alignItems="flex-start">
+                <Grid item xs={12} md={7}>
+                  <Typography variant="overline" component="p" sx={{ letterSpacing: 2, mb: 2, color: 'primary.main' }}>
+                    農村好宅整建活化平台
+                  </Typography>
+                  <Typography variant="h3" component="h1" sx={{ fontWeight: 800, mb: 2 }}>
+                    農村好##
+                  </Typography>
+                  <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 650 }}>
+                    輸入地點或宅院名稱，並以區位、建築條件與再利用方向篩選，快速找到最具價值的活化標的。
+                  </Typography>
+                </Grid>
 
-                    <div className="rounded-3xl border border-slate-200 bg-white p-5">
-                      <label className="block text-sm font-semibold text-slate-900 uppercase tracking-[0.15em] mb-4">再利用類型方向</label>
-                      <select
-                        value={selectedReuse}
-                        onChange={(e) => setSelectedReuse(e.target.value as '綠色照顧據點' | '戶外開放空間' | '地方文化展示館' | '農村體驗空間' | '青年創業基地')}
-                        className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-accent"
-                      >
-                        <option value="綠色照顧據點">綠色照顧據點</option>
-                        <option value="戶外開放空間">戶外開放空間</option>
-                        <option value="地方文化展示館">地方文化展示館</option>
-                        <option value="農村體驗空間">農村體驗空間</option>
-                        <option value="青年創業基地">青年創業基地</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </section>
-          )}
-        </div>
+                <Grid item xs={12} md={5}>
+                  <Card sx={{ bgcolor: 'grey.50', boxShadow: 'none', borderRadius: 3 }}>
+                    <CardContent>
+                      <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 2 }}>
+                        搜尋農村好宅
+                      </Typography>
+                      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+                        <TextField
+                          fullWidth
+                          value={schoolName}
+                          onChange={(e) => setSchoolName(e.target.value)}
+                          onKeyDown={handleKeyPress}
+                          placeholder="輸入縣市、村里或宅院名稱"
+                          variant="outlined"
+                        />
+                        <Button
+                          variant="contained"
+                          size="large"
+                          onClick={() => handleSearch()}
+                          disabled={isLoading || isGeneratingPdf}
+                        >
+                          搜尋
+                        </Button>
+                      </Stack>
+                      <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 2 }}>
+                        可輸入範例：嘉義好宅1、嘉義好宅2。
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              </Grid>
+
+              <Grid container spacing={3} sx={{ mt: 3 }}>
+                <Grid item xs={12} sm={6} md={3}>
+                  <FormControl fullWidth sx={{ bgcolor: 'background.paper', borderRadius: 3 }}>
+                    <InputLabel>整建潛力</InputLabel>
+                    <Select
+                      value={selectedPotential}
+                      label="整建潛力"
+                      onChange={(e) => setSelectedPotential(e.target.value as '高' | '中' | '低')}
+                    >
+                      <MenuItem value="高">高</MenuItem>
+                      <MenuItem value="中">中</MenuItem>
+                      <MenuItem value="低">低</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Grid>
+
+                <Grid item xs={12} sm={6} md={3}>
+                  <FormControl fullWidth sx={{ bgcolor: 'background.paper', borderRadius: 3 }}>
+                    <InputLabel>區位與生活機能</InputLabel>
+                    <Select
+                      value={selectedLocation}
+                      label="區位與生活機能"
+                      onChange={(e) => setSelectedLocation(e.target.value as '主幹道上' | '周邊有公共設施')}
+                    >
+                      <MenuItem value="主幹道上">主幹道上</MenuItem>
+                      <MenuItem value="周邊有公共設施">周邊有公共設施</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Grid>
+
+                <Grid item xs={12} sm={6} md={3}>
+                  <FormControl fullWidth sx={{ bgcolor: 'background.paper', borderRadius: 3 }}>
+                    <InputLabel>建築條件</InputLabel>
+                    <Select
+                      value={selectedBuilding}
+                      label="建築條件"
+                      onChange={(e) =>
+                        setSelectedBuilding(
+                          e.target.value as '一條龍' | '單伸手' | '三合院' | '水泥連棟式' | '具歷史價值'
+                        )
+                      }
+                    >
+                      <MenuItem value="一條龍">一條龍</MenuItem>
+                      <MenuItem value="單伸手">單伸手</MenuItem>
+                      <MenuItem value="三合院">三合院</MenuItem>
+                      <MenuItem value="水泥連棟式">水泥連棟式</MenuItem>
+                      <MenuItem value="具歷史價值">具歷史價值</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Grid>
+
+                <Grid item xs={12} sm={6} md={3}>
+                  <FormControl fullWidth sx={{ bgcolor: 'background.paper', borderRadius: 3 }}>
+                    <InputLabel>再利用類型方向</InputLabel>
+                    <Select
+                      value={selectedReuse}
+                      label="再利用類型方向"
+                      onChange={(e) =>
+                        setSelectedReuse(
+                          e.target.value as
+                            | '綠色照顧據點'
+                            | '戶外開放空間'
+                            | '地方文化展示館'
+                            | '農村體驗空間'
+                            | '青年創業基地'
+                        )
+                      }
+                    >
+                      <MenuItem value="綠色照顧據點">綠色照顧據點</MenuItem>
+                      <MenuItem value="戶外開放空間">戶外開放空間</MenuItem>
+                      <MenuItem value="地方文化展示館">地方文化展示館</MenuItem>
+                      <MenuItem value="農村體驗空間">農村體驗空間</MenuItem>
+                      <MenuItem value="青年創業基地">青年創業基地</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Grid>
+              </Grid>
+            </CardContent>
+          </Card>
+        )}
 
         <MapBlock />
-      </main>
-    </div>
+      </Container>
+    </Box>
   );
 };
 
