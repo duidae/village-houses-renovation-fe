@@ -195,60 +195,6 @@ const App: React.FC = () => {
   return (
     <div className="min-h-screen bg-white text-brand-text font-sans">
       <main className="container mx-auto px-4 py-8 md:py-12">
-        {/*
-        <header className="text-center mb-8">
-          <h1 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-zinc-100 to-zinc-400 mb-2">
-            ReVillage
-          </h1>
-          <p className="text-lg text-brand-subtext">農村個別宅院整建潛能分析平台</p>
-        </header>
-
-        
-        <div className="bg-zinc-900/50 p-4 sm:p-6 rounded-xl shadow-lg border border-zinc-800 backdrop-blur-sm">
-          <div className="flex flex-col sm:flex-row gap-4">
-            <input
-              type="text"
-              value={schoolName}
-              onChange={(e) => setSchoolName(e.target.value)}
-              onKeyPress={handleKeyPress}
-              placeholder="請輸入農村好宅..."
-              className="flex-grow bg-zinc-800 border border-zinc-700 rounded-md py-3 px-4 text-brand-text placeholder-brand-subtext/70 focus:ring-2 focus:ring-brand-accent focus:outline-none transition"
-              disabled={isLoading || isGeneratingPdf}
-            />
-            <button
-              id="search-button"
-              onClick={() => handleSearch()}
-              disabled={isLoading || isGeneratingPdf}
-              className="bg-brand-secondary hover:bg-teal-500 text-white font-bold py-3 px-6 rounded-md transition-colors duration-300 disabled:bg-zinc-700 disabled:cursor-not-allowed flex items-center justify-center"
-            >
-              {isLoading ? (
-                <>
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  分析中...
-                </>
-              ) : '開始分析'}
-            </button>
-          </div>
-          <div className="text-center mt-4">
-            <p className="text-sm text-brand-subtext">或試試範例：</p>
-            <div className="flex flex-wrap justify-center gap-2 mt-2">
-                {exampleSchools.map(school => (
-                    <button
-                        key={school}
-                        onClick={() => handleHistoryOrExampleClick(school)}
-                        disabled={isLoading || isGeneratingPdf}
-                        className="text-xs bg-zinc-800 hover:bg-zinc-700 text-zinc-300 py-1 px-3 rounded-full transition-colors disabled:opacity-50">
-                        {school}
-                    </button>
-                ))}
-            </div>
-          </div>
-        </div>
-        */}
-
         <div className="mt-10">
           {isLoading && <LoadingSpinner />}
           {error && <div className="text-center text-red-700 bg-red-100 p-4 rounded-lg max-w-2xl mx-auto border border-red-200">{error}</div>}
@@ -347,47 +293,6 @@ const App: React.FC = () => {
                   </div>
                 </div>
               </div>
-
-{/*
-              <div className="grid gap-4 lg:grid-cols-[1.5fr_1fr]">
-                <div className="rounded-3xl border border-zinc-800 bg-zinc-950/90 p-5">
-                  <div className="flex items-center justify-between mb-4">
-                    <div>
-                      <p className="text-sm text-brand-subtext uppercase tracking-[0.2em]">地圖預覽</p>
-                      <h3 className="text-xl font-semibold text-brand-text">農村好宅分布</h3>
-                    </div>
-                    <span className="rounded-full bg-brand-accent/10 text-brand-accent px-3 py-1 text-xs font-semibold">即時搜尋</span>
-                  </div>
-                  <div className="relative overflow-hidden rounded-3xl bg-zinc-900 h-[320px] border border-zinc-800">
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(56,189,248,0.18),_transparent_20%),radial-gradient(circle_at_bottom_right,_rgba(16,185,129,0.16),_transparent_24%)]" />
-                    <div className="absolute inset-0 p-5 flex flex-wrap items-end gap-3">
-                      {['高', '中', '低', '高', '中'].map((item, index) => (
-                        <span key={index} className={`rounded-full px-3 py-1 text-xs font-semibold ${item === '高' ? 'bg-emerald-500/20 text-emerald-200' : item === '中' ? 'bg-amber-500/20 text-amber-200' : 'bg-zinc-700/60 text-zinc-100'}`}>{item}</span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="rounded-3xl border border-zinc-800 bg-zinc-950/90 p-5">
-                  <p className="text-sm font-semibold text-brand-text uppercase tracking-[0.2em] mb-3">使用說明</p>
-                  <ul className="space-y-3 text-sm text-zinc-300">
-                    <li>1. 輸入縣市、村里或宅院名稱進行搜尋。</li>
-                    <li>2. 選擇整建潛力、區位條件與建築類型。</li>
-                    <li>3. 指定再利用方向，找到最適合的活化建議。</li>
-                    <li>4. 檢視分析結果、下載報告並保存歷史紀錄。</li>
-                  </ul>
-                  <div className="mt-6 rounded-3xl bg-zinc-900/90 p-4 border border-zinc-800">
-                    <p className="text-sm font-semibold text-brand-text mb-2">目前選擇</p>
-                    <div className="space-y-2 text-sm text-zinc-300">
-                      <p>整建潛力：<span className="text-brand-text">{selectedPotential}</span></p>
-                      <p>區位機能：<span className="text-brand-text">{selectedLocation}</span></p>
-                      <p>建築條件：<span className="text-brand-text">{selectedBuilding}</span></p>
-                      <p>再利用方向：<span className="text-brand-text">{selectedReuse}</span></p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              */}
             </section>
           )}
         </div>
