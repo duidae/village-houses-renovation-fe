@@ -393,56 +393,6 @@ const App: React.FC = () => {
         </div>
 
         <MapBlock />
-
-        <FiveForces />
-
-        {searchHistory.length > 0 && (
-            <div className="mt-12">
-                <div className="bg-slate-100 p-6 rounded-xl border border-slate-200">
-                    <h3 className="text-xl font-semibold mb-4 text-slate-900 flex items-center">
-                        <HistoryIcon className="w-6 h-6 mr-3 text-brand-accent"/>
-                        最近搜尋紀錄
-                    </h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    {searchHistory.map(item => (
-                        <button
-                            key={item.schoolName}
-                            onClick={() => handleHistoryOrExampleClick(item.schoolName)}
-                            disabled={isLoading || isGeneratingPdf}
-                            className="w-full text-left p-4 rounded-lg bg-slate-100 hover:bg-slate-200 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            <p className="font-medium text-slate-900 text-sm">{item.schoolName}</p>
-                            <p className="text-xs text-slate-500 mt-1">分析日期：{item.date}</p>
-                        </button>
-                    ))}
-                    </div>
-                </div>
-            </div>
-        )}
-
-        {analysisData && !isLoading && (
-            <button
-                onClick={handleDownloadPdf}
-                disabled={isGeneratingPdf}
-                className="fixed bottom-6 right-6 z-50 bg-brand-accent hover:bg-teal-300 text-brand-dark font-bold py-3 px-5 rounded-full shadow-lg transform transition-all hover:scale-110 duration-300 disabled:bg-zinc-600 disabled:cursor-wait disabled:scale-100 flex items-center"
-                aria-label="下載分析報告"
-            >
-                {isGeneratingPdf ? (
-                    <>
-                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        產生中...
-                    </>
-                ) : (
-                    <>
-                        <DownloadIcon className="w-5 h-5 mr-2" />
-                        下載分析報告
-                    </>
-                )}
-            </button>
-        )}
       </main>
     </div>
   );
