@@ -23,6 +23,10 @@ const App: React.FC = () => {
   const [isGeneratingPdf, setIsGeneratingPdf] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [searchHistory, setSearchHistory] = useState<SearchHistoryItem[]>([]);
+  const [selectedPotential, setSelectedPotential] = useState<'高' | '中' | '低'>('中');
+  const [selectedLocation, setSelectedLocation] = useState<'主幹道上' | '周邊有公共設施'>('主幹道上');
+  const [selectedBuilding, setSelectedBuilding] = useState<'一條龍' | '單伸手' | '三合院' | '水泥連棟式' | '具歷史價值'>('一條龍');
+  const [selectedReuse, setSelectedReuse] = useState<'綠色照顧據點' | '戶外開放空間' | '地方文化展示館' | '農村體驗空間' | '青年創業基地'>('綠色照顧據點');
 
   const loadSearchHistory = useCallback(() => {
     const history: SearchHistoryItem[] = [];
@@ -189,8 +193,9 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-brand-text font-sans">
+    <div className="min-h-screen bg-white text-brand-text font-sans">
       <main className="container mx-auto px-4 py-8 md:py-12">
+        {/*
         <header className="text-center mb-8">
           <h1 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-zinc-100 to-zinc-400 mb-2">
             ReVillage
@@ -198,6 +203,7 @@ const App: React.FC = () => {
           <p className="text-lg text-brand-subtext">農村個別宅院整建潛能分析平台</p>
         </header>
 
+        
         <div className="bg-zinc-900/50 p-4 sm:p-6 rounded-xl shadow-lg border border-zinc-800 backdrop-blur-sm">
           <div className="flex flex-col sm:flex-row gap-4">
             <input
@@ -241,17 +247,153 @@ const App: React.FC = () => {
             </div>
           </div>
         </div>
+        */}
 
         <div className="mt-10">
           {isLoading && <LoadingSpinner />}
           {error && <div className="text-center text-red-400 bg-red-900/50 p-4 rounded-lg max-w-2xl mx-auto border border-red-800">{error}</div>}
           {analysisData && <AnalysisDashboard id="analysis-report" data={analysisData} />}
-          {false && !isLoading && !error && !analysisData && (
-            <div className="text-center text-brand-subtext max-w-2xl mx-auto mt-16 flex flex-col items-center">
-                <img height="400" width="400" src={twSvgUrl} alt="My SVG image" />
-                <h2 className="text-2xl font-semibold text-brand-text mb-2">準備好探索校園新潛力了嗎？</h2>
-                <p>輸入一所學校的名稱，ReSchool 將為您生成一份完整的地理潛力分析報告，包含校地資訊、環境評估、潛力指數與活化建議，為您的決策提供數據支持。</p>
-            </div>
+          {!analysisData && !isLoading && !error && (
+            <section className="mt-10 grid gap-8">
+              <div className="relative overflow-hidden rounded-3xl border border-zinc-800 bg-zinc-900/70 p-6 shadow-2xl">
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(56,189,248,0.16),_transparent_20%),radial-gradient(circle_at_bottom_right,_rgba(16,185,129,0.14),_transparent_24%)] pointer-events-none" />
+                <div className="relative">
+                  <div className="flex flex-col lg:flex-row items-start justify-between gap-6">
+                    <div className="max-w-2xl">
+                      <p className="text-sm uppercase tracking-[0.32em] text-brand-accent/80 mb-3">農村好宅整建活化平台</p>
+                      <h2 className="text-4xl md:text-5xl font-extrabold text-white leading-tight">農村好##</h2>
+                      <p className="mt-4 text-zinc-300 max-w-2xl">輸入地點或宅院名稱，並以區位、建築條件與再利用方向篩選，快速找到最具價值的活化標的。</p>
+                    </div>
+                    <div className="w-full lg:w-[420px]">
+                      <div className="rounded-3xl border border-zinc-800 bg-zinc-950/90 p-5 shadow-inner">
+                        <label className="block text-sm font-medium text-brand-subtext mb-3">搜尋農村好宅</label>
+                        <div className="flex gap-3">
+                          <input
+                            type="text"
+                            value={schoolName}
+                            onChange={(e) => setSchoolName(e.target.value)}
+                            onKeyPress={handleKeyPress}
+                            placeholder="輸入縣市、村里或宅院名稱"
+                            className="flex-1 rounded-2xl border border-zinc-800 bg-zinc-900 px-4 py-3 text-brand-text placeholder-brand-subtext/70 focus:outline-none focus:ring-2 focus:ring-brand-accent"
+                          />
+                          <button
+                            onClick={() => handleSearch()}
+                            disabled={isLoading || isGeneratingPdf}
+                            className="rounded-2xl bg-brand-secondary px-5 py-3 text-white font-semibold transition hover:bg-teal-500 disabled:opacity-60"
+                          >
+                            搜尋
+                          </button>
+                        </div>
+                        <div className="mt-4 text-xs text-zinc-400">可輸入範例：嘉義好宅1、嘉義好宅2。</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-8 grid gap-4 lg:grid-cols-4">
+                    <div className="rounded-3xl border border-zinc-800 bg-zinc-950/90 p-5">
+                      <h3 className="text-sm font-semibold text-brand-text uppercase tracking-[0.15em] mb-4">整建潛力</h3>
+                      <div className="space-y-2">
+                        {['高', '中', '低'].map((option) => (
+                          <button
+                            key={option}
+                            onClick={() => setSelectedPotential(option as '高' | '中' | '低')}
+                            className={`w-full rounded-2xl border px-3 py-2 text-left text-sm transition ${selectedPotential === option ? 'border-brand-accent bg-brand-accent/10 text-white' : 'border-zinc-800 text-zinc-300 hover:border-zinc-600'}`}
+                          >
+                            {option}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="rounded-3xl border border-zinc-800 bg-zinc-950/90 p-5">
+                      <h3 className="text-sm font-semibold text-brand-text uppercase tracking-[0.15em] mb-4">區位與生活機能</h3>
+                      <div className="space-y-2">
+                        {['主幹道上', '周邊有公共設施'].map((option) => (
+                          <button
+                            key={option}
+                            onClick={() => setSelectedLocation(option as '主幹道上' | '周邊有公共設施')}
+                            className={`w-full rounded-2xl border px-3 py-2 text-left text-sm transition ${selectedLocation === option ? 'border-brand-accent bg-brand-accent/10 text-white' : 'border-zinc-800 text-zinc-300 hover:border-zinc-600'}`}
+                          >
+                            {option}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="rounded-3xl border border-zinc-800 bg-zinc-950/90 p-5">
+                      <h3 className="text-sm font-semibold text-brand-text uppercase tracking-[0.15em] mb-4">建築條件</h3>
+                      <div className="space-y-2">
+                        {['一條龍', '單伸手', '三合院', '水泥連棟式', '具歷史價值'].map((option) => (
+                          <button
+                            key={option}
+                            onClick={() => setSelectedBuilding(option as '一條龍' | '單伸手' | '三合院' | '水泥連棟式' | '具歷史價值')}
+                            className={`w-full rounded-2xl border px-3 py-2 text-left text-sm transition ${selectedBuilding === option ? 'border-brand-accent bg-brand-accent/10 text-white' : 'border-zinc-800 text-zinc-300 hover:border-zinc-600'}`}
+                          >
+                            {option}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="rounded-3xl border border-zinc-800 bg-zinc-950/90 p-5">
+                      <h3 className="text-sm font-semibold text-brand-text uppercase tracking-[0.15em] mb-4">再利用類型方向</h3>
+                      <div className="space-y-2">
+                        {['綠色照顧據點', '戶外開放空間', '地方文化展示館', '農村體驗空間', '青年創業基地'].map((option) => (
+                          <button
+                            key={option}
+                            onClick={() => setSelectedReuse(option as '綠色照顧據點' | '戶外開放空間' | '地方文化展示館' | '農村體驗空間' | '青年創業基地')}
+                            className={`w-full rounded-2xl border px-3 py-2 text-left text-sm transition ${selectedReuse === option ? 'border-brand-accent bg-brand-accent/10 text-white' : 'border-zinc-800 text-zinc-300 hover:border-zinc-600'}`}
+                          >
+                            {option}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+{/*
+              <div className="grid gap-4 lg:grid-cols-[1.5fr_1fr]">
+                <div className="rounded-3xl border border-zinc-800 bg-zinc-950/90 p-5">
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <p className="text-sm text-brand-subtext uppercase tracking-[0.2em]">地圖預覽</p>
+                      <h3 className="text-xl font-semibold text-brand-text">農村好宅分布</h3>
+                    </div>
+                    <span className="rounded-full bg-brand-accent/10 text-brand-accent px-3 py-1 text-xs font-semibold">即時搜尋</span>
+                  </div>
+                  <div className="relative overflow-hidden rounded-3xl bg-zinc-900 h-[320px] border border-zinc-800">
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(56,189,248,0.18),_transparent_20%),radial-gradient(circle_at_bottom_right,_rgba(16,185,129,0.16),_transparent_24%)]" />
+                    <div className="absolute inset-0 p-5 flex flex-wrap items-end gap-3">
+                      {['高', '中', '低', '高', '中'].map((item, index) => (
+                        <span key={index} className={`rounded-full px-3 py-1 text-xs font-semibold ${item === '高' ? 'bg-emerald-500/20 text-emerald-200' : item === '中' ? 'bg-amber-500/20 text-amber-200' : 'bg-zinc-700/60 text-zinc-100'}`}>{item}</span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="rounded-3xl border border-zinc-800 bg-zinc-950/90 p-5">
+                  <p className="text-sm font-semibold text-brand-text uppercase tracking-[0.2em] mb-3">使用說明</p>
+                  <ul className="space-y-3 text-sm text-zinc-300">
+                    <li>1. 輸入縣市、村里或宅院名稱進行搜尋。</li>
+                    <li>2. 選擇整建潛力、區位條件與建築類型。</li>
+                    <li>3. 指定再利用方向，找到最適合的活化建議。</li>
+                    <li>4. 檢視分析結果、下載報告並保存歷史紀錄。</li>
+                  </ul>
+                  <div className="mt-6 rounded-3xl bg-zinc-900/90 p-4 border border-zinc-800">
+                    <p className="text-sm font-semibold text-brand-text mb-2">目前選擇</p>
+                    <div className="space-y-2 text-sm text-zinc-300">
+                      <p>整建潛力：<span className="text-brand-text">{selectedPotential}</span></p>
+                      <p>區位機能：<span className="text-brand-text">{selectedLocation}</span></p>
+                      <p>建築條件：<span className="text-brand-text">{selectedBuilding}</span></p>
+                      <p>再利用方向：<span className="text-brand-text">{selectedReuse}</span></p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              */}
+            </section>
           )}
         </div>
 
