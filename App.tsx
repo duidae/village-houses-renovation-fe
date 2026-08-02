@@ -291,63 +291,58 @@ const App: React.FC = () => {
 
                   <div className="mt-8 grid gap-4 lg:grid-cols-4">
                     <div className="rounded-3xl border border-slate-200 bg-white p-5">
-                      <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-[0.15em] mb-4">整建潛力</h3>
-                      <div className="space-y-2">
-                        {['高', '中', '低'].map((option) => (
-                          <button
-                            key={option}
-                            onClick={() => setSelectedPotential(option as '高' | '中' | '低')}
-                            className={`w-full rounded-2xl border px-3 py-2 text-left text-sm transition ${selectedPotential === option ? 'border-brand-accent bg-brand-accent/10 text-slate-900' : 'border-slate-200 text-slate-700 hover:border-slate-300'}`}
-                          >
-                            {option}
-                          </button>
-                        ))}
-                      </div>
+                      <label className="block text-sm font-semibold text-slate-900 uppercase tracking-[0.15em] mb-4">整建潛力</label>
+                      <select
+                        value={selectedPotential}
+                        onChange={(e) => setSelectedPotential(e.target.value as '高' | '中' | '低')}
+                        className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-accent"
+                      >
+                        <option value="高">高</option>
+                        <option value="中">中</option>
+                        <option value="低">低</option>
+                      </select>
                     </div>
 
                     <div className="rounded-3xl border border-slate-200 bg-white p-5">
-                      <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-[0.15em] mb-4">區位與生活機能</h3>
-                      <div className="space-y-2">
-                        {['主幹道上', '周邊有公共設施'].map((option) => (
-                          <button
-                            key={option}
-                            onClick={() => setSelectedLocation(option as '主幹道上' | '周邊有公共設施')}
-                            className={`w-full rounded-2xl border px-3 py-2 text-left text-sm transition ${selectedLocation === option ? 'border-brand-accent bg-brand-accent/10 text-slate-900' : 'border-slate-200 text-slate-700 hover:border-slate-300'}`}
-                          >
-                            {option}
-                          </button>
-                        ))}
-                      </div>
+                      <label className="block text-sm font-semibold text-slate-900 uppercase tracking-[0.15em] mb-4">區位與生活機能</label>
+                      <select
+                        value={selectedLocation}
+                        onChange={(e) => setSelectedLocation(e.target.value as '主幹道上' | '周邊有公共設施')}
+                        className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-accent"
+                      >
+                        <option value="主幹道上">主幹道上</option>
+                        <option value="周邊有公共設施">周邊有公共設施</option>
+                      </select>
                     </div>
 
                     <div className="rounded-3xl border border-slate-200 bg-white p-5">
-                      <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-[0.15em] mb-4">建築條件</h3>
-                      <div className="space-y-2">
-                        {['一條龍', '單伸手', '三合院', '水泥連棟式', '具歷史價值'].map((option) => (
-                          <button
-                            key={option}
-                            onClick={() => setSelectedBuilding(option as '一條龍' | '單伸手' | '三合院' | '水泥連棟式' | '具歷史價值')}
-                            className={`w-full rounded-2xl border px-3 py-2 text-left text-sm transition ${selectedBuilding === option ? 'border-brand-accent bg-brand-accent/10 text-slate-900' : 'border-slate-200 text-slate-700 hover:border-slate-300'}`}
-                          >
-                            {option}
-                          </button>
-                        ))}
-                      </div>
+                      <label className="block text-sm font-semibold text-slate-900 uppercase tracking-[0.15em] mb-4">建築條件</label>
+                      <select
+                        value={selectedBuilding}
+                        onChange={(e) => setSelectedBuilding(e.target.value as '一條龍' | '單伸手' | '三合院' | '水泥連棟式' | '具歷史價值')}
+                        className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-accent"
+                      >
+                        <option value="一條龍">一條龍</option>
+                        <option value="單伸手">單伸手</option>
+                        <option value="三合院">三合院</option>
+                        <option value="水泥連棟式">水泥連棟式</option>
+                        <option value="具歷史價值">具歷史價值</option>
+                      </select>
                     </div>
 
                     <div className="rounded-3xl border border-slate-200 bg-white p-5">
-                      <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-[0.15em] mb-4">再利用類型方向</h3>
-                      <div className="space-y-2">
-                        {['綠色照顧據點', '戶外開放空間', '地方文化展示館', '農村體驗空間', '青年創業基地'].map((option) => (
-                          <button
-                            key={option}
-                            onClick={() => setSelectedReuse(option as '綠色照顧據點' | '戶外開放空間' | '地方文化展示館' | '農村體驗空間' | '青年創業基地')}
-                            className={`w-full rounded-2xl border px-3 py-2 text-left text-sm transition ${selectedReuse === option ? 'border-brand-accent bg-brand-accent/10 text-slate-900' : 'border-slate-200 text-slate-700 hover:border-slate-300'}`}
-                          >
-                            {option}
-                          </button>
-                        ))}
-                      </div>
+                      <label className="block text-sm font-semibold text-slate-900 uppercase tracking-[0.15em] mb-4">再利用類型方向</label>
+                      <select
+                        value={selectedReuse}
+                        onChange={(e) => setSelectedReuse(e.target.value as '綠色照顧據點' | '戶外開放空間' | '地方文化展示館' | '農村體驗空間' | '青年創業基地')}
+                        className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-accent"
+                      >
+                        <option value="綠色照顧據點">綠色照顧據點</option>
+                        <option value="戶外開放空間">戶外開放空間</option>
+                        <option value="地方文化展示館">地方文化展示館</option>
+                        <option value="農村體驗空間">農村體驗空間</option>
+                        <option value="青年創業基地">青年創業基地</option>
+                      </select>
                     </div>
                   </div>
                 </div>
