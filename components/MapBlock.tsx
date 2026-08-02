@@ -165,29 +165,21 @@ const MapBlock: React.FC = () => {
   };
 
   return (
-    <div className="bg-zinc-900/50 p-6 rounded-xl border border-zinc-800 mt-10">
-      {/* Header */}
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold text-brand-text mb-2 flex items-center">
-          🗺️ 村落整建地圖
-        </h2>
-        <p className="text-brand-subtext">互動式地圖展示參與整建計畫的農村宅院</p>
-      </div>
-
+    <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm mt-2">
       {/* Map Container */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
           <div
             id="map-container"
-            className="w-full h-96 lg:h-full rounded-lg border border-zinc-700 overflow-hidden"
+            className="w-full h-96 lg:h-full rounded-lg border border-slate-200 overflow-hidden bg-slate-50"
             style={{ minHeight: '500px' }}
           />
         </div>
 
         {/* Right Panel - Selected Property Details */}
         <div className="flex flex-col">
-          <div className="bg-zinc-800/70 p-5 rounded-lg border border-zinc-700 flex-1 overflow-y-auto">
-            <h3 className="text-lg font-semibold text-brand-text mb-4">
+          <div className="bg-slate-50 p-5 rounded-lg border border-slate-200 flex-1 overflow-y-auto">
+            <h3 className="text-lg font-semibold text-slate-900 mb-4">
               {selectedProperty ? '宅院詳情' : '選擇宅院'}
             </h3>
 
@@ -195,16 +187,16 @@ const MapBlock: React.FC = () => {
               <div className="space-y-4">
                 {/* Property Name */}
                 <div>
-                  <p className="text-xs text-brand-subtext uppercase">名稱</p>
-                  <p className="text-sm font-semibold text-brand-text">
+                  <p className="text-xs text-slate-500 uppercase">名稱</p>
+                  <p className="text-sm font-semibold text-slate-900">
                     {selectedProperty.name}
                   </p>
                 </div>
 
                 {/* Description */}
                 <div>
-                  <p className="text-xs text-brand-subtext uppercase">描述</p>
-                  <p className="text-sm text-brand-text/90">
+                  <p className="text-xs text-slate-500 uppercase">描述</p>
+                  <p className="text-sm text-slate-700">
                     {selectedProperty.description}
                   </p>
                 </div>
@@ -212,14 +204,14 @@ const MapBlock: React.FC = () => {
                 {/* Coordinates */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <p className="text-xs text-brand-subtext uppercase">緯度</p>
-                    <p className="text-sm font-mono text-brand-accent">
+                    <p className="text-xs text-slate-500 uppercase">緯度</p>
+                    <p className="text-sm font-mono text-slate-700">
                       {selectedProperty.lat.toFixed(4)}
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-brand-subtext uppercase">經度</p>
-                    <p className="text-sm font-mono text-brand-accent">
+                    <p className="text-xs text-slate-500 uppercase">經度</p>
+                    <p className="text-sm font-mono text-slate-700">
                       {selectedProperty.lng.toFixed(4)}
                     </p>
                   </div>
@@ -227,7 +219,7 @@ const MapBlock: React.FC = () => {
 
                 {/* Status */}
                 <div>
-                  <p className="text-xs text-brand-subtext uppercase mb-2">
+                  <p className="text-xs text-slate-500 uppercase mb-2">
                     整建進度
                   </p>
                   <span
@@ -249,14 +241,14 @@ const MapBlock: React.FC = () => {
                   href={`https://www.google.com/maps?q=${selectedProperty.lat},${selectedProperty.lng}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="mt-4 w-full bg-brand-accent hover:bg-teal-300 text-brand-dark font-semibold py-2 px-4 rounded-lg transition-colors text-center text-sm"
+                  className="mt-4 w-full bg-slate-900 hover:bg-slate-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors text-center text-sm"
                 >
                   📍 Google 街景檢視
                 </a>
               </div>
             ) : (
               <div className="text-center py-8">
-                <p className="text-brand-subtext text-sm">
+                <p className="text-slate-500 text-sm">
                   在地圖上點擊任一標記以檢視宅院詳情
                 </p>
               </div>
@@ -264,8 +256,8 @@ const MapBlock: React.FC = () => {
           </div>
 
           {/* Legend */}
-          <div className="mt-4 bg-zinc-800/70 p-4 rounded-lg border border-zinc-700">
-            <p className="text-xs font-semibold text-brand-text mb-3 uppercase">
+          <div className="mt-4 bg-slate-50 p-4 rounded-lg border border-slate-200">
+            <p className="text-xs font-semibold text-slate-900 mb-3 uppercase">
               進度圖例
             </p>
             <div className="space-y-2">
@@ -274,21 +266,21 @@ const MapBlock: React.FC = () => {
                   className="w-4 h-4 rounded-full"
                   style={{ backgroundColor: '#fbbf24' }}
                 />
-                <span className="text-xs text-brand-text/80">規劃中</span>
+                <span className="text-xs text-slate-700">規劃中</span>
               </div>
               <div className="flex items-center gap-2">
                 <div
                   className="w-4 h-4 rounded-full"
                   style={{ backgroundColor: '#60a5fa' }}
                 />
-                <span className="text-xs text-brand-text/80">施工中</span>
+                <span className="text-xs text-slate-700">施工中</span>
               </div>
               <div className="flex items-center gap-2">
                 <div
                   className="w-4 h-4 rounded-full"
                   style={{ backgroundColor: '#4ade80' }}
                 />
-                <span className="text-xs text-brand-text/80">已完成</span>
+                <span className="text-xs text-slate-700">已完成</span>
               </div>
             </div>
           </div>

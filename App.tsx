@@ -152,7 +152,7 @@ const App: React.FC = () => {
       const canvas = await html2canvas(reportElement, {
         scale: 2,
         useCORS: true,
-        backgroundColor: '#09090b',
+        backgroundColor: '#ffffff',
         onclone: (document) => {
           document.body.style.backgroundColor = '#ffffff';
         },
@@ -190,7 +190,7 @@ const App: React.FC = () => {
   };
 
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: 'background.default', color: 'text.primary', py: 2 }}>
+    <Box sx={{ minHeight: '100vh', bgcolor: 'grey.100', color: 'text.primary', py: 2 }}>
       <Container maxWidth="lg">
         {isLoading && <LoadingSpinner />}
 
@@ -203,14 +203,14 @@ const App: React.FC = () => {
         {analysisData ? (
           <AnalysisDashboard id="analysis-report" data={analysisData} />
         ) : (
-          <Card sx={{ position: 'relative', overflow: 'hidden', bgcolor: 'background.paper', boxShadow: 5, borderRadius: 4, p: 3, mb: 4 }}>
+          <Card sx={{ position: 'relative', overflow: 'hidden', bgcolor: 'background.paper', boxShadow: 5, borderRadius: 4, p: 3, mb: 1 }}>
             <Box
               sx={{
                 position: 'absolute',
                 inset: 0,
                 bgcolor: 'transparent',
                 backgroundImage:
-                  'radial-gradient(circle at top left, rgba(56,189,248,0.08), transparent 20%), radial-gradient(circle at bottom right, rgba(16,185,129,0.07), transparent 24%)',
+                  'radial-gradient(circle at top left, rgba(59,130,246,0.08), transparent 20%), radial-gradient(circle at bottom right, rgba(16,185,129,0.05), transparent 24%)',
                 pointerEvents: 'none',
               }}
             />
@@ -230,7 +230,7 @@ const App: React.FC = () => {
                 </Grid>
 
                 <Grid item xs={12} md={5}>
-                  <Card sx={{ bgcolor: 'grey.50', boxShadow: 'none', borderRadius: 3 }}>
+                  <Card sx={{ bgcolor: 'grey.100', boxShadow: 'none', borderRadius: 3 }}>
                     <CardContent>
                       <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 2 }}>
                         搜尋農村好宅
@@ -339,10 +339,9 @@ const App: React.FC = () => {
                 </Grid>
               </Grid>
             </CardContent>
+            <MapBlock />
           </Card>
         )}
-
-        <MapBlock />
       </Container>
     </Box>
   );
