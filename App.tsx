@@ -221,9 +221,17 @@ const App: React.FC = () => {
                   <Typography variant="overline" component="p" sx={{ letterSpacing: 2, mb: 2, color: 'primary.main' }}>
                     農村好宅整建活化平台
                   </Typography>
-                  <Typography variant="h3" component="h1" sx={{ fontWeight: 800, mb: 2 }}>
-                    農村好##
-                  </Typography>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2, flexWrap: 'wrap' }}>
+                    <Box
+                      component="img"
+                      src="/logo.png"
+                      alt="Logo"
+                      sx={{ width: 56, height: 56, borderRadius: 2, objectFit: 'contain' }}
+                    />
+                    <Typography variant="h3" component="h1" sx={{ fontWeight: 800 }}>
+                      農村好##
+                    </Typography>
+                  </Box>
                   <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 650 }}>
                     輸入地點或宅院名稱，並以區位、建築條件與再利用方向篩選，快速找到最具價值的活化標的。
                   </Typography>
