@@ -191,7 +191,7 @@ const App: React.FC = () => {
 
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: 'grey.100', color: 'text.primary', py: 2 }}>
-      <Container maxWidth="lg">
+      <Container maxWidth={false} disableGutters>
         {isLoading && <LoadingSpinner />}
 
         {error && (
@@ -204,17 +204,6 @@ const App: React.FC = () => {
           <AnalysisDashboard id="analysis-report" data={analysisData} />
         ) : (
           <Card sx={{ position: 'relative', overflow: 'hidden', bgcolor: 'background.paper', boxShadow: 5, borderRadius: 4, p: 3, mb: 1 }}>
-            <Box
-              sx={{
-                position: 'absolute',
-                inset: 0,
-                bgcolor: 'transparent',
-                backgroundImage:
-                  'radial-gradient(circle at top left, rgba(59,130,246,0.08), transparent 20%), radial-gradient(circle at bottom right, rgba(16,185,129,0.05), transparent 24%)',
-                pointerEvents: 'none',
-              }}
-            />
-
             <CardContent sx={{ position: 'relative' }}>
               <Grid container spacing={4} alignItems="flex-start">
                 <Grid item xs={12} md={7}>
