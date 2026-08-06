@@ -204,9 +204,9 @@ const App: React.FC = () => {
           <AnalysisDashboard id="analysis-report" data={analysisData} />
         ) : (
           <Card sx={{ position: 'relative', overflow: 'hidden', bgcolor: 'background.paper', boxShadow: 5, borderRadius: 4, p: 3, mb: 1 }}>
-            <CardContent sx={{ position: 'relative' }}>
+            <CardContent sx={{ position: 'relative', py: 2 }}>
               <Grid container spacing={4} alignItems="flex-start">
-                <Grid item xs={12} md={7}>
+                <Grid item xs={12} md={6}>
                   <Typography variant="overline" component="p" sx={{ letterSpacing: 2, mb: 2, color: 'primary.main' }}>
                     農村好宅整建活化平台
                   </Typography>
@@ -221,18 +221,18 @@ const App: React.FC = () => {
                       農村好##
                     </Typography>
                   </Box>
-                  <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 650 }}>
+                  <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 700 }}>
                     輸入地點或宅院名稱，並以區位、建築條件與再利用方向篩選，快速找到最具價值的活化標的。
                   </Typography>
                 </Grid>
 
-                <Grid item xs={12} md={5}>
+                <Grid item xs={12} md={6}>
                   <Card sx={{ bgcolor: 'grey.100', boxShadow: 'none', borderRadius: 3 }}>
                     <CardContent>
-                      <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 2 }}>
+                      <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1 }}>
                         搜尋農村好宅
                       </Typography>
-                      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+                      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
                         <TextField
                           fullWidth
                           value={schoolName}
@@ -243,14 +243,14 @@ const App: React.FC = () => {
                         />
                         <Button
                           variant="contained"
-                          size="large"
+                          size="medium"
                           onClick={() => handleSearch()}
                           disabled={isLoading || isGeneratingPdf}
                         >
                           搜尋
                         </Button>
                       </Stack>
-                      <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 2 }}>
+                      <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1 }}>
                         可輸入範例：嘉義好宅1、嘉義好宅2。
                       </Typography>
                     </CardContent>
@@ -258,7 +258,7 @@ const App: React.FC = () => {
                 </Grid>
               </Grid>
 
-              <Grid container spacing={3} sx={{ mt: 3 }}>
+              <Grid container spacing={3} sx={{ mt: 2 }}>
                 <Grid item xs={12} sm={6} md={3}>
                   <FormControl fullWidth sx={{ bgcolor: 'background.paper', borderRadius: 3 }}>
                     <InputLabel>整建潛力</InputLabel>
