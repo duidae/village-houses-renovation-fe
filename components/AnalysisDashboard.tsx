@@ -86,12 +86,12 @@ const NewsSection: React.FC<{news: NewsItem[]}> = ({ news }) => {
     return (
         <div className="space-y-4">
             {news.map((item, index) => (
-                <div key={index} className="bg-zinc-800/50 p-4 rounded-lg flex items-start space-x-4">
+                <div key={index} className="bg-slate-50 border border-slate-200 p-4 rounded-lg flex items-start space-x-4 shadow-sm">
                     <NewspaperIcon className="w-6 h-6 text-brand-accent flex-shrink-0 mt-1"/>
                     <div>
                         <div className="flex justify-between items-baseline">
                             <h5 className="font-semibold text-brand-text">{item.title}</h5>
-                            <span className="text-xs text-zinc-500 ml-4 whitespace-nowrap">{item.date}</span>
+                            <span className="text-xs text-slate-500 ml-4 whitespace-nowrap">{item.date}</span>
                         </div>
                         <p className="text-sm text-brand-subtext mt-1"><HighlightedText text={item.summary} /></p>
                     </div>
@@ -104,14 +104,14 @@ const NewsSection: React.FC<{news: NewsItem[]}> = ({ news }) => {
 const PopulationChart: React.FC<{ data: PopulationDataPoint[] }> = ({ data }) => {
     const sortedData = [...data].sort((a, b) => a.year - b.year);
     return (
-        <div className="w-full h-80 bg-zinc-900/50 p-4 rounded-lg">
+        <div className="w-full h-80 bg-slate-50 p-4 rounded-lg border border-slate-200 shadow-sm">
             <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={sortedData} margin={{ top: 5, right: 20, left: 30, bottom: 5 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#3f3f46" />
-                    <XAxis dataKey="year" stroke="#a1a1aa" />
-                    <YAxis stroke="#a1a1aa" tickFormatter={(value) => new Intl.NumberFormat('en-US', { notation: 'compact', compactDisplay: 'short' }).format(value as number)} domain={[0, (dataMax: number) => Math.ceil(dataMax * 1.1)]} />
-                    <Tooltip contentStyle={{ backgroundColor: '#18181b', borderColor: '#27272a', color: '#e4e4e7' }} formatter={(value: number) => [value.toLocaleString(), '人口數']} />
-                    <Legend wrapperStyle={{ color: '#a1a1aa' }} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#cbd5e1" />
+                    <XAxis dataKey="year" stroke="#475569" />
+                    <YAxis stroke="#475569" tickFormatter={(value) => new Intl.NumberFormat('en-US', { notation: 'compact', compactDisplay: 'short' }).format(value as number)} domain={[0, (dataMax: number) => Math.ceil(dataMax * 1.1)]} />
+                    <Tooltip contentStyle={{ backgroundColor: '#f8fafc', borderColor: '#cbd5e1', color: '#0f172a' }} formatter={(value: number) => [value.toLocaleString(), '人口數']} />
+                    <Legend wrapperStyle={{ color: '#475569' }} />
                     <Line type="monotone" dataKey="population" stroke="#14b8a6" strokeWidth={2} activeDot={{ r: 8 }} name="人口數" />
                 </LineChart>
             </ResponsiveContainer>
@@ -122,14 +122,14 @@ const PopulationChart: React.FC<{ data: PopulationDataPoint[] }> = ({ data }) =>
 const SchoolEnrollmentChart: React.FC<{ data: SchoolEnrollmentDataPoint[] }> = ({ data }) => {
     const sortedData = [...data].sort((a, b) => a.year - b.year);
     return (
-        <div className="w-full h-80 bg-zinc-900/50 p-4 rounded-lg">
+        <div className="w-full h-80 bg-slate-50 p-4 rounded-lg border border-slate-200 shadow-sm">
             <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={sortedData} margin={{ top: 5, right: 20, left: 30, bottom: 5 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#3f3f46" />
-                    <XAxis dataKey="year" stroke="#a1a1aa" />
-                    <YAxis stroke="#a1a1aa" tickFormatter={(value) => new Intl.NumberFormat('en-US', { notation: 'compact', compactDisplay: 'short' }).format(value as number)} domain={[0, (dataMax: number) => Math.ceil(dataMax * 1.1)]} />
-                    <Tooltip contentStyle={{ backgroundColor: '#18181b', borderColor: '#27272a', color: '#e4e4e7' }} formatter={(value: number) => [value.toLocaleString(), '全校學生數']} />
-                    <Legend wrapperStyle={{ color: '#a1a1aa' }} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#cbd5e1" />
+                    <XAxis dataKey="year" stroke="#475569" />
+                    <YAxis stroke="#475569" tickFormatter={(value) => new Intl.NumberFormat('en-US', { notation: 'compact', compactDisplay: 'short' }).format(value as number)} domain={[0, (dataMax: number) => Math.ceil(dataMax * 1.1)]} />
+                    <Tooltip contentStyle={{ backgroundColor: '#f8fafc', borderColor: '#cbd5e1', color: '#0f172a' }} formatter={(value: number) => [value.toLocaleString(), '全校學生數']} />
+                    <Legend wrapperStyle={{ color: '#475569' }} />
                     <Line type="monotone" dataKey="studentCount" stroke="#14b8a6" strokeWidth={2} activeDot={{ r: 8 }} name="全校學生數" />
                 </LineChart>
             </ResponsiveContainer>
@@ -184,15 +184,15 @@ const TrendProjectionChart: React.FC<{
 
     return (
         <div className="space-y-6">
-            <div className="w-full h-96 bg-zinc-900/50 p-4 rounded-lg">
+            <div className="w-full h-96 bg-slate-50 p-4 rounded-lg border border-slate-200 shadow-sm">
                 <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={finalChartData} margin={{ top: 5, right: 30, left: 30, bottom: 5 }}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#3f3f46" />
-                        <XAxis dataKey="year" stroke="#a1a1aa" />
+                        <CartesianGrid strokeDasharray="3 3" stroke="#cbd5e1" />
+                        <XAxis dataKey="year" stroke="#475569" />
                         <YAxis yAxisId="left" stroke="#14b8a6" label={{ value: '城市人口', angle: -90, position: 'insideLeft', fill: '#14b8a6', style: {textAnchor: 'middle'} }} tickFormatter={(value) => new Intl.NumberFormat('en-US', { notation: 'compact', compactDisplay: 'short' }).format(value as number)} />
                         <YAxis yAxisId="right" orientation="right" stroke="#f59e0b" label={{ value: '學生人數', angle: 90, position: 'insideRight', fill: '#f59e0b', style: {textAnchor: 'middle'} }} tickFormatter={(value) => new Intl.NumberFormat('en-US', { notation: 'compact', compactDisplay: 'short' }).format(value as number)} />
-                        <Tooltip contentStyle={{ backgroundColor: '#18181b', borderColor: '#27272a', color: '#e4e4e7' }} />
-                        <Legend wrapperStyle={{ color: '#a1a1aa', paddingTop: '10px' }} />
+                        <Tooltip contentStyle={{ backgroundColor: '#f8fafc', borderColor: '#cbd5e1', color: '#0f172a' }} />
+                        <Legend wrapperStyle={{ color: '#475569', paddingTop: '10px' }} />
 
                         <Line yAxisId="left" type="monotone" dataKey="population" stroke="#14b8a6" strokeWidth={2} activeDot={{ r: 6 }} name="歷史人口" connectNulls />
                         <Line yAxisId="left" type="monotone" dataKey="projectedPopulation" stroke="#14b8a6" strokeWidth={2} strokeDasharray="5 5" name="預估人口" connectNulls />
@@ -211,17 +211,17 @@ const TrendProjectionChart: React.FC<{
 
 const PestAnalysisDisplay: React.FC<{ data: PestAnalysis }> = ({ data }) => {
     const items = [
-        { title: 'Political (政策)', content: data.political, color: 'text-sky-400' },
-        { title: 'Economic (經濟)', content: data.economic, color: 'text-emerald-400' },
-        { title: 'Social (社會)', content: data.social, color: 'text-amber-400' },
-        { title: 'Technological (技術)', content: data.technological, color: 'text-violet-400' },
+        { title: 'Political (政策)', content: data.political, color: 'text-sky-500' },
+        { title: 'Economic (經濟)', content: data.economic, color: 'text-emerald-500' },
+        { title: 'Social (社會)', content: data.social, color: 'text-amber-500' },
+        { title: 'Technological (技術)', content: data.technological, color: 'text-violet-500' },
     ];
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {items.map(item => (
-                <div key={item.title} className="bg-zinc-800/50 p-4 rounded-lg">
+                <div key={item.title} className="bg-slate-50 p-4 rounded-lg border border-slate-200 shadow-sm">
                     <h4 className={`font-bold text-lg ${item.color}`}>{item.title}</h4>
-                    <p className="text-brand-subtext text-sm mt-2 leading-relaxed"><HighlightedText text={item.content} /></p>
+                    <p className="text-slate-600 text-sm mt-2 leading-relaxed"><HighlightedText text={item.content} /></p>
                 </div>
             ))}
         </div>
@@ -281,12 +281,12 @@ const InternalHealthDisplay: React.FC<{ data: InternalHealthMetrics }> = ({ data
     ];
 
     const MetricCard: React.FC<{ item: MetricItem }> = ({ item }) => (
-        <div className="bg-zinc-800/50 p-3 rounded-md">
+        <div className="bg-slate-50 p-3 rounded-md border border-slate-200 shadow-sm">
             <div className="flex justify-between items-center">
                 <p className="text-sm font-semibold text-brand-text">{item.metric}</p>
-                <p className="text-sm font-bold text-brand-accent bg-zinc-700 px-2 py-0.5 rounded">{item.value}</p>
+                <p className="text-sm font-bold text-brand-accent bg-slate-100 px-2 py-0.5 rounded">{item.value}</p>
             </div>
-            <p className="text-xs text-brand-subtext mt-1 leading-relaxed"><HighlightedText text={item.analysis} /></p>
+            <p className="text-xs text-slate-600 mt-1 leading-relaxed"><HighlightedText text={item.analysis} /></p>
         </div>
     );
 
@@ -330,35 +330,35 @@ const StrategicRecommendationsDisplay: React.FC<{ recommendations: StrategicReco
         switch (type) {
             case '產業升級型':
                 return {
-                    icon: <CpuChipIcon className="w-6 h-6 text-sky-400" />,
-                    borderColor: 'border-sky-800/50',
-                    bgColor: 'bg-sky-900/10',
-                    textColor: 'text-sky-400',
-                    labelClass: 'bg-sky-500/10 text-sky-300 ring-1 ring-sky-500/20',
+                    icon: <CpuChipIcon className="w-6 h-6 text-sky-500" />,
+                    borderColor: 'border-sky-200',
+                    bgColor: 'bg-sky-50',
+                    textColor: 'text-sky-600',
+                    labelClass: 'bg-sky-100 text-sky-700 ring-1 ring-sky-200',
                 };
             case '社會需求型':
                 return {
-                    icon: <BuildingOffice2Icon className="w-6 h-6 text-emerald-400" />,
-                    borderColor: 'border-emerald-800/50',
-                    bgColor: 'bg-emerald-900/10',
-                    textColor: 'text-emerald-400',
-                    labelClass: 'bg-emerald-500/10 text-emerald-300 ring-1 ring-emerald-500/20',
+                    icon: <BuildingOffice2Icon className="w-6 h-6 text-emerald-500" />,
+                    borderColor: 'border-emerald-200',
+                    bgColor: 'bg-emerald-50',
+                    textColor: 'text-emerald-600',
+                    labelClass: 'bg-emerald-100 text-emerald-700 ring-1 ring-emerald-200',
                 };
             case '地方再生型':
                 return {
-                    icon: <PaintBrushIcon className="w-6 h-6 text-amber-400" />,
-                    borderColor: 'border-amber-800/50',
-                    bgColor: 'bg-amber-900/10',
-                    textColor: 'text-amber-400',
-                    labelClass: 'bg-amber-500/10 text-amber-300 ring-1 ring-amber-500/20',
+                    icon: <PaintBrushIcon className="w-6 h-6 text-amber-500" />,
+                    borderColor: 'border-amber-200',
+                    bgColor: 'bg-amber-50',
+                    textColor: 'text-amber-600',
+                    labelClass: 'bg-amber-100 text-amber-700 ring-1 ring-amber-200',
                 };
             default:
                 return {
-                    icon: <LightbulbIcon className="w-6 h-6 text-zinc-400" />,
-                    borderColor: 'border-zinc-700',
-                    bgColor: 'bg-zinc-800/50',
-                    textColor: 'text-zinc-400',
-                    labelClass: LABEL_STYLE,
+                    icon: <LightbulbIcon className="w-6 h-6 text-slate-500" />,
+                    borderColor: 'border-slate-200',
+                    bgColor: 'bg-slate-50',
+                    textColor: 'text-slate-600',
+                    labelClass: 'bg-slate-100 text-slate-700 ring-1 ring-slate-200',
                 };
         }
     };
@@ -495,9 +495,9 @@ const TransformationAlternativesDisplay: React.FC<{ alternatives: Transformation
 const RecommendationsDisplay: React.FC<{ recommendations: Recommendation[] }> = ({ recommendations }) => (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {recommendations.map((rec, index) => (
-            <div key={index} className="bg-teal-900/20 p-5 rounded-lg border border-teal-800/50 transform hover:scale-105 hover:border-teal-700 transition-all duration-300">
+            <div key={index} className="bg-slate-50 p-5 rounded-lg border border-slate-200 transform hover:scale-105 hover:border-slate-300 transition-all duration-300 shadow-sm">
                 <div className="flex items-center mb-3">
-                    <LightbulbIcon className="w-6 h-6 text-amber-300 mr-3"/>
+                    <LightbulbIcon className="w-6 h-6 text-amber-500 mr-3"/>
                     <h4 className="font-bold text-lg text-brand-text">{rec.title}</h4>
                 </div>
                 <p className="text-brand-subtext text-sm mb-3 leading-relaxed"><HighlightedText text={rec.description} styleType="label" /></p>
@@ -510,12 +510,12 @@ const RecommendationsDisplay: React.FC<{ recommendations: Recommendation[] }> = 
 const PastCasesDisplay: React.FC<{ pastCases: PastCase[] }> = ({ pastCases }) => (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {pastCases.map((pcase, index) => (
-            <div key={index} className="bg-zinc-800/50 p-5 rounded-lg border border-zinc-700 flex flex-col space-y-3">
+            <div key={index} className="bg-slate-50 p-5 rounded-lg border border-slate-200 flex flex-col space-y-3 shadow-sm">
                 <div className="flex items-center">
                     <HistoryIcon className="w-6 h-6 text-brand-accent mr-3 flex-shrink-0"/>
                     <div>
                         <h4 className="font-bold text-lg text-brand-text">{pcase.schoolName}</h4>
-                        <p className="text-xs text-brand-subtext">{pcase.location}</p>
+                        <p className="text-xs text-slate-500">{pcase.location}</p>
                     </div>
                 </div>
                 <div className="text-sm space-y-2 text-brand-subtext leading-relaxed">
@@ -530,7 +530,7 @@ const PastCasesDisplay: React.FC<{ pastCases: PastCase[] }> = ({ pastCases }) =>
 
 
 const Section: React.FC<{title: string, icon: React.ReactNode, children: React.ReactNode}> = ({ title, icon, children }) => (
-    <div className="bg-zinc-900 p-6 rounded-xl border border-zinc-800">
+    <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
         <h3 className="text-xl font-semibold mb-4 text-brand-text flex items-center">
             {icon}<span className="ml-3">{title}</span>
         </h3>
@@ -725,7 +725,7 @@ export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id }
 
   return (
     <div id={id} className="space-y-6 animate-fade-in">
-        <div className="bg-zinc-900/50 p-6 rounded-xl border border-zinc-800 space-y-4">
+        <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
             <div className="text-center">
                 <h2 className="text-3xl font-bold text-brand-text">{basicInfo.name}</h2>
                 <p className="text-brand-subtext mt-1">
@@ -740,7 +740,7 @@ export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id }
                     </a>
                 </p>
             </div>
-            <div className="h-64 rounded-lg overflow-hidden border-2 border-zinc-700">
+            <div className="h-64 rounded-lg overflow-hidden border-2 border-slate-200">
                 <iframe title="School Location" src={mapSrc} width="100%" height="100%" style={{ border: 0 }} allowFullScreen={false} loading="lazy" referrerPolicy="no-referrer-when-downgrade"></iframe>
             </div>
         </div>
