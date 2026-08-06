@@ -3,13 +3,11 @@ import React, { useState, useCallback, useEffect } from 'react';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import type { AnalysisData, CacheEntry, SearchHistoryItem } from './types';
-import { AnalysisDashboard } from './components/AnalysisDashboard';
 import HomePage from './components/HomePage';
-import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import CaseAnalysisPage from './components/CaseAnalysisPage';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
-import Button from '@mui/material/Button';
-import Stack from '@mui/material/Stack';
 
 const CACHE_PREFIX = 'reschool_cache_';
 const CACHE_DURATION_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
@@ -178,26 +176,8 @@ const App: React.FC = () => {
     }
   };
 
-  const navigate = useNavigate();
-
-  const CaseAnalysisPage = () => {
-    if (!analysisData) {
-      return <Navigate to="/" replace />;
-    }
-
   return (
-    <>
-      <Stack direction="row" justifyContent="flex-end" sx={{ mb: 2 }}>
-        <Button variant="outlined" onClick={() => navigate('/')}>
-          返回搜尋
-        </Button>
-      </Stack>
-      <AnalysisDashboard id="analysis-report" data={analysisData} />
-    </>
-  );
-};
 
-return (
   <Box sx={{ minHeight: '100vh', bgcolor: 'grey.100', color: 'text.primary', py: 2 }}>
     <Container maxWidth={false} disableGutters>
       <Routes>
