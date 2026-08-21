@@ -116,31 +116,31 @@ const MapBlock: React.FC = () => {
           <div style="
             background-color: white;
             color: #1e293b;
-            font-size: 11px;
+            font-size: 17px;
             font-weight: bold;
-            padding: 2px 8px;
-            border-radius: 10px;
-            border: 1.5px solid ${statusColor};
-            box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+            padding: 3px 12px;
+            border-radius: 15px;
+            border: 2.25px solid ${statusColor};
+            box-shadow: 0 1.5px 6px rgba(0,0,0,0.25);
             white-space: nowrap;
-            margin-bottom: 2px;
+            margin-bottom: 3px;
           ">
             ${formatPrice(property.price)}
           </div>
           <div style="
             background-color: ${statusColor};
-            width: 30px;
-            height: 30px;
+            width: 45px;
+            height: 45px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 3px solid white;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            border: 4.5px solid white;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.3);
             cursor: pointer;
             font-weight: bold;
             color: white;
-            font-size: 16px;
+            font-size: 24px;
           ">
             🏠
           </div>
@@ -150,9 +150,9 @@ const MapBlock: React.FC = () => {
       const customIcon = L.divIcon({
         html: markerHtml,
         className: '',
-        iconSize: [70, 56],
-        iconAnchor: [35, 45],
-        popupAnchor: [0, -45],
+        iconSize: [105, 84],
+        iconAnchor: [53, 68],
+        popupAnchor: [0, -68],
       });
 
       const marker = L.marker([property.lat, property.lng], {
