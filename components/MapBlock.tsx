@@ -191,14 +191,13 @@ const MapBlock: React.FC = () => {
   };
 
   return (
-    <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm mt-2">
+    <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm mt-2 h-full flex flex-col">
       {/* Map Container */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1 min-h-0">
+        <div className="lg:col-span-2 h-full">
           <div
             id="map-container"
             className="w-full h-96 lg:h-full rounded-lg border border-slate-200 overflow-hidden bg-slate-50"
-            style={{ minHeight: '500px' }}
           />
         </div>
 

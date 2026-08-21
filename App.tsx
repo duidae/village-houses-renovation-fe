@@ -289,8 +289,8 @@ const App: React.FC = () => {
 
   return (
 
-  <Box sx={{ minHeight: '100vh', bgcolor: 'grey.100', color: 'text.primary', py: 2 }}>
-    <Container maxWidth={false} disableGutters>
+  <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column', bgcolor: 'grey.100', color: 'text.primary', py: 2 }}>
+    <Container maxWidth={false} disableGutters sx={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
       <Routes>
         <Route
           path="/"

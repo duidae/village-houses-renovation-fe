@@ -58,7 +58,7 @@ const HomePage: React.FC<HomePageProps> = ({
   const navigate = useNavigate();
 
   return (
-    <>
+    <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
       {isLoading && <LoadingSpinner />}
 
       {error && (
@@ -77,8 +77,8 @@ const HomePage: React.FC<HomePageProps> = ({
           <AnalysisDashboard id="analysis-report" data={analysisData} />
         </>
       ) : (
-        <Card sx={{ position: 'relative', overflow: 'hidden', bgcolor: 'background.paper', boxShadow: 5, borderRadius: 4, p: 3, mb: 1 }}>
-          <CardContent sx={{ position: 'relative', py: 2 }}>
+        <Card sx={{ position: 'relative', overflow: 'hidden', bgcolor: 'background.paper', boxShadow: 5, borderRadius: 4, p: 3, mb: 1, flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+          <CardContent sx={{ position: 'relative', py: 2, flexShrink: 0 }}>
             <Grid container spacing={4} alignItems="flex-start">
               <Grid item xs={12} md={6}>
                 <Typography variant="overline" component="p" sx={{ letterSpacing: 2, mb: 2, color: 'primary.main' }}>
@@ -210,10 +210,12 @@ const HomePage: React.FC<HomePageProps> = ({
               </Grid>
             </Grid>
           </CardContent>
-          <MapBlock />
+          <Box sx={{ flex: 1, minHeight: 0 }}>
+            <MapBlock />
+          </Box>
         </Card>
       )}
-    </>
+    </Box>
   );
 };
 
