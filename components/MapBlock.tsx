@@ -4,6 +4,12 @@ import { fetchProperties } from '../services/propertiesService';
 
 const formatPrice = (price: number) => `${price.toLocaleString('zh-TW')} 萬`;
 
+const getScoreLevelColor = (score: number) => {
+  if (score >= 80) return '#ef4444'; // high - red
+  if (score >= 60) return '#f97316'; // mid - orange
+  return '#9ca3af'; // low - grey
+};
+
 const MapBlock: React.FC = () => {
   const [selectedProperty, setSelectedProperty] = useState<PropertyMarker | null>(
     null
@@ -66,6 +72,8 @@ const MapBlock: React.FC = () => {
         'in-progress': '#60a5fa', // blue
         completed: '#4ade80', // green
       }[property.renovationStatus];
+      const scoreColor = getScoreLevelColor(property.score);
+      const isHighScore = property.score >= 80;
 
       // Create custom marker HTML with a price tag above the pin
       const markerHtml = `
@@ -77,15 +85,15 @@ const MapBlock: React.FC = () => {
             font-weight: bold;
             padding: 3px 12px;
             border-radius: 15px;
-            border: 2.25px solid ${statusColor};
+            border: 2.25px solid ${scoreColor};
             box-shadow: 0 1.5px 6px rgba(0,0,0,0.25);
             white-space: nowrap;
             margin-bottom: 3px;
           ">
-            ${formatPrice(property.price)} · 分數 ${property.score}
+            ${isHighScore ? '🔥 ' : ''}${formatPrice(property.price)} · 分數 ${property.score}
           </div>
           <div style="
-            background-color: ${statusColor};
+            background-color: ${scoreColor};
             width: 45px;
             height: 45px;
             border-radius: 50%;
@@ -271,6 +279,36 @@ const MapBlock: React.FC = () => {
                   style={{ backgroundColor: '#4ade80' }}
                 />
                 <span className="text-xs text-slate-700">已完成</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Score Level Legend */}
+          <div className="mt-4 bg-slate-50 p-4 rounded-lg border border-slate-200">
+            <p className="text-xs font-semibold text-slate-900 mb-3 uppercase">
+              分數等級圖例
+            </p>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <div
+                  className="w-4 h-4 rounded-full"
+                  style={{ backgroundColor: '#ef4444' }}
+                />
+                <span className="text-xs text-slate-700">高分（80～100）</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div
+                  className="w-4 h-4 rounded-full"
+                  style={{ backgroundColor: '#f97316' }}
+                />
+                <span className="text-xs text-slate-700">中分（60～79）</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div
+                  className="w-4 h-4 rounded-full"
+                  style={{ backgroundColor: '#9ca3af' }}
+                />
+                <span className="text-xs text-slate-700">低分（0～59）</span>
               </div>
             </div>
           </div>
