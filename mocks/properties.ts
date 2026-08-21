@@ -7,6 +7,7 @@ export interface PropertyMarker {
   streetViewUrl?: string;
   renovationStatus: 'planning' | 'in-progress' | 'completed';
   price: number; // 單位：萬元
+  score: number; // 整建潛力分數，範圍 1~100
 }
 
 export const sampleProperties: PropertyMarker[] = [
@@ -18,6 +19,7 @@ export const sampleProperties: PropertyMarker[] = [
     description: '木造老屋，保留傳統建築特色，規劃文化展示空間',
     renovationStatus: 'planning',
     price: 680,
+    score: 72,
   },
   {
     id: 'prop-2',
@@ -27,6 +29,7 @@ export const sampleProperties: PropertyMarker[] = [
     description: '導入生態理念，設置太陽能、雨水回收系統',
     renovationStatus: 'in-progress',
     price: 920,
+    score: 85,
   },
   {
     id: 'prop-3',
@@ -36,6 +39,7 @@ export const sampleProperties: PropertyMarker[] = [
     description: '無障礙空間改造，適合銀髮族居住',
     renovationStatus: 'completed',
     price: 1250,
+    score: 91,
   },
   {
     id: 'prop-4',
@@ -45,5 +49,6 @@ export const sampleProperties: PropertyMarker[] = [
     description: '改造為青年創業空間，結合居住與工作功能',
     renovationStatus: 'planning',
     price: 450,
+    score: 58,
   },
 ];

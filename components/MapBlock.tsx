@@ -82,7 +82,7 @@ const MapBlock: React.FC = () => {
             white-space: nowrap;
             margin-bottom: 3px;
           ">
-            ${formatPrice(property.price)}
+            ${formatPrice(property.price)} · 分數 ${property.score}
           </div>
           <div style="
             background-color: ${statusColor};
