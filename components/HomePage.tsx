@@ -27,6 +27,10 @@ interface HomePageProps {
   handleSearch: (searchSchoolName?: string) => Promise<void>;
   handleKeyPress: (event: React.KeyboardEvent<HTMLInputElement>) => void;
   isGeneratingPdf: boolean;
+  selectedResearchBase: '全部' | '嘉義好宅1' | '嘉義好宅2' | '嘉義好宅3' | '嘉義好宅4';
+  setSelectedResearchBase: React.Dispatch<
+    React.SetStateAction<'全部' | '嘉義好宅1' | '嘉義好宅2' | '嘉義好宅3' | '嘉義好宅4'>
+  >;
   selectedPotential: '高' | '中' | '低';
   setSelectedPotential: React.Dispatch<React.SetStateAction<'高' | '中' | '低'>>;
   selectedLocation: '主幹道上' | '周邊有公共設施';
@@ -46,6 +50,8 @@ const HomePage: React.FC<HomePageProps> = ({
   handleSearch,
   handleKeyPress,
   isGeneratingPdf,
+  selectedResearchBase,
+  setSelectedResearchBase,
   selectedPotential,
   setSelectedPotential,
   selectedLocation,
@@ -133,7 +139,28 @@ const HomePage: React.FC<HomePageProps> = ({
             </Grid>
 
             <Grid container spacing={3} sx={{ mt: 2 }}>
-              <Grid item xs={12} sm={6} md={3}>
+              <Grid item xs={12} sm={6} md={2.4}>
+                <FormControl fullWidth sx={{ bgcolor: 'background.paper', borderRadius: 3 }}>
+                  <InputLabel>研究基地</InputLabel>
+                  <Select
+                    value={selectedResearchBase}
+                    label="研究基地"
+                    onChange={(e) =>
+                      setSelectedResearchBase(
+                        e.target.value as '全部' | '嘉義好宅1' | '嘉義好宅2' | '嘉義好宅3' | '嘉義好宅4'
+                      )
+                    }
+                  >
+                    <MenuItem value="全部">全部</MenuItem>
+                    <MenuItem value="嘉義好宅1">嘉義好宅1</MenuItem>
+                    <MenuItem value="嘉義好宅2">嘉義好宅2</MenuItem>
+                    <MenuItem value="嘉義好宅3">嘉義好宅3</MenuItem>
+                    <MenuItem value="嘉義好宅4">嘉義好宅4</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+
+              <Grid item xs={12} sm={6} md={2.4}>
                 <FormControl fullWidth sx={{ bgcolor: 'background.paper', borderRadius: 3 }}>
                   <InputLabel>整建潛力</InputLabel>
                   <Select
@@ -148,7 +175,7 @@ const HomePage: React.FC<HomePageProps> = ({
                 </FormControl>
               </Grid>
 
-              <Grid item xs={12} sm={6} md={3}>
+              <Grid item xs={12} sm={6} md={2.4}>
                 <FormControl fullWidth sx={{ bgcolor: 'background.paper', borderRadius: 3 }}>
                   <InputLabel>區位與生活機能</InputLabel>
                   <Select
@@ -162,7 +189,7 @@ const HomePage: React.FC<HomePageProps> = ({
                 </FormControl>
               </Grid>
 
-              <Grid item xs={12} sm={6} md={3}>
+              <Grid item xs={12} sm={6} md={2.4}>
                 <FormControl fullWidth sx={{ bgcolor: 'background.paper', borderRadius: 3 }}>
                   <InputLabel>建築條件</InputLabel>
                   <Select
@@ -183,7 +210,7 @@ const HomePage: React.FC<HomePageProps> = ({
                 </FormControl>
               </Grid>
 
-              <Grid item xs={12} sm={6} md={3}>
+              <Grid item xs={12} sm={6} md={2.4}>
                 <FormControl fullWidth sx={{ bgcolor: 'background.paper', borderRadius: 3 }}>
                   <InputLabel>再利用類型方向</InputLabel>
                   <Select
