@@ -8,6 +8,7 @@ interface PropertyMarker {
   description: string;
   streetViewUrl?: string;
   renovationStatus: 'planning' | 'in-progress' | 'completed';
+  price: number; // 單位：萬元
 }
 
 const sampleProperties: PropertyMarker[] = [
@@ -18,6 +19,7 @@ const sampleProperties: PropertyMarker[] = [
     lng: 120.4470,
     description: '木造老屋，保留傳統建築特色，規劃文化展示空間',
     renovationStatus: 'planning',
+    price: 680,
   },
   {
     id: 'prop-2',
@@ -26,6 +28,7 @@ const sampleProperties: PropertyMarker[] = [
     lng: 120.4480,
     description: '導入生態理念，設置太陽能、雨水回收系統',
     renovationStatus: 'in-progress',
+    price: 920,
   },
   {
     id: 'prop-3',
@@ -34,6 +37,7 @@ const sampleProperties: PropertyMarker[] = [
     lng: 120.4490,
     description: '無障礙空間改造，適合銀髮族居住',
     renovationStatus: 'completed',
+    price: 1250,
   },
   {
     id: 'prop-4',
@@ -42,8 +46,11 @@ const sampleProperties: PropertyMarker[] = [
     lng: 120.4460,
     description: '改造為青年創業空間，結合居住與工作功能',
     renovationStatus: 'planning',
+    price: 450,
   },
 ];
+
+const formatPrice = (price: number) => `${price.toLocaleString('zh-TW')} 萬`;
 
 const MapBlock: React.FC = () => {
   const [selectedProperty, setSelectedProperty] = useState<PropertyMarker | null>(
@@ -103,31 +110,49 @@ const MapBlock: React.FC = () => {
         completed: '#4ade80', // green
       }[property.renovationStatus];
 
-      // Create custom marker HTML
+      // Create custom marker HTML with a price tag above the pin
       const markerHtml = `
-        <div style="
-          background-color: ${statusColor};
-          width: 30px;
-          height: 30px;
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          border: 3px solid white;
-          box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-          cursor: pointer;
-          font-weight: bold;
-          color: white;
-          font-size: 16px;
-        ">
-          🏠
+        <div style="display: flex; flex-direction: column; align-items: center;">
+          <div style="
+            background-color: white;
+            color: #1e293b;
+            font-size: 11px;
+            font-weight: bold;
+            padding: 2px 8px;
+            border-radius: 10px;
+            border: 1.5px solid ${statusColor};
+            box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+            white-space: nowrap;
+            margin-bottom: 2px;
+          ">
+            ${formatPrice(property.price)}
+          </div>
+          <div style="
+            background-color: ${statusColor};
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            cursor: pointer;
+            font-weight: bold;
+            color: white;
+            font-size: 16px;
+          ">
+            🏠
+          </div>
         </div>
       `;
 
       const customIcon = L.divIcon({
         html: markerHtml,
-        iconSize: [30, 30],
-        popupAnchor: [0, -15],
+        className: '',
+        iconSize: [70, 56],
+        iconAnchor: [35, 45],
+        popupAnchor: [0, -45],
       });
 
       const marker = L.marker([property.lat, property.lng], {
@@ -136,7 +161,8 @@ const MapBlock: React.FC = () => {
 
       marker.bindPopup(`
         <div style="font-family: sans-serif; color: #333;">
-          <h3 style="margin: 0 0 10px 0; font-size: 14px; font-weight: bold;">${property.name}</h3>
+          <h3 style="margin: 0 0 6px 0; font-size: 14px; font-weight: bold;">${property.name}</h3>
+          <p style="margin: 0 0 10px 0; font-size: 13px; font-weight: bold; color: #0f172a;">${formatPrice(property.price)}</p>
           <p style="margin: 0 0 10px 0; font-size: 12px;">${property.description}</p>
           <span style="display: inline-block; padding: 4px 8px; border-radius: 4px; background-color: ${statusColor}; color: white; font-size: 11px; font-weight: bold;">
             ${getStatusText(property.renovationStatus)}
@@ -190,6 +216,14 @@ const MapBlock: React.FC = () => {
                   <p className="text-xs text-slate-500 uppercase">名稱</p>
                   <p className="text-sm font-semibold text-slate-900">
                     {selectedProperty.name}
+                  </p>
+                </div>
+
+                {/* Price */}
+                <div>
+                  <p className="text-xs text-slate-500 uppercase">價格</p>
+                  <p className="text-sm font-semibold text-slate-900">
+                    {formatPrice(selectedProperty.price)}
                   </p>
                 </div>
 
