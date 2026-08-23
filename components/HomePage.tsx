@@ -87,7 +87,7 @@ const HomePage: React.FC<HomePageProps> = ({
           <CardContent sx={{ position: 'relative', py: 2, flexShrink: 0 }}>
             <Grid container spacing={4} alignItems="flex-start">
               <Grid item xs={12} md={6}>
-                <Typography variant="overline" component="p" sx={{ letterSpacing: 2, mb: 2, color: 'primary.main' }}>
+                <Typography variant="overline" component="p" sx={{ fontSize: '20px', letterSpacing: 2, mb: 2, color: 'primary.main' }}>
                   農村好宅整建活化平台
                 </Typography>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2, flexWrap: 'wrap' }}>
