@@ -10,6 +10,12 @@ const getScoreLevelColor = (score: number) => {
   return '#9ca3af'; // low - grey
 };
 
+const getScoreLevelText = (score: number) => {
+  if (score >= 80) return '高';
+  if (score >= 60) return '中';
+  return '低';
+};
+
 const MapBlock: React.FC = () => {
   const [selectedProperty, setSelectedProperty] = useState<PropertyMarker | null>(
     null
@@ -169,10 +175,19 @@ const MapBlock: React.FC = () => {
         {/* Right Panel - Selected Property Details */}
         <div className="flex flex-col">
           <div className="bg-slate-50 p-5 rounded-lg border border-slate-200 flex-1 overflow-y-auto">
-            <h3 className="text-lg font-semibold text-slate-900 mb-4">
-              {selectedProperty ? '宅院詳情' : '選擇宅院'}
+            <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
+              {selectedProperty ? '宅院重點摘要' : '選擇宅院'}
+              {selectedProperty && (
+                <span
+                  className="inline-block px-2 py-0.5 rounded-full text-md font-bold text-white"
+                  style={{
+                    backgroundColor: getScoreLevelColor(selectedProperty.score),
+                  }}
+                >
+                  整建潛力 {getScoreLevelText(selectedProperty.score)}
+                </span>
+              )}
             </h3>
-
             {selectedProperty ? (
               <div className="space-y-4">
                 {/* Property Name */}
@@ -251,66 +266,6 @@ const MapBlock: React.FC = () => {
                 </p>
               </div>
             )}
-          </div>
-
-          {/* Legend */}
-          <div className="mt-4 bg-slate-50 p-4 rounded-lg border border-slate-200">
-            <p className="text-xs font-semibold text-slate-900 mb-3 uppercase">
-              進度圖例
-            </p>
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <div
-                  className="w-4 h-4 rounded-full"
-                  style={{ backgroundColor: '#fbbf24' }}
-                />
-                <span className="text-xs text-slate-700">規劃中</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div
-                  className="w-4 h-4 rounded-full"
-                  style={{ backgroundColor: '#60a5fa' }}
-                />
-                <span className="text-xs text-slate-700">施工中</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div
-                  className="w-4 h-4 rounded-full"
-                  style={{ backgroundColor: '#4ade80' }}
-                />
-                <span className="text-xs text-slate-700">已完成</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Score Level Legend */}
-          <div className="mt-4 bg-slate-50 p-4 rounded-lg border border-slate-200">
-            <p className="text-xs font-semibold text-slate-900 mb-3 uppercase">
-              分數等級圖例
-            </p>
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <div
-                  className="w-4 h-4 rounded-full"
-                  style={{ backgroundColor: '#ef4444' }}
-                />
-                <span className="text-xs text-slate-700">高分（80～100）</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div
-                  className="w-4 h-4 rounded-full"
-                  style={{ backgroundColor: '#f97316' }}
-                />
-                <span className="text-xs text-slate-700">中分（60～79）</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div
-                  className="w-4 h-4 rounded-full"
-                  style={{ backgroundColor: '#9ca3af' }}
-                />
-                <span className="text-xs text-slate-700">低分（0～59）</span>
-              </div>
-            </div>
           </div>
         </div>
       </div>
