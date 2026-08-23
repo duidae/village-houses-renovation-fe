@@ -184,12 +184,35 @@ const MapBlock: React.FC = () => {
                     backgroundColor: getScoreLevelColor(selectedProperty.score),
                   }}
                 >
-                  整建潛力 {getScoreLevelText(selectedProperty.score)}
+                  整建潛力 - {getScoreLevelText(selectedProperty.score)}
                 </span>
               )}
             </h3>
             {selectedProperty ? (
               <div className="space-y-4">
+                {/* Score */}
+                <div>
+                  <p className="text-lg text-slate-500 uppercase mb-2">
+                    整建分數
+                  </p>
+                  <span
+                    className="inline-block px-3 py-1 rounded-full text-lg font-bold text-white"
+                    style={{
+                      backgroundColor: getScoreLevelColor(selectedProperty.score),
+                    }}
+                  >
+                    {selectedProperty.score}
+                  </span>
+                </div>
+
+                {/* Property ID */}
+                <div>
+                  <p className="text-xs text-slate-500 uppercase">宅院編號</p>
+                  <p className="text-sm font-mono text-slate-700">
+                    {selectedProperty.id}
+                  </p>
+                </div>
+
                 {/* Property Name */}
                 <div>
                   <p className="text-xs text-slate-500 uppercase">名稱</p>
@@ -215,20 +238,14 @@ const MapBlock: React.FC = () => {
                 </div>
 
                 {/* Coordinates */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-xs text-slate-500 uppercase">緯度</p>
-                    <p className="text-sm font-mono text-slate-700">
-                      {selectedProperty.lat.toFixed(4)}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-slate-500 uppercase">經度</p>
-                    <p className="text-sm font-mono text-slate-700">
-                      {selectedProperty.lng.toFixed(4)}
-                    </p>
-                  </div>
+                <div>
+                  <p className="text-xs text-slate-500 uppercase">經緯度</p>
+                  <p className="text-sm font-mono text-slate-700">
+                    {selectedProperty.lat.toFixed(4)}, {selectedProperty.lng.toFixed(4)}
+                  </p>
                 </div>
+
+                
 
                 {/* Status */}
                 <div>
@@ -249,15 +266,20 @@ const MapBlock: React.FC = () => {
                   </span>
                 </div>
 
-                {/* Street View Link */}
-                <a
-                  href={`https://www.google.com/maps?q=${selectedProperty.lat},${selectedProperty.lng}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-4 w-full bg-slate-900 hover:bg-slate-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors text-center text-sm"
-                >
-                  📍 Google 街景檢視
-                </a>
+                {/* GSV View */}
+                <div>
+                  <p className="text-xs text-slate-500 uppercase mb-2">
+                    GSV檢視
+                  </p>
+                  <a
+                    href={`https://www.google.com/maps?q=${selectedProperty.lat},${selectedProperty.lng}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block w-full bg-slate-900 hover:bg-slate-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors text-center text-sm"
+                  >
+                    📍 Google 街景檢視
+                  </a>
+                </div>
               </div>
             ) : (
               <div className="text-center py-8">
