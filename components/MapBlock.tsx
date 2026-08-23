@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import type { PropertyMarker } from '../mocks/properties';
 import { fetchProperties } from '../services/propertiesService';
 
@@ -280,6 +281,14 @@ const MapBlock: React.FC = () => {
                     📍 Google 街景檢視
                   </a>
                 </div>
+
+                {/* Case Analysis Link */}
+                <Link
+                  to={`/cases/${selectedProperty.id}`}
+                  className="block w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2 px-4 rounded-lg transition-colors text-center text-sm"
+                >
+                  📊 查看完整分析報告
+                </Link>
               </div>
             ) : (
               <div className="text-center py-8">
