@@ -31,8 +31,8 @@ interface HomePageProps {
   setSelectedResearchBase: React.Dispatch<
     React.SetStateAction<'全部' | '嘉義好宅1' | '嘉義好宅2' | '嘉義好宅3' | '嘉義好宅4'>
   >;
-  selectedPotential: '高' | '中' | '低';
-  setSelectedPotential: React.Dispatch<React.SetStateAction<'高' | '中' | '低'>>;
+  selectedPotential: '全部' | '高' | '中' | '低';
+  setSelectedPotential: React.Dispatch<React.SetStateAction<'全部' | '高' | '中' | '低'>>;
   selectedLocation: '主幹道上' | '周邊有公共設施';
   setSelectedLocation: React.Dispatch<React.SetStateAction<'主幹道上' | '周邊有公共設施'>>;
   selectedBuilding: '一條龍' | '單伸手' | '三合院' | '水泥連棟式' | '具歷史價值';
@@ -166,8 +166,9 @@ const HomePage: React.FC<HomePageProps> = ({
                   <Select
                     value={selectedPotential}
                     label="整建潛力"
-                    onChange={(e) => setSelectedPotential(e.target.value as '高' | '中' | '低')}
+                    onChange={(e) => setSelectedPotential(e.target.value as '全部' | '高' | '中' | '低')}
                   >
+                    <MenuItem value="全部">全部</MenuItem>
                     <MenuItem value="高">高</MenuItem>
                     <MenuItem value="中">中</MenuItem>
                     <MenuItem value="低">低</MenuItem>
