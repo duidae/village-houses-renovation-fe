@@ -1,28 +1,24 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { sampleProperties } from '../mocks/properties';
 import { mockAnalysisData } from '../mocks/analysisData';
+import { fetchVillageHouses, buildAnalysisDataForRecord, type VillageHouseRecord } from '../services/villageHousesService';
 import CaseAnalysisPage from './CaseAnalysisPage';
+import { LoadingSpinner } from './LoadingSpinner';
 
 const CasePage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const property = sampleProperties.find((p) => p.id === id);
+  const [records, setRecords] = useState<VillageHouseRecord[] | null>(null);
 
-  const analysisData = property
-    ? {
-        ...mockAnalysisData,
-        basicInfo: {
-          ...mockAnalysisData.basicInfo,
-          name: property.name,
-          latitude: property.lat,
-          longitude: property.lng,
-        },
-        potentialIndex: {
-          ...mockAnalysisData.potentialIndex,
-          cpiScore: property.score,
-        },
-      }
-    : mockAnalysisData;
+  useEffect(() => {
+    fetchVillageHouses().then(setRecords);
+  }, []);
+
+  if (!records) {
+    return <LoadingSpinner />;
+  }
+
+  const record = records.find((r) => r.id === id);
+  const analysisData = record ? buildAnalysisDataForRecord(mockAnalysisData, record) : mockAnalysisData;
 
   return <CaseAnalysisPage analysisData={analysisData} />;
 };

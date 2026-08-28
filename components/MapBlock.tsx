@@ -3,6 +3,9 @@ import { Link } from 'react-router-dom';
 import type { PropertyMarker } from '../mocks/properties';
 import { fetchProperties } from '../services/propertiesService';
 
+const defaultCenter = [23.4789, 120.447];
+const defaultZoom = 8;
+
 const formatPrice = (price: number) => `${price.toLocaleString('zh-TW')} 萬`;
 
 const getScoreLevelColor = (score: number) => {
@@ -64,7 +67,7 @@ const MapBlock: React.FC = () => {
     if (!mapContainer) return;
 
     // Initialize map
-    const map = L.map('map-container').setView([23.4789, 120.447], 15);
+    const map = L.map('map-container').setView(defaultCenter, defaultZoom);
 
     // Add OpenStreetMap tile layer
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
