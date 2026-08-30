@@ -4,7 +4,7 @@ import type { AnalysisData } from '../types';
 import { AnalysisDashboard } from './AnalysisDashboard';
 import { LoadingSpinner } from './LoadingSpinner';
 import MapBlock from './MapBlock';
-import { fetchVillageHouses } from '../services/villageHousesService';
+import { fetchProperties } from '../services/propertiesService';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
@@ -61,10 +61,12 @@ const HomePage: React.FC<HomePageProps> = ({
   setSelectedReuse,
 }) => {
   const navigate = useNavigate();
-  const [houseIds, setHouseIds] = useState<string[]>([]);
+  const [houseOptions, setHouseOptions] = useState<{ id: string; name: string }[]>([]);
 
   useEffect(() => {
-    fetchVillageHouses().then((records) => setHouseIds(records.map((r) => r.id)));
+    fetchProperties().then((properties) =>
+      setHouseOptions(properties.map((p) => ({ id: p.id, name: p.name })))
+    );
   }, []);
 
   return (
@@ -152,9 +154,9 @@ const HomePage: React.FC<HomePageProps> = ({
                     onChange={(e) => setSelectedResearchBase(e.target.value)}
                   >
                     <MenuItem value="全部">全部</MenuItem>
-                    {houseIds.map((id) => (
-                      <MenuItem key={id} value={id}>
-                        {id}
+                    {houseOptions.map((house) => (
+                      <MenuItem key={house.id} value={house.id}>
+                        {house.name}
                       </MenuItem>
                     ))}
                   </Select>
