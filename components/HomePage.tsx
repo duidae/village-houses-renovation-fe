@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { AnalysisData } from '../types';
 import { AnalysisDashboard } from './AnalysisDashboard';
 import { LoadingSpinner } from './LoadingSpinner';
 import MapBlock from './MapBlock';
+import { fetchVillageHouses } from '../services/villageHousesService';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
@@ -27,10 +28,8 @@ interface HomePageProps {
   handleSearch: (searchSchoolName?: string) => Promise<void>;
   handleKeyPress: (event: React.KeyboardEvent<HTMLInputElement>) => void;
   isGeneratingPdf: boolean;
-  selectedResearchBase: '全部' | '嘉義好宅1' | '嘉義好宅2' | '嘉義好宅3' | '嘉義好宅4';
-  setSelectedResearchBase: React.Dispatch<
-    React.SetStateAction<'全部' | '嘉義好宅1' | '嘉義好宅2' | '嘉義好宅3' | '嘉義好宅4'>
-  >;
+  selectedResearchBase: string;
+  setSelectedResearchBase: React.Dispatch<React.SetStateAction<string>>;
   selectedPotential: '全部' | '高' | '中' | '低';
   setSelectedPotential: React.Dispatch<React.SetStateAction<'全部' | '高' | '中' | '低'>>;
   selectedLocation: '主幹道上' | '周邊有公共設施';
@@ -62,6 +61,11 @@ const HomePage: React.FC<HomePageProps> = ({
   setSelectedReuse,
 }) => {
   const navigate = useNavigate();
+  const [houseIds, setHouseIds] = useState<string[]>([]);
+
+  useEffect(() => {
+    fetchVillageHouses().then((records) => setHouseIds(records.map((r) => r.id)));
+  }, []);
 
   return (
     <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
@@ -145,17 +149,14 @@ const HomePage: React.FC<HomePageProps> = ({
                   <Select
                     value={selectedResearchBase}
                     label="研究基地"
-                    onChange={(e) =>
-                      setSelectedResearchBase(
-                        e.target.value as '全部' | '嘉義好宅1' | '嘉義好宅2' | '嘉義好宅3' | '嘉義好宅4'
-                      )
-                    }
+                    onChange={(e) => setSelectedResearchBase(e.target.value)}
                   >
                     <MenuItem value="全部">全部</MenuItem>
-                    <MenuItem value="嘉義好宅1">嘉義好宅1</MenuItem>
-                    <MenuItem value="嘉義好宅2">嘉義好宅2</MenuItem>
-                    <MenuItem value="嘉義好宅3">嘉義好宅3</MenuItem>
-                    <MenuItem value="嘉義好宅4">嘉義好宅4</MenuItem>
+                    {houseIds.map((id) => (
+                      <MenuItem key={id} value={id}>
+                        {id}
+                      </MenuItem>
+                    ))}
                   </Select>
                 </FormControl>
               </Grid>
@@ -239,7 +240,7 @@ const HomePage: React.FC<HomePageProps> = ({
             </Grid>
           </CardContent>
           <Box sx={{ flex: 1, minHeight: 0 }}>
-            <MapBlock />
+            <MapBlock selectedResearchBase={selectedResearchBase} />
           </Box>
         </Card>
       )}

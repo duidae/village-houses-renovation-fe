@@ -21,9 +21,7 @@ const App: React.FC = () => {
   const [isGeneratingPdf, setIsGeneratingPdf] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [searchHistory, setSearchHistory] = useState<SearchHistoryItem[]>([]);
-  const [selectedResearchBase, setSelectedResearchBase] = useState<
-    '全部' | '嘉義好宅1' | '嘉義好宅2' | '嘉義好宅3' | '嘉義好宅4'
-  >('全部');
+  const [selectedResearchBase, setSelectedResearchBase] = useState<string>('全部');
   const [selectedPotential, setSelectedPotential] = useState<'高' | '中' | '低'>('中');
   const [selectedLocation, setSelectedLocation] = useState<'主幹道上' | '周邊有公共設施'>('主幹道上');
   const [selectedBuilding, setSelectedBuilding] = useState<'一條龍' | '單伸手' | '三合院' | '水泥連棟式' | '具歷史價值'>('一條龍');

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import type { PropertyMarker } from '../mocks/properties';
 import { fetchProperties } from '../services/propertiesService';
@@ -20,7 +20,11 @@ const getScoreLevelText = (score: number) => {
   return '低';
 };
 
-const MapBlock: React.FC = () => {
+interface MapBlockProps {
+  selectedResearchBase?: string;
+}
+
+const MapBlock: React.FC<MapBlockProps> = ({ selectedResearchBase = '全部' }) => {
   const [selectedProperty, setSelectedProperty] = useState<PropertyMarker | null>(
     null
   );
@@ -30,6 +34,18 @@ const MapBlock: React.FC = () => {
   React.useEffect(() => {
     fetchProperties().then(setProperties);
   }, []);
+
+  const visibleProperties = useMemo(
+    () =>
+      selectedResearchBase === '全部'
+        ? properties
+        : properties.filter((property) => property.id === selectedResearchBase),
+    [properties, selectedResearchBase]
+  );
+
+  React.useEffect(() => {
+    setSelectedProperty(visibleProperties.length === 1 ? visibleProperties[0] : null);
+  }, [selectedResearchBase, properties]);
 
   React.useEffect(() => {
     // Load Leaflet CSS and JS dynamically
@@ -67,7 +83,12 @@ const MapBlock: React.FC = () => {
     if (!mapContainer) return;
 
     // Initialize map
-    const map = L.map('map-container').setView(defaultCenter, defaultZoom);
+    const initialView =
+      visibleProperties.length === 1
+        ? ([visibleProperties[0].lat, visibleProperties[0].lng] as [number, number])
+        : defaultCenter;
+    const initialZoom = visibleProperties.length === 1 ? 17 : defaultZoom;
+    const map = L.map('map-container').setView(initialView, initialZoom);
 
     // Add OpenStreetMap tile layer
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -76,7 +97,7 @@ const MapBlock: React.FC = () => {
     }).addTo(map);
 
     // Add markers for each property
-    properties.forEach((property) => {
+    visibleProperties.forEach((property) => {
       const statusColor = {
         planning: '#fbbf24', // amber
         'in-progress': '#60a5fa', // blue
@@ -154,7 +175,7 @@ const MapBlock: React.FC = () => {
     return () => {
       map.remove();
     };
-  }, [mapLoaded, properties]);
+  }, [mapLoaded, visibleProperties]);
 
   const getStatusText = (status: string) => {
     const statusMap: Record<string, string> = {
