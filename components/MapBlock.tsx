@@ -121,7 +121,7 @@ const MapBlock: React.FC<MapBlockProps> = ({ selectedResearchBase = '全部' }) 
             white-space: nowrap;
             margin-bottom: 3px;
           ">
-            ${isHighScore ? '🔥 ' : ''}${formatPrice(property.price)} · 分數 ${property.score}
+            ${formatPrice(property.price)} · 分數 ${property.score}
           </div>
           <div style="
             background-color: ${scoreColor};
