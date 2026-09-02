@@ -12,7 +12,10 @@ import CardContent from '@mui/material/CardContent';
 import FormControl from '@mui/material/FormControl';
 import Grid from '@mui/material/Grid';
 import InputLabel from '@mui/material/InputLabel';
+import List from '@mui/material/List';
+import ListItemButton from '@mui/material/ListItemButton';
 import MenuItem from '@mui/material/MenuItem';
+import Paper from '@mui/material/Paper';
 import Select from '@mui/material/Select';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
@@ -69,6 +72,16 @@ const HomePage: React.FC<HomePageProps> = ({
     );
   }, []);
 
+  const normalizedSearch = schoolName.trim().replace(/\s+/g, '').toLocaleLowerCase();
+  const hasExactMatch = houseOptions.some(
+    ({ name }) => name.replace(/\s+/g, '').toLocaleLowerCase() === normalizedSearch
+  );
+  const matchedHouses = normalizedSearch
+    ? houseOptions
+        .filter(({ name }) => name.replace(/\s+/g, '').toLocaleLowerCase().includes(normalizedSearch))
+        .slice(0, 8)
+    : [];
+
   return (
     <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
       {isLoading && <LoadingSpinner />}
@@ -113,20 +126,42 @@ const HomePage: React.FC<HomePageProps> = ({
               </Grid>
 
               <Grid item xs={12} md={6}>
-                <Card sx={{ bgcolor: 'grey.100', boxShadow: 'none', borderRadius: 3 }}>
+                <Card sx={{ bgcolor: 'grey.100', boxShadow: 'none', borderRadius: 3, overflow: 'visible' }}>
                   <CardContent>
                     <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1 }}>
                       搜尋農村好宅
                     </Typography>
                     <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
-                      <TextField
-                        fullWidth
-                        value={schoolName}
-                        onChange={(e) => setSchoolName(e.target.value)}
-                        onKeyDown={handleKeyPress}
-                        placeholder="輸入縣市、村里或宅院名稱"
-                        variant="outlined"
-                      />
+                      <Box sx={{ position: 'relative', flex: 1 }}>
+                        <TextField
+                          fullWidth
+                          value={schoolName}
+                          onChange={(e) => setSchoolName(e.target.value)}
+                          onKeyDown={handleKeyPress}
+                          placeholder="輸入縣市、村里或宅院名稱"
+                          variant="outlined"
+                        />
+                        {matchedHouses.length > 0 && !hasExactMatch && (
+                          <Paper
+                            elevation={4}
+                            sx={{ position: 'absolute', zIndex: 2, left: 0, right: 0, mt: 1, maxHeight: 280, overflowY: 'auto' }}
+                          >
+                            <List disablePadding>
+                              {matchedHouses.map((house) => (
+                                <ListItemButton
+                                  key={house.id}
+                                  onClick={() => {
+                                    setSchoolName(house.name);
+                                    setSelectedResearchBase(house.id);
+                                  }}
+                                >
+                                  {house.name}
+                                </ListItemButton>
+                              ))}
+                            </List>
+                          </Paper>
+                        )}
+                      </Box>
                       <Button
                         variant="contained"
                         size="medium"
@@ -137,7 +172,7 @@ const HomePage: React.FC<HomePageProps> = ({
                       </Button>
                     </Stack>
                     <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1 }}>
-                      可輸入範例：嘉義好宅1、嘉義好宅2。
+                      可輸入範例：西昌社區、福興社區。
                     </Typography>
                   </CardContent>
                 </Card>
