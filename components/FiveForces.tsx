@@ -109,7 +109,7 @@ const FiveForces: React.FC = () => {
   const compositeScore = Math.round(barData.reduce((acc, cur) => acc + (cur.value || 0), 0) / Math.max(1, barData.length));
   const radialData = [
     { name: 'score', value: compositeScore, fill: '#14b8a6' },
-    { name: 'remaining', value: Math.max(0, 100 - compositeScore), fill: '#1f2937' },
+    { name: 'remaining', value: Math.max(0, 100 - compositeScore), fill: '#e2e8f0' },
   ];
 
   const getImpactColor = (impact: string) => {
@@ -121,7 +121,7 @@ const FiveForces: React.FC = () => {
       case 'low':
         return 'border-green-500 bg-green-500/10';
       default:
-        return 'border-zinc-600 bg-zinc-600/10';
+        return 'border-slate-300 bg-slate-100';
     }
   };
 
@@ -134,12 +134,12 @@ const FiveForces: React.FC = () => {
       case 'low':
         return { text: '低風險', color: 'bg-green-600' };
       default:
-        return { text: '未知', color: 'bg-zinc-600' };
+        return { text: '未知', color: 'bg-slate-500' };
     }
   };
 
   return (
-    <div className="bg-zinc-900/50 p-6 rounded-xl border border-zinc-800 mt-10">
+    <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm mt-10">
       {/* Header */}
       <div className="mb-8">
         <h2 className="text-2xl font-bold text-brand-text mb-2 flex items-center">
@@ -151,7 +151,7 @@ const FiveForces: React.FC = () => {
       {/* Center Competitive Rivalry */}
       <div className="mb-8 flex justify-center">
         <div className="w-full max-w-2xl">
-          <div className="bg-gradient-to-br from-zinc-800 to-zinc-900 p-6 rounded-lg border-2 border-brand-accent shadow-lg">
+          <div className="bg-white p-6 rounded-lg border-2 border-brand-accent shadow-lg">
             <p className="text-center text-xs font-bold text-brand-accent uppercase mb-2">
               競爭力五邊形分析
             </p>
@@ -166,18 +166,18 @@ const FiveForces: React.FC = () => {
                     <stop offset="95%" stopColor="#0d9488" stopOpacity={0.1} />
                   </linearGradient>
                 </defs>
-                <PolarGrid stroke="#404040" />
+                <PolarGrid stroke="#cbd5e1" />
                 <PolarAngleAxis
                   dataKey="name"
                   tick={{
                     fontSize: 12,
-                    fill: '#a1a1aa',
+                    fill: '#475569',
                   }}
                 />
                 <PolarRadiusAxis
                   angle={90}
                   domain={[0, 100]}
-                  tick={{ fontSize: 11, fill: '#71717a' }}
+                  tick={{ fontSize: 11, fill: '#94a3b8' }}
                 />
                 <Radar
                   name="影響力強度"
@@ -214,7 +214,7 @@ const FiveForces: React.FC = () => {
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart layout="vertical" data={barData} margin={{ top: 6, right: 12, left: 12, bottom: 6 }}>
                         <XAxis type="number" domain={[0, 100]} hide />
-                        <YAxis type="category" dataKey="name" width={120} tick={{ fontSize: 12, fill: '#a1a1aa' }} />
+                        <YAxis type="category" dataKey="name" width={120} tick={{ fontSize: 12, fill: '#475569' }} />
                         <Tooltip formatter={(value: number) => `${value}%`} />
                         <Bar dataKey="value" barSize={12} isAnimationActive={true}>
                           {barData.map((entry, idx) => {
@@ -255,7 +255,7 @@ const FiveForces: React.FC = () => {
                   <span className={`text-xs font-bold text-white px-2 py-1 rounded ${badgeStyle.color}`}>
                     {badgeStyle.text}
                   </span>
-                  <span className="text-xs font-mono text-brand-accent bg-zinc-800/60 px-2 py-0.5 rounded">
+                  <span className="text-xs font-mono text-teal-700 bg-teal-500/10 px-2 py-0.5 rounded">
                     {score}%
                   </span>
                 </div>
@@ -291,7 +291,7 @@ const FiveForces: React.FC = () => {
 
       {/* Summary Insights */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-zinc-800/70 p-4 rounded-lg border border-zinc-700">
+        <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
           <p className="text-xs font-bold text-brand-accent mb-2 uppercase">
             主要機會
           </p>
@@ -302,7 +302,7 @@ const FiveForces: React.FC = () => {
           </ul>
         </div>
 
-        <div className="bg-zinc-800/70 p-4 rounded-lg border border-zinc-700">
+        <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
           <p className="text-xs font-bold text-brand-accent mb-2 uppercase">
             主要威脅
           </p>
@@ -313,7 +313,7 @@ const FiveForces: React.FC = () => {
           </ul>
         </div>
 
-        <div className="bg-zinc-800/70 p-4 rounded-lg border border-zinc-700">
+        <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
           <p className="text-xs font-bold text-brand-accent mb-2 uppercase">
             建議策略
           </p>

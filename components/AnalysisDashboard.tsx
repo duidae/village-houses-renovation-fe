@@ -7,8 +7,8 @@ import { BuildingIcon, CalendarIcon, AreaIcon, MountainIcon, WaveIcon, RiverIcon
 
 // --- Keyword Highlighting Component & Definitions ---
 
-const LABEL_STYLE = 'bg-teal-500/10 text-teal-300 ring-1 ring-teal-500/20';
-const UNDERLINE_STYLE = 'no-underline border-b-2 border-teal-500/50 font-medium text-teal-300';
+const LABEL_STYLE = 'bg-teal-500/10 text-teal-700 ring-1 ring-teal-500/20';
+const UNDERLINE_STYLE = 'no-underline border-b-2 border-teal-500/50 font-medium text-teal-700';
 
 
 const HighlightedText: React.FC<{ text: string | undefined | null; styleType?: 'label' | 'underline'; customLabelClass?: string }> = ({ text, styleType = 'underline', customLabelClass }) => {
@@ -61,7 +61,7 @@ const InfoItem: React.FC<{ icon: React.ReactNode; label: string; value: string |
 
 const CpiGauge: React.FC<{ score: number }> = ({ score }) => {
     const data = [ { name: 'Score', value: score }, { name: 'Remaining', value: 100 - score }, ];
-    const COLORS = ['#2dd4bf', '#27272a']; // teal-400, zinc-800
+    const COLORS = ['#2dd4bf', '#e2e8f0']; // teal-400, slate-200
 
     return (
         <div className="relative w-full h-48 sm:h-64">
@@ -70,7 +70,7 @@ const CpiGauge: React.FC<{ score: number }> = ({ score }) => {
                     <Pie data={data} cx="50%" cy="50%" startAngle={180} endAngle={0} innerRadius="70%" outerRadius="100%" fill="#8884d8" paddingAngle={2} dataKey="value" stroke="none">
                         {data.map((entry, index) => (<Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />))}
                     </Pie>
-                    <Tooltip formatter={(value: number) => [`${value}`, '分數']} contentStyle={{ backgroundColor: '#18181b', borderColor: '#27272a' }}/>
+                    <Tooltip formatter={(value: number) => [`${value}`, '分數']} contentStyle={{ backgroundColor: '#f8fafc', borderColor: '#cbd5e1', color: '#0f172a' }}/>
                 </PieChart>
             </ResponsiveContainer>
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/3 text-center">
@@ -250,11 +250,11 @@ const FiveForcesAnalysisChart: React.FC<{ data: FiveForcesAnalysis }> = ({ data 
             <div className="w-full h-80">
                 <ResponsiveContainer width="100%" height="100%">
                     <RadarChart cx="50%" cy="50%" outerRadius="80%" data={chartData}>
-                        <PolarGrid stroke="#3f3f46"/>
-                        <PolarAngleAxis dataKey="subject" stroke="#e4e4e7" tick={{ fill: '#e4e4e7', fontSize: 14 }} />
-                        <PolarRadiusAxis angle={30} domain={[0, 10]} stroke="#a1a1aa" />
+                        <PolarGrid stroke="#cbd5e1"/>
+                        <PolarAngleAxis dataKey="subject" stroke="#94a3b8" tick={{ fill: '#475569', fontSize: 14 }} />
+                        <PolarRadiusAxis angle={30} domain={[0, 10]} stroke="#94a3b8" />
                         <Radar name="威脅分數" dataKey="score" stroke="#14b8a6" fill="#14b8a6" fillOpacity={0.6} />
-                         <Tooltip contentStyle={{ backgroundColor: '#18181b', borderColor: '#27272a', color: '#e4e4e7' }}/>
+                         <Tooltip contentStyle={{ backgroundColor: '#f8fafc', borderColor: '#cbd5e1', color: '#0f172a' }}/>
                     </RadarChart>
                 </ResponsiveContainer>
             </div>
@@ -306,10 +306,10 @@ const InternalHealthDisplay: React.FC<{ data: InternalHealthMetrics }> = ({ data
 
 const SwotAnalysisDisplay: React.FC<{ data: SwotAnalysis }> = ({ data }) => {
     const items = [
-        { title: 'Strengths (優勢)', items: data.strengths, bgColor: 'bg-emerald-500/10', textColor: 'text-emerald-300' },
-        { title: 'Weaknesses (劣勢)', items: data.weaknesses, bgColor: 'bg-red-500/10', textColor: 'text-red-400' },
-        { title: 'Opportunities (機會)', items: data.opportunities, bgColor: 'bg-sky-500/10', textColor: 'text-sky-300' },
-        { title: 'Threats (威脅)', items: data.threats, bgColor: 'bg-amber-500/10', textColor: 'text-amber-300' },
+        { title: 'Strengths (優勢)', items: data.strengths, bgColor: 'bg-emerald-500/10', textColor: 'text-emerald-700' },
+        { title: 'Weaknesses (劣勢)', items: data.weaknesses, bgColor: 'bg-red-500/10', textColor: 'text-red-600' },
+        { title: 'Opportunities (機會)', items: data.opportunities, bgColor: 'bg-sky-500/10', textColor: 'text-sky-700' },
+        { title: 'Threats (威脅)', items: data.threats, bgColor: 'bg-amber-500/10', textColor: 'text-amber-700' },
     ];
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -363,7 +363,7 @@ const StrategicRecommendationsDisplay: React.FC<{ recommendations: StrategicReco
         }
     };
 
-    const policyTagStyle = "bg-brand-secondary/30 text-brand-accent border border-brand-secondary/50 hover:bg-brand-secondary/50";
+    const policyTagStyle = "bg-brand-secondary/10 text-teal-700 border border-brand-secondary/30 hover:bg-brand-secondary/20";
 
     return (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -376,10 +376,10 @@ const StrategicRecommendationsDisplay: React.FC<{ recommendations: StrategicReco
                             <span className={`font-semibold text-sm px-3 py-1 rounded-full ${style.bgColor} border ${style.borderColor} ${style.textColor}`}>{rec.type}</span>
                         </div>
                         <h4 className="font-bold text-lg text-brand-text">{rec.project}</h4>
-                        <p className="text-brand-subtext text-sm flex-grow leading-relaxed"><span className="font-semibold text-zinc-400">理由：</span><HighlightedText text={rec.reason} styleType="label" customLabelClass={style.labelClass} /></p>
+                        <p className="text-brand-subtext text-sm flex-grow leading-relaxed"><span className="font-semibold text-slate-500">理由：</span><HighlightedText text={rec.reason} styleType="label" customLabelClass={style.labelClass} /></p>
                         {rec.policyAlignment && rec.policyAlignment.length > 0 && (
                             <div>
-                                <h5 className="text-sm font-semibold text-zinc-400 mb-2">可對接政策：</h5>
+                                <h5 className="text-sm font-semibold text-slate-500 mb-2">可對接政策：</h5>
                                 <div className="flex flex-wrap gap-2">
                                     {rec.policyAlignment.map((policy, pIndex) => (
                                         <span key={pIndex} className={`text-xs py-1 px-3 rounded-full transition-colors cursor-default ${policyTagStyle}`}>
@@ -400,13 +400,13 @@ const ImpactAssessmentDisplay: React.FC<{ data: ImpactAssessment }> = ({ data })
     const { economic, social, sustainability, summary } = data;
     
     const categories = [
-        { title: "經濟效益", metrics: economic, icon: <TrendingUpIcon className="w-8 h-8 text-sky-400" />, color: "border-sky-500", textColor: "text-sky-400" },
-        { title: "社會效益", metrics: social, icon: <UsersIcon className="w-8 h-8 text-emerald-400" />, color: "border-emerald-500", textColor: "text-emerald-400" },
-        { title: "永續效益", metrics: sustainability, icon: <LeafIcon className="w-8 h-8 text-amber-400" />, color: "border-amber-500", textColor: "text-amber-400" }
+        { title: "經濟效益", metrics: economic, icon: <TrendingUpIcon className="w-8 h-8 text-sky-500" />, color: "border-sky-500", textColor: "text-sky-600" },
+        { title: "社會效益", metrics: social, icon: <UsersIcon className="w-8 h-8 text-emerald-500" />, color: "border-emerald-500", textColor: "text-emerald-600" },
+        { title: "永續效益", metrics: sustainability, icon: <LeafIcon className="w-8 h-8 text-amber-500" />, color: "border-amber-500", textColor: "text-amber-600" }
     ];
 
     const MetricCard: React.FC<{ item: ImpactMetric }> = ({ item }) => (
-        <div className="bg-zinc-800/50 p-4 rounded-lg transform transition-transform hover:scale-105">
+        <div className="bg-slate-50 border border-slate-200 p-4 rounded-lg transform transition-transform hover:scale-105 shadow-sm">
             <p className="font-semibold text-brand-text">{item.metric}</p>
             <p className="text-2xl font-bold text-brand-accent my-1">{item.value}</p>
             <p className="text-xs text-brand-subtext leading-relaxed"><HighlightedText text={item.description} /></p>
@@ -415,11 +415,11 @@ const ImpactAssessmentDisplay: React.FC<{ data: ImpactAssessment }> = ({ data })
 
     return (
         <div className="space-y-8">
-            <p className="text-center text-brand-subtext text-lg max-w-3xl mx-auto leading-relaxed border-t border-b border-zinc-700 py-4"><HighlightedText text={summary} /></p>
+            <p className="text-center text-brand-subtext text-lg max-w-3xl mx-auto leading-relaxed border-t border-b border-slate-200 py-4"><HighlightedText text={summary} /></p>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {categories.map(cat => (
-                    <div key={cat.title} className={`p-5 rounded-xl bg-zinc-900/50 border-2 ${cat.color}/30`}>
+                    <div key={cat.title} className={`p-5 rounded-xl bg-slate-50 border-2 ${cat.color}/30`}>
                         <div className="flex items-center space-x-3 mb-4">
                             {cat.icon}
                             <h4 className={`text-xl font-bold ${cat.textColor}`}>{cat.title}</h4>
@@ -438,47 +438,47 @@ const TransformationAlternativesDisplay: React.FC<{ alternatives: Transformation
   return (
     <div className="space-y-8">
       {alternatives.map((alt, index) => (
-        <div key={index} className="bg-zinc-800/50 p-5 rounded-lg border border-zinc-700 transition-shadow hover:shadow-lg hover:border-zinc-600">
+        <div key={index} className="bg-slate-50 p-5 rounded-lg border border-slate-200 shadow-sm transition-shadow hover:shadow-lg hover:border-slate-300">
           <div className="flex items-center mb-4">
-            <SparklesIcon className="w-6 h-6 text-amber-400 mr-3 flex-shrink-0" />
+            <SparklesIcon className="w-6 h-6 text-amber-500 mr-3 flex-shrink-0" />
             <h4 className="font-bold text-lg text-brand-text">{alt.title}</h4>
           </div>
-          
+
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-6">
             {/* Left Column: Descriptions */}
             <div className="space-y-4">
-              <p className="text-brand-subtext text-sm leading-relaxed"><span className="font-semibold text-zinc-400">描述：</span><HighlightedText text={alt.description} /></p>
-              <p className="text-brand-subtext text-sm leading-relaxed"><span className="font-semibold text-zinc-400">對接分析：</span><HighlightedText text={alt.alignment} /></p>
+              <p className="text-brand-subtext text-sm leading-relaxed"><span className="font-semibold text-slate-500">描述：</span><HighlightedText text={alt.description} /></p>
+              <p className="text-brand-subtext text-sm leading-relaxed"><span className="font-semibold text-slate-500">對接分析：</span><HighlightedText text={alt.alignment} /></p>
             </div>
 
             {/* Right Column: Steps, Partners, Risks */}
             <div className="space-y-4">
               <div>
-                <h5 className="text-md font-semibold text-brand-text mb-2 flex items-center"><ListBulletIcon className="w-5 h-5 mr-2 text-sky-400"/>執行步驟</h5>
+                <h5 className="text-md font-semibold text-brand-text mb-2 flex items-center"><ListBulletIcon className="w-5 h-5 mr-2 text-sky-500"/>執行步驟</h5>
                 <ol className="list-decimal list-inside space-y-1 text-sm text-brand-subtext pl-2">
                   {alt.implementationSteps.map((step, i) => <li key={i}><HighlightedText text={step}/></li>)}
                 </ol>
               </div>
                <div>
-                <h5 className="text-md font-semibold text-brand-text mb-2 flex items-center"><UserGroupIcon className="w-5 h-5 mr-2 text-emerald-400"/>關鍵合作夥伴</h5>
+                <h5 className="text-md font-semibold text-brand-text mb-2 flex items-center"><UserGroupIcon className="w-5 h-5 mr-2 text-emerald-500"/>關鍵合作夥伴</h5>
                 <div className="flex flex-wrap gap-2">
                     {alt.keyPartners.map((partner, i) => (
-                        <span key={i} className="text-xs bg-emerald-900/50 text-emerald-300 py-1 px-3 rounded-full">{partner}</span>
+                        <span key={i} className="text-xs bg-emerald-100 text-emerald-700 py-1 px-3 rounded-full">{partner}</span>
                     ))}
                 </div>
               </div>
                <div>
-                <h5 className="text-md font-semibold text-brand-text mb-2 flex items-center"><ExclamationTriangleIcon className="w-5 h-5 mr-2 text-red-400"/>風險與對策</h5>
+                <h5 className="text-md font-semibold text-brand-text mb-2 flex items-center"><ExclamationTriangleIcon className="w-5 h-5 mr-2 text-red-500"/>風險與對策</h5>
                  <p className="text-sm text-brand-subtext leading-relaxed"><HighlightedText text={alt.riskAnalysis}/></p>
               </div>
             </div>
           </div>
-          
-          <div className="mt-6 pt-4 border-t border-zinc-700/50">
+
+          <div className="mt-6 pt-4 border-t border-slate-200">
             <h5 className="text-md font-semibold text-brand-text mb-3">潛在效益</h5>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {alt.potentialImpact.map((impact, i) => (
-                <div key={i} className="bg-zinc-900/50 p-3 rounded-md">
+                <div key={i} className="bg-white border border-slate-200 p-3 rounded-md">
                   <p className="font-semibold text-sm text-brand-text">{impact.metric}</p>
                   <p className="text-xl font-bold text-brand-accent my-1">{impact.value}</p>
                   <p className="text-xs text-brand-subtext"><HighlightedText text={impact.description} /></p>
@@ -519,9 +519,9 @@ const PastCasesDisplay: React.FC<{ pastCases: PastCase[] }> = ({ pastCases }) =>
                     </div>
                 </div>
                 <div className="text-sm space-y-2 text-brand-subtext leading-relaxed">
-                    <p><span className="font-semibold text-zinc-400">原始條件：</span><HighlightedText text={pcase.originalCondition} styleType="label" /></p>
-                    <p><span className="font-semibold text-zinc-400">活化主題：</span><span className="font-semibold text-amber-400"><HighlightedText text={pcase.revitalizationTheme} styleType="label" /></span></p>
-                    <p><span className="font-semibold text-zinc-400">最終成果：</span><HighlightedText text={pcase.outcome} styleType="label" /></p>
+                    <p><span className="font-semibold text-slate-500">原始條件：</span><HighlightedText text={pcase.originalCondition} styleType="label" /></p>
+                    <p><span className="font-semibold text-slate-500">活化主題：</span><span className="font-semibold text-amber-600"><HighlightedText text={pcase.revitalizationTheme} styleType="label" /></span></p>
+                    <p><span className="font-semibold text-slate-500">最終成果：</span><HighlightedText text={pcase.outcome} styleType="label" /></p>
                 </div>
             </div>
         ))}
@@ -577,7 +577,7 @@ export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id }
                     <InfoItem icon={<TrainIcon className="w-6 h-6"/>} label="交通分數" value={`${environmentalAnalysis.transportationScore} / 10`} />
                 </div>
                 {(environmentalAnalysis.localAttractions?.length > 0 || environmentalAnalysis.localSpecialtyFoods?.length > 0) && (
-                    <div className="mt-6 pt-6 border-t border-zinc-800">
+                    <div className="mt-6 pt-6 border-t border-slate-200">
                         <h4 className="text-md font-semibold text-brand-text mb-4">區域特色</h4>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             {environmentalAnalysis.localAttractions?.length > 0 && (
@@ -588,7 +588,7 @@ export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id }
                                     </div>
                                     <div className="flex flex-wrap gap-2">
                                         {environmentalAnalysis.localAttractions.map((item, index) => (
-                                            <span key={index} className="text-sm bg-sky-900/50 text-sky-300 py-1 px-3 rounded-full">{item}</span>
+                                            <span key={index} className="text-sm bg-sky-100 text-sky-700 py-1 px-3 rounded-full">{item}</span>
                                         ))}
                                     </div>
                                 </div>
@@ -601,7 +601,7 @@ export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id }
                                     </div>
                                     <div className="flex flex-wrap gap-2">
                                         {environmentalAnalysis.localSpecialtyFoods.map((item, index) => (
-                                            <span key={index} className="text-sm bg-amber-900/50 text-amber-300 py-1 px-3 rounded-full">{item}</span>
+                                            <span key={index} className="text-sm bg-amber-100 text-amber-700 py-1 px-3 rounded-full">{item}</span>
                                         ))}
                                     </div>
                                 </div>
@@ -612,22 +612,22 @@ export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id }
             </Section>
         </div>
         <div className="space-y-6">
-             <div className="bg-zinc-900 p-6 rounded-xl border border-zinc-800 h-full flex flex-col justify-between">
+             <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm h-full flex flex-col justify-between">
                 <div>
                   <h3 className="text-xl font-semibold mb-2 text-center text-brand-text">3. 潛力指標 (CPI)</h3>
                   <CpiGauge score={potentialIndex.cpiScore} />
                 </div>
                 <p className="text-center text-brand-subtext mt-2 px-2"><HighlightedText text={potentialIndex.summary} /></p>
-                 <p className="text-center text-sm text-zinc-500 mt-4 px-2">* 指數為模型估算，計算參考公式：<br/><span className="font-mono text-brand-accent">CPI = (交通x0.4) + (環境x0.3) + (面積x0.2) + (校齡x0.1)</span></p>
+                 <p className="text-center text-sm text-slate-400 mt-4 px-2">* 指數為模型估算，計算參考公式：<br/><span className="font-mono text-brand-accent">CPI = (交通x0.4) + (環境x0.3) + (面積x0.2) + (校齡x0.1)</span></p>
             </div>
         </div>
       </div>
     )},
     { condition: (recentNews?.schoolNews?.length > 0) || (recentNews?.cityNews?.length > 0), component: (
         <Section title="近期相關動態" icon={<NewspaperIcon className="w-6 h-6"/>}>
-            <div className="flex space-x-2 border-b border-zinc-700 mb-4">
-                <button onClick={() => setActiveTab('school')} className={`px-4 py-2 text-sm font-medium rounded-t-lg transition-colors ${activeTab === 'school' ? 'bg-brand-secondary text-white' : 'text-brand-subtext hover:bg-zinc-700'}`}>學校近期動態</button>
-                <button onClick={() => setActiveTab('city')} className={`px-4 py-2 text-sm font-medium rounded-t-lg transition-colors ${activeTab === 'city' ? 'bg-brand-secondary text-white' : 'text-brand-subtext hover:bg-zinc-700'}`}>城市近期動態</button>
+            <div className="flex space-x-2 border-b border-slate-200 mb-4">
+                <button onClick={() => setActiveTab('school')} className={`px-4 py-2 text-sm font-medium rounded-t-lg transition-colors ${activeTab === 'school' ? 'bg-brand-secondary text-white' : 'text-brand-subtext hover:bg-slate-100'}`}>學校近期動態</button>
+                <button onClick={() => setActiveTab('city')} className={`px-4 py-2 text-sm font-medium rounded-t-lg transition-colors ${activeTab === 'city' ? 'bg-brand-secondary text-white' : 'text-brand-subtext hover:bg-slate-100'}`}>城市近期動態</button>
             </div>
             <div>
                 {activeTab === 'school' && <NewsSection news={recentNews.schoolNews} />}
@@ -638,13 +638,13 @@ export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id }
     { condition: cityPopulation && cityPopulation.length > 0, component: (
         <Section title="所在城市人口趨勢" icon={<UsersIcon className="w-6 h-6"/>}>
             <PopulationChart data={cityPopulation} />
-            <p className="text-xs text-zinc-600 text-center mt-2">資料來源：中華民國內政部戶政司</p>
+            <p className="text-xs text-slate-400 text-center mt-2">資料來源：中華民國內政部戶政司</p>
         </Section>
     )},
     { condition: schoolEnrollment && schoolEnrollment.length > 0, component: (
         <Section title="學校近年學生人數趨勢" icon={<TrendingUpIcon className="w-6 h-6"/>}>
             <SchoolEnrollmentChart data={schoolEnrollment} />
-            <p className="text-xs text-zinc-600 text-center mt-2">資料來源：中華民國教育部統計處</p>
+            <p className="text-xs text-slate-400 text-center mt-2">資料來源：中華民國教育部統計處</p>
         </Section>
     )},
      { condition: trendProjection && trendProjection.projectionData.length > 0, component: (
@@ -662,11 +662,11 @@ export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id }
     { condition: true, component: <Section title="策略定位 (SWOT) 整合分析" icon={<PuzzleIcon className="w-6 h-6"/>}><SwotAnalysisDisplay data={swotAnalysis} /></Section> },
     { condition: hasRevitalizationData || hasTransformationData, component: (
         <Section title="策略與轉型建議" icon={<KeyIcon className="w-6 h-6" />}>
-          <div className="flex space-x-2 border-b border-zinc-700 mb-6">
+          <div className="flex space-x-2 border-b border-slate-200 mb-6">
             {hasTransformationData && (
               <button
                 onClick={() => setActiveStrategyTab('transformation')}
-                className={`px-4 py-2 text-sm font-medium rounded-t-lg transition-colors ${activeStrategyTab === 'transformation' ? 'bg-brand-secondary text-white' : 'text-brand-subtext hover:bg-zinc-700'}`}
+                className={`px-4 py-2 text-sm font-medium rounded-t-lg transition-colors ${activeStrategyTab === 'transformation' ? 'bg-brand-secondary text-white' : 'text-brand-subtext hover:bg-slate-100'}`}
               >
                 多元轉型營運建議
               </button>
@@ -674,7 +674,7 @@ export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id }
             {hasRevitalizationData && (
               <button
                 onClick={() => setActiveStrategyTab('revitalization')}
-                className={`px-4 py-2 text-sm font-medium rounded-t-lg transition-colors ${activeStrategyTab === 'revitalization' ? 'bg-brand-secondary text-white' : 'text-brand-subtext hover:bg-zinc-700'}`}
+                className={`px-4 py-2 text-sm font-medium rounded-t-lg transition-colors ${activeStrategyTab === 'revitalization' ? 'bg-brand-secondary text-white' : 'text-brand-subtext hover:bg-slate-100'}`}
               >
                 策略性活化建議
               </button>
