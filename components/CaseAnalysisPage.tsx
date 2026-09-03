@@ -20,7 +20,7 @@ const CaseAnalysisPage: React.FC<CaseAnalysisPageProps> = ({ analysisData }) => 
   return (
     <Box sx={{ bgcolor: 'grey.50', minHeight: '100vh', py: 3, px: { xs: 2, md: 4 } }}>
       <Box sx={{ bgcolor: 'common.white', borderRadius: 3, boxShadow: 2, p: 3 }}>
-        <Stack direction="row" justifyContent="flex-end" sx={{ mb: 2 }}>
+        <Stack direction="row" justifyContent="flex-start" sx={{ mb: 2 }}>
           <Button variant="outlined" onClick={() => navigate('/')}>返回搜尋</Button>
         </Stack>
         <AnalysisDashboard id="analysis-report" data={analysisData} />

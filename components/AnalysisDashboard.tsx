@@ -1,6 +1,6 @@
 
 
-import React, { FC, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip, LineChart, Line, XAxis, YAxis, CartesianGrid, Legend, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
 import { AnalysisData, NewsItem, PopulationDataPoint, SchoolEnrollmentDataPoint, FiveForcesAnalysis, PestAnalysis, InternalHealthMetrics, SwotAnalysis, MetricItem, StrategicRecommendation, ImpactAssessment, ImpactMetric, TrendProjection, TransformationAlternative, PastCase, Recommendation } from '../types';
 import { BuildingIcon, CalendarIcon, AreaIcon, MountainIcon, WaveIcon, RiverIcon, TrainIcon, LightbulbIcon, HistoryIcon, NewspaperIcon, UsersIcon, TrendingUpIcon, ShieldIcon, GlobeIcon, ClipboardListIcon, PuzzleIcon, HeartbeatIcon, MapPinIcon, SparklesIcon, KeyIcon, CpuChipIcon, BuildingOffice2Icon, PaintBrushIcon, ChartBarIcon, LeafIcon, ListBulletIcon, UserGroupIcon, ExclamationTriangleIcon } from './icons';
@@ -546,15 +546,90 @@ export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id }
       fiveForcesAnalysis, internalHealthMetrics, swotAnalysis, trendProjection,
       transformationAlternatives
   } = data;
-  const mapDelta = 0.005;
-  const mapBbox = [
-    basicInfo.longitude - mapDelta,
-    basicInfo.latitude - mapDelta,
-    basicInfo.longitude + mapDelta,
-    basicInfo.latitude + mapDelta,
-  ].join(',');
-  const mapSrc = `https://www.openstreetmap.org/export/embed.html?bbox=${mapBbox}&layer=mapnik&marker=${basicInfo.latitude},${basicInfo.longitude}`;
   const mapLink = `https://www.openstreetmap.org/?mlat=${basicInfo.latitude}&mlon=${basicInfo.longitude}#map=18/${basicInfo.latitude}/${basicInfo.longitude}`;
+  const mapContainerId = `analysis-map-${id || 'default'}`;
+  const [mapLoaded, setMapLoaded] = useState(false);
+
+  useEffect(() => {
+    if ((window as any).L) {
+      setMapLoaded(true);
+      return;
+    }
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css';
+    document.head.appendChild(link);
+
+    const script = document.createElement('script');
+    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js';
+    script.async = true;
+    script.onload = () => setMapLoaded(true);
+    document.body.appendChild(script);
+  }, []);
+
+  useEffect(() => {
+    if (!mapLoaded) return;
+    const L = (window as any).L;
+    const container = document.getElementById(mapContainerId);
+    if (!container) return;
+
+    const map = L.map(mapContainerId).setView([basicInfo.latitude, basicInfo.longitude], 17);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors',
+      maxZoom: 19,
+    }).addTo(map);
+
+    const markerHtml = `
+      <div style="display: flex; flex-direction: column; align-items: center;">
+        <div style="
+          background-color: white;
+          color: #1e293b;
+          font-size: 13px;
+          font-weight: bold;
+          padding: 3px 10px;
+          border-radius: 12px;
+          border: 2px solid #2dd4bf;
+          box-shadow: 0 1.5px 6px rgba(0,0,0,0.25);
+          white-space: nowrap;
+          max-width: 160px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          margin-bottom: 3px;
+        ">
+          ${basicInfo.name}
+        </div>
+        <div style="
+          background-color: #2dd4bf;
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border: 4px solid white;
+          box-shadow: 0 3px 12px rgba(0,0,0,0.3);
+          font-size: 20px;
+        ">
+          🏫
+        </div>
+      </div>
+    `;
+
+    const customIcon = L.divIcon({
+      html: markerHtml,
+      className: '',
+      iconSize: [96, 76],
+      iconAnchor: [48, 60],
+      popupAnchor: [0, -60],
+    });
+
+    L.marker([basicInfo.latitude, basicInfo.longitude], { icon: customIcon }).addTo(map);
+
+    return () => {
+      map.remove();
+    };
+  }, [mapLoaded, mapContainerId, basicInfo.latitude, basicInfo.longitude, basicInfo.name]);
 
   const [activeTab, setActiveTab] = useState<'school' | 'city'>('school');
   
@@ -748,9 +823,7 @@ export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id }
                     </a>
                 </p>
             </div>
-            <div className="h-64 rounded-lg overflow-hidden border-2 border-slate-200">
-                <iframe title="School Location" src={mapSrc} width="100%" height="100%" style={{ border: 0 }} allowFullScreen={false} loading="lazy" referrerPolicy="no-referrer-when-downgrade"></iframe>
-            </div>
+            <div id={mapContainerId} className="h-64 rounded-lg overflow-hidden border-2 border-slate-200 bg-slate-50" />
         </div>
         
       {visibleSections.map((section, index) => {
