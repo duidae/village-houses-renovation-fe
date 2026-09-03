@@ -546,7 +546,15 @@ export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id }
       fiveForcesAnalysis, internalHealthMetrics, swotAnalysis, trendProjection,
       transformationAlternatives
   } = data;
-  const mapSrc = `https://maps.google.com/maps?q=${encodeURIComponent(basicInfo.address)}&t=k&z=18&output=embed&hl=zh-TW`;
+  const mapDelta = 0.005;
+  const mapBbox = [
+    basicInfo.longitude - mapDelta,
+    basicInfo.latitude - mapDelta,
+    basicInfo.longitude + mapDelta,
+    basicInfo.latitude + mapDelta,
+  ].join(',');
+  const mapSrc = `https://www.openstreetmap.org/export/embed.html?bbox=${mapBbox}&layer=mapnik&marker=${basicInfo.latitude},${basicInfo.longitude}`;
+  const mapLink = `https://www.openstreetmap.org/?mlat=${basicInfo.latitude}&mlon=${basicInfo.longitude}#map=18/${basicInfo.latitude}/${basicInfo.longitude}`;
 
   const [activeTab, setActiveTab] = useState<'school' | 'city'>('school');
   
@@ -730,11 +738,11 @@ export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id }
                 <h2 className="text-3xl font-bold text-brand-text">{basicInfo.name}</h2>
                 <p className="text-brand-subtext mt-1">
                     <a
-                        href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(basicInfo.address)}`}
+                        href={mapLink}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="hover:text-brand-accent transition-colors duration-200 underline"
-                        title={`在 Google 地圖上查看 ${basicInfo.name}`}
+                        title={`在 OpenStreetMap 上查看 ${basicInfo.name}`}
                     >
                         {basicInfo.address}
                     </a>
