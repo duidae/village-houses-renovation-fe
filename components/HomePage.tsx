@@ -4,6 +4,8 @@ import type { AnalysisData } from '../types';
 import { AnalysisDashboard } from './AnalysisDashboard';
 import { LoadingSpinner } from './LoadingSpinner';
 import MapBlock from './MapBlock';
+import { mockAnalysisData } from '../mocks/analysisData';
+import { buildAnalysisDataForRecord, fetchVillageHouses, type VillageHouseRecord } from '../services/villageHousesService';
 import { fetchProperties } from '../services/propertiesService';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -65,11 +67,13 @@ const HomePage: React.FC<HomePageProps> = ({
 }) => {
   const navigate = useNavigate();
   const [houseOptions, setHouseOptions] = useState<{ id: string; name: string }[]>([]);
+  const [villageHouses, setVillageHouses] = useState<VillageHouseRecord[]>([]);
 
   useEffect(() => {
     fetchProperties().then((properties) =>
       setHouseOptions(properties.map((p) => ({ id: p.id, name: p.name })))
     );
+    fetchVillageHouses().then(setVillageHouses);
   }, []);
 
   const normalizedSearch = schoolName.trim().replace(/\s+/g, '').toLocaleLowerCase();
@@ -81,9 +85,24 @@ const HomePage: React.FC<HomePageProps> = ({
         .filter(({ name }) => name.replace(/\s+/g, '').toLocaleLowerCase().includes(normalizedSearch))
         .slice(0, 8)
     : [];
+  const selectedHouse = villageHouses.find((house) => house.id === selectedResearchBase);
+  const selectedAnalysis = selectedHouse
+    ? buildAnalysisDataForRecord(mockAnalysisData, selectedHouse)
+    : null;
+  const scrollToAnalysis = () => {
+    document.getElementById('case-analysis')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
 
   return (
-    <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+    <Box
+      sx={{
+        flex: 1,
+        display: 'flex',
+        flexDirection: 'column',
+        minHeight: 0,
+        overflowY: selectedResearchBase === '全部' ? 'hidden' : 'auto',
+      }}
+    >
       {isLoading && <LoadingSpinner />}
 
       {error && (
@@ -102,7 +121,7 @@ const HomePage: React.FC<HomePageProps> = ({
           <AnalysisDashboard id="analysis-report" data={analysisData} />
         </>
       ) : (
-        <Card sx={{ position: 'relative', overflow: 'hidden', bgcolor: 'background.paper', boxShadow: 5, borderRadius: 4, p: 3, mb: 1, flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+        <Card sx={{ position: 'relative', overflow: selectedResearchBase === '全部' ? 'hidden' : 'visible', bgcolor: 'background.paper', boxShadow: 5, borderRadius: 4, p: 3, mb: 1, flex: selectedResearchBase === '全部' ? 1 : '0 0 auto', display: 'flex', flexDirection: 'column', minHeight: 0 }}>
           <CardContent sx={{ position: 'relative', py: 2, flexShrink: 0 }}>
             <Grid container spacing={4} alignItems="flex-start">
               <Grid item xs={12} md={6}>
@@ -276,9 +295,17 @@ const HomePage: React.FC<HomePageProps> = ({
               </Grid>
             </Grid>
           </CardContent>
-          <Box sx={{ flex: 1, minHeight: 0 }}>
-            <MapBlock selectedResearchBase={selectedResearchBase} />
+          <Box sx={{ flex: selectedResearchBase === '全部' ? 1 : '0 0 70vh', minHeight: 0 }}>
+            <MapBlock selectedResearchBase={selectedResearchBase} onViewAnalysis={scrollToAnalysis} />
           </Box>
+          {selectedAnalysis && (
+            <Box
+              id="case-analysis"
+              sx={{ bgcolor: 'grey.50', borderRadius: 3, boxShadow: 2, mt: 3, p: { xs: 2, md: 3 }, minHeight: '100vh', scrollMarginTop: 16 }}
+            >
+              <AnalysisDashboard id="case-analysis-report" data={selectedAnalysis} />
+            </Box>
+          )}
         </Card>
       )}
     </Box>

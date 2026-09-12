@@ -22,9 +22,13 @@ const getScoreLevelText = (score: number) => {
 
 interface MapBlockProps {
   selectedResearchBase?: string;
+  onViewAnalysis?: () => void;
 }
 
-const MapBlock: React.FC<MapBlockProps> = ({ selectedResearchBase = '全部' }) => {
+const MapBlock: React.FC<MapBlockProps> = ({
+  selectedResearchBase = '全部',
+  onViewAnalysis,
+}) => {
   const [selectedProperty, setSelectedProperty] = useState<PropertyMarker | null>(
     null
   );
@@ -324,6 +328,16 @@ const MapBlock: React.FC<MapBlockProps> = ({ selectedResearchBase = '全部' }) 
           </div>
         </div>
       </div>
+      {selectedResearchBase !== '全部' && onViewAnalysis && (
+        <button
+          type="button"
+          onClick={onViewAnalysis}
+          className="fixed bottom-5 left-1/2 z-[1000] -translate-x-1/2 rounded-full bg-emerald-600 px-4 py-2 text-xs font-semibold text-white shadow-lg transition-all hover:scale-105 hover:bg-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:ring-offset-2"
+          aria-label="捲動至個案分析"
+        >
+          查看個案分析 ↓
+        </button>
+      )}
     </div>
   );
 };
