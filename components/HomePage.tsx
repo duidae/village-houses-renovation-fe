@@ -323,6 +323,7 @@ const HomePage: React.FC<HomePageProps> = ({
           >
             <MapBlock
               selectedResearchBase={selectedResearchBase}
+              onSelectResearchBase={setSelectedResearchBase}
               onViewAnalysis={scrollToAnalysis}
               showAnalysisButton={!isAnalysisVisible}
             />

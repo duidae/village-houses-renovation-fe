@@ -22,12 +22,14 @@ const getScoreLevelText = (score: number) => {
 
 interface MapBlockProps {
   selectedResearchBase?: string;
+  onSelectResearchBase?: (researchBaseId: string) => void;
   onViewAnalysis?: () => void;
   showAnalysisButton?: boolean;
 }
 
 const MapBlock: React.FC<MapBlockProps> = ({
   selectedResearchBase = '全部',
+  onSelectResearchBase,
   onViewAnalysis,
   showAnalysisButton = true,
 }) => {
@@ -174,6 +176,7 @@ const MapBlock: React.FC<MapBlockProps> = ({
 
       marker.on('click', () => {
         setSelectedProperty(property);
+        onSelectResearchBase?.(property.id);
       });
     });
 
