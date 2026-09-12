@@ -189,8 +189,8 @@ const MapBlock: React.FC<MapBlockProps> = ({ selectedResearchBase = '全部' }) 
   return (
     <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm mt-2 h-full flex flex-col">
       {/* Map Container */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1 min-h-0">
-        <div className="lg:col-span-2 h-full">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1 min-h-0 overflow-hidden">
+        <div className="lg:col-span-2 h-full min-h-0 overflow-hidden">
           <div
             id="map-container"
             className="w-full h-96 lg:h-full rounded-lg border border-slate-200 overflow-hidden bg-slate-50"
@@ -198,8 +198,8 @@ const MapBlock: React.FC<MapBlockProps> = ({ selectedResearchBase = '全部' }) 
         </div>
 
         {/* Right Panel - Selected Property Details */}
-        <div className="flex flex-col">
-          <div className="bg-slate-50 p-5 rounded-lg border border-slate-200 flex-1 overflow-y-auto">
+        <div className="flex flex-col min-h-0">
+          <div className="bg-slate-50 p-5 rounded-lg border border-slate-200 flex-1 min-h-0 overflow-y-auto">
             <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
               {selectedProperty ? '宅院重點摘要' : '選擇宅院'}
               {selectedProperty && (
