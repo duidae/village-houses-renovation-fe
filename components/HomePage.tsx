@@ -313,7 +313,14 @@ const HomePage: React.FC<HomePageProps> = ({
               </Grid>
             </Grid>
           </CardContent>
-          <Box sx={{ flex: selectedResearchBase === '全部' ? 1 : '0 0 70vh', minHeight: 0 }}>
+          <Box
+            sx={{
+              flex: selectedResearchBase === '全部'
+                ? 1
+                : { xs: '0 0 auto', md: '0 0 max(24rem, min(70vh, calc(100dvh - 22.5rem)))' },
+              minHeight: 0,
+            }}
+          >
             <MapBlock
               selectedResearchBase={selectedResearchBase}
               onViewAnalysis={scrollToAnalysis}
