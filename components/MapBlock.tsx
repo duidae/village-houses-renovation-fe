@@ -1,10 +1,15 @@
 import React, { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+import shp from 'shpjs';
 import type { PropertyMarker } from '../mocks/properties';
 import { fetchProperties } from '../services/propertiesService';
 
 const defaultCenter = [23.4789, 120.447];
 const defaultZoom = 8;
+const mapLayerSources = [
+  { url: '/layers/key_area-20260912T112510Z-1-001.zip', color: '#0f766e' },
+  { url: '/layers/public-20260912T112511Z-1-001.zip', color: '#2563eb' },
+];
 
 const formatPrice = (price: number) => `${price.toLocaleString('zh-TW')} 萬`;
 
@@ -104,6 +109,42 @@ const MapBlock: React.FC<MapBlockProps> = ({
       maxZoom: 19,
     }).addTo(map);
 
+    const shapeLayers = L.layerGroup().addTo(map);
+    let layersCancelled = false;
+
+    const loadShapeLayers = async () => {
+      await Promise.all(
+        mapLayerSources.map(async ({ url, color }) => {
+          try {
+            const geoJson = await shp(url);
+            if (layersCancelled) return;
+
+            L.geoJSON(geoJson, {
+              style: {
+                color,
+                fillColor: color,
+                fillOpacity: 0.12,
+                opacity: 0.8,
+                weight: 2,
+              },
+              pointToLayer: (_feature: unknown, latLng: unknown) =>
+                L.circleMarker(latLng, {
+                  radius: 5,
+                  color,
+                  fillColor: '#ffffff',
+                  fillOpacity: 0.9,
+                  weight: 2,
+                }),
+            }).addTo(shapeLayers);
+          } catch (error) {
+            console.error(`Unable to load map layer: ${url}`, error);
+          }
+        })
+      );
+    };
+
+    loadShapeLayers();
+
     // Add markers for each property
     visibleProperties.forEach((property) => {
       const statusColor = {
@@ -182,6 +223,7 @@ const MapBlock: React.FC<MapBlockProps> = ({
 
     // Cleanup function
     return () => {
+      layersCancelled = true;
       map.remove();
     };
   }, [mapLoaded, visibleProperties]);
