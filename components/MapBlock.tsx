@@ -23,11 +23,13 @@ const getScoreLevelText = (score: number) => {
 interface MapBlockProps {
   selectedResearchBase?: string;
   onViewAnalysis?: () => void;
+  showAnalysisButton?: boolean;
 }
 
 const MapBlock: React.FC<MapBlockProps> = ({
   selectedResearchBase = '全部',
   onViewAnalysis,
+  showAnalysisButton = true,
 }) => {
   const [selectedProperty, setSelectedProperty] = useState<PropertyMarker | null>(
     null
@@ -328,7 +330,7 @@ const MapBlock: React.FC<MapBlockProps> = ({
           </div>
         </div>
       </div>
-      {selectedResearchBase !== '全部' && onViewAnalysis && (
+      {selectedResearchBase !== '全部' && onViewAnalysis && showAnalysisButton && (
         <button
           type="button"
           onClick={onViewAnalysis}

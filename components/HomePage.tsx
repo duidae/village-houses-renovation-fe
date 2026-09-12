@@ -68,6 +68,7 @@ const HomePage: React.FC<HomePageProps> = ({
   const navigate = useNavigate();
   const [houseOptions, setHouseOptions] = useState<{ id: string; name: string }[]>([]);
   const [villageHouses, setVillageHouses] = useState<VillageHouseRecord[]>([]);
+  const [isAnalysisVisible, setIsAnalysisVisible] = useState(false);
 
   useEffect(() => {
     fetchProperties().then((properties) =>
@@ -89,6 +90,23 @@ const HomePage: React.FC<HomePageProps> = ({
   const selectedAnalysis = selectedHouse
     ? buildAnalysisDataForRecord(mockAnalysisData, selectedHouse)
     : null;
+
+  useEffect(() => {
+    setIsAnalysisVisible(false);
+    if (!selectedHouse) return;
+
+    const analysisElement = document.getElementById('case-analysis');
+    if (!analysisElement) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsAnalysisVisible(entry.isIntersecting),
+      { threshold: 0.1 }
+    );
+    observer.observe(analysisElement);
+
+    return () => observer.disconnect();
+  }, [selectedHouse]);
+
   const scrollToAnalysis = () => {
     document.getElementById('case-analysis')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
@@ -296,7 +314,11 @@ const HomePage: React.FC<HomePageProps> = ({
             </Grid>
           </CardContent>
           <Box sx={{ flex: selectedResearchBase === '全部' ? 1 : '0 0 70vh', minHeight: 0 }}>
-            <MapBlock selectedResearchBase={selectedResearchBase} onViewAnalysis={scrollToAnalysis} />
+            <MapBlock
+              selectedResearchBase={selectedResearchBase}
+              onViewAnalysis={scrollToAnalysis}
+              showAnalysisButton={!isAnalysisVisible}
+            />
           </Box>
           {selectedAnalysis && (
             <Box
