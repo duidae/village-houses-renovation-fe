@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import shp from 'shpjs';
 import type { PropertyMarker } from '../mocks/properties';
@@ -7,8 +7,18 @@ import { fetchProperties } from '../services/propertiesService';
 const defaultCenter = [23.4789, 120.447];
 const defaultZoom = 8;
 const mapLayerSources = [
-  { url: '/layers/key_area-20260912T112510Z-1-001.zip', color: '#0f766e' },
-  { url: '/layers/public-20260912T112511Z-1-001.zip', color: '#2563eb' },
+  {
+    id: 'key-area',
+    label: '重點區域',
+    url: '/layers/key_area-20260912T112510Z-1-001.zip',
+    color: '#0f766e',
+  },
+  {
+    id: 'public-facilities',
+    label: '公共設施',
+    url: '/layers/public-20260912T112511Z-1-001.zip',
+    color: '#2563eb',
+  },
 ];
 
 const formatPrice = (price: number) => `${price.toLocaleString('zh-TW')} 萬`;
@@ -43,6 +53,26 @@ const MapBlock: React.FC<MapBlockProps> = ({
   );
   const [properties, setProperties] = useState<PropertyMarker[]>([]);
   const [mapLoaded, setMapLoaded] = useState(false);
+  const [enabledMapLayers, setEnabledMapLayers] = useState<Record<string, boolean>>(
+    () => Object.fromEntries(mapLayerSources.map(({ id }) => [id, true]))
+  );
+  const enabledMapLayersRef = useRef(enabledMapLayers);
+  const mapRef = useRef<any>(null);
+  const mapLayerGroupsRef = useRef<Record<string, any>>({});
+
+  React.useEffect(() => {
+    enabledMapLayersRef.current = enabledMapLayers;
+    Object.entries(mapLayerGroupsRef.current).forEach(([id, layer]) => {
+      const map = mapRef.current;
+      if (!map) return;
+
+      if (enabledMapLayers[id]) {
+        layer.addTo(map);
+      } else {
+        layer.removeFrom(map);
+      }
+    });
+  }, [enabledMapLayers]);
 
   React.useEffect(() => {
     fetchProperties().then(setProperties);
@@ -102,6 +132,7 @@ const MapBlock: React.FC<MapBlockProps> = ({
         : defaultCenter;
     const initialZoom = visibleProperties.length === 1 ? 17 : defaultZoom;
     const map = L.map('map-container').setView(initialView, initialZoom);
+    mapRef.current = map;
 
     // Add OpenStreetMap tile layer
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -109,17 +140,16 @@ const MapBlock: React.FC<MapBlockProps> = ({
       maxZoom: 19,
     }).addTo(map);
 
-    const shapeLayers = L.layerGroup().addTo(map);
     let layersCancelled = false;
 
     const loadShapeLayers = async () => {
       await Promise.all(
-        mapLayerSources.map(async ({ url, color }) => {
+        mapLayerSources.map(async ({ id, url, color }) => {
           try {
             const geoJson = await shp(url);
             if (layersCancelled) return;
 
-            L.geoJSON(geoJson, {
+            const layer = L.geoJSON(geoJson, {
               style: {
                 color,
                 fillColor: color,
@@ -135,7 +165,9 @@ const MapBlock: React.FC<MapBlockProps> = ({
                   fillOpacity: 0.9,
                   weight: 2,
                 }),
-            }).addTo(shapeLayers);
+            });
+            mapLayerGroupsRef.current[id] = layer;
+            if (enabledMapLayersRef.current[id]) layer.addTo(map);
           } catch (error) {
             console.error(`Unable to load map layer: ${url}`, error);
           }
@@ -224,6 +256,8 @@ const MapBlock: React.FC<MapBlockProps> = ({
     // Cleanup function
     return () => {
       layersCancelled = true;
+      mapRef.current = null;
+      mapLayerGroupsRef.current = {};
       map.remove();
     };
   }, [mapLoaded, visibleProperties]);
@@ -238,14 +272,36 @@ const MapBlock: React.FC<MapBlockProps> = ({
   };
 
   return (
-    <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm h-full min-h-0 overflow-hidden flex flex-col">
+    <div className="relative bg-white p-6 rounded-xl border border-slate-200 shadow-sm h-full min-h-0 overflow-hidden flex flex-col">
       {/* Map Container */}
       <div className="grid grid-cols-1 md:grid-cols-3 md:grid-rows-[minmax(0,1fr)] gap-6 flex-1 min-h-0 overflow-hidden">
-        <div className="md:col-span-2 h-full min-h-0 overflow-hidden">
+        <div className="relative md:col-span-2 h-full min-h-0 overflow-hidden">
           <div
             id="map-container"
             className="w-full h-96 md:h-full rounded-lg border border-slate-200 overflow-hidden bg-slate-50"
           />
+          <fieldset className="absolute right-3 top-3 z-[500] m-0 rounded-lg border border-slate-200 bg-white/95 p-3 shadow-md backdrop-blur-sm">
+            <legend className="px-1 text-xs font-semibold text-slate-700">圖層</legend>
+            <div className="space-y-2">
+              {mapLayerSources.map(({ id, label, color }) => (
+                <label key={id} className="flex cursor-pointer items-center gap-2 text-xs text-slate-700">
+                  <input
+                    type="checkbox"
+                    checked={enabledMapLayers[id]}
+                    onChange={() =>
+                      setEnabledMapLayers((current) => ({
+                        ...current,
+                        [id]: !current[id],
+                      }))
+                    }
+                    className="h-3.5 w-3.5 accent-emerald-600"
+                  />
+                  <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: color }} />
+                  <span>{label}</span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
         </div>
 
         {/* Right Panel - Selected Property Details */}
