@@ -69,6 +69,7 @@ const HomePage: React.FC<HomePageProps> = ({
   const [houseOptions, setHouseOptions] = useState<{ id: string; name: string }[]>([]);
   const [villageHouses, setVillageHouses] = useState<VillageHouseRecord[]>([]);
   const [isAnalysisVisible, setIsAnalysisVisible] = useState(false);
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
 
   useEffect(() => {
     fetchProperties().then((properties) =>
@@ -174,11 +175,13 @@ const HomePage: React.FC<HomePageProps> = ({
                           fullWidth
                           value={schoolName}
                           onChange={(e) => setSchoolName(e.target.value)}
+                          onFocus={() => setIsSearchFocused(true)}
+                          onBlur={() => setIsSearchFocused(false)}
                           onKeyDown={handleKeyPress}
                           placeholder="輸入縣市、村里或宅院名稱"
                           variant="outlined"
                         />
-                        {matchedHouses.length > 0 && !hasExactMatch && (
+                        {isSearchFocused && matchedHouses.length > 0 && !hasExactMatch && (
                           <Paper
                             elevation={4}
                             sx={{ position: 'absolute', zIndex: 1300, left: 0, right: 0, mt: 1, maxHeight: 280, overflowY: 'auto' }}
@@ -187,7 +190,8 @@ const HomePage: React.FC<HomePageProps> = ({
                               {matchedHouses.map((house) => (
                                 <ListItemButton
                                   key={house.id}
-                                  onClick={() => {
+                                  onMouseDown={(event) => {
+                                    event.preventDefault();
                                     setSchoolName(house.name);
                                     setSelectedResearchBase(house.id);
                                   }}
