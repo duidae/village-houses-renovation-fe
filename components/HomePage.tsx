@@ -142,7 +142,7 @@ const HomePage: React.FC<HomePageProps> = ({
         <Card sx={{ position: 'relative', overflow: selectedResearchBase === '全部' ? 'hidden' : 'visible', bgcolor: 'background.paper', boxShadow: 5, borderRadius: 4, p: 3, mb: 1, flex: selectedResearchBase === '全部' ? 1 : '0 0 auto', display: 'flex', flexDirection: 'column', minHeight: 0 }}>
           <CardContent sx={{ position: 'relative', py: 2, flexShrink: 0 }}>
             <Grid container spacing={4} alignItems="flex-start">
-              <Grid item xs={12} md={6}>
+              <Grid item xs={12} md={6} sx={{ position: 'relative', zIndex: 2 }}>
                 <Typography variant="overline" component="p" sx={{ fontSize: '20px', letterSpacing: 2, mb: 2, color: 'primary.main' }}>
                   農村好宅整建活化平台
                 </Typography>
@@ -181,7 +181,7 @@ const HomePage: React.FC<HomePageProps> = ({
                         {matchedHouses.length > 0 && !hasExactMatch && (
                           <Paper
                             elevation={4}
-                            sx={{ position: 'absolute', zIndex: 2, left: 0, right: 0, mt: 1, maxHeight: 280, overflowY: 'auto' }}
+                            sx={{ position: 'absolute', zIndex: 1300, left: 0, right: 0, mt: 1, maxHeight: 280, overflowY: 'auto' }}
                           >
                             <List disablePadding>
                               {matchedHouses.map((house) => (
