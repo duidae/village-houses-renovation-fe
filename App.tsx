@@ -12,13 +12,70 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 
+type HouseOption = { id: string; name: string };
+
+const normalizeSearchText = (value: string): string =>
+  value.normalize('NFKC').toLocaleLowerCase().replace(/[\s\p{P}\p{S}]/gu, '');
+
+const getEditDistance = (left: string, right: string): number => {
+  const previousRow = Array.from({ length: right.length + 1 }, (_, index) => index);
+
+  for (let leftIndex = 1; leftIndex <= left.length; leftIndex += 1) {
+    let diagonal = previousRow[0];
+    previousRow[0] = leftIndex;
+
+    for (let rightIndex = 1; rightIndex <= right.length; rightIndex += 1) {
+      const above = previousRow[rightIndex];
+      previousRow[rightIndex] = left[leftIndex - 1] === right[rightIndex - 1]
+        ? diagonal
+        : Math.min(diagonal, previousRow[rightIndex - 1], above) + 1;
+      diagonal = above;
+    }
+  }
+
+  return previousRow[right.length];
+};
+
+const getNameEditDistance = (query: string, name: string): number => {
+  let closestDistance = Number.POSITIVE_INFINITY;
+  const shortestWindow = Math.max(1, query.length - 1);
+  const longestWindow = Math.min(name.length, query.length + 1);
+
+  for (let windowLength = shortestWindow; windowLength <= longestWindow; windowLength += 1) {
+    for (let start = 0; start <= name.length - windowLength; start += 1) {
+      closestDistance = Math.min(
+        closestDistance,
+        getEditDistance(query, name.slice(start, start + windowLength)),
+      );
+    }
+  }
+
+  return closestDistance;
+};
+
+const findHouseMatch = (houseOptions: HouseOption[], searchText: string): HouseOption | undefined => {
+  const query = normalizeSearchText(searchText);
+  if (!query) return undefined;
+
+  const rankedMatches = houseOptions
+    .map((house, index) => {
+      const name = normalizeSearchText(house.name);
+      const distance = name.includes(query) ? 0 : getNameEditDistance(query, name);
+      return { house, index, distance };
+    })
+    .filter(({ distance }) => distance <= (query.length === 1 ? 0 : Math.max(1, Math.floor(query.length * 0.35))))
+    .sort((left, right) => left.distance - right.distance || left.index - right.index);
+
+  return rankedMatches[0]?.house;
+};
+
 const App: React.FC = () => {
   const [schoolName, setSchoolName] = useState<string>('');
   const [analysisData, setAnalysisData] = useState<AnalysisData | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [houseOptions, setHouseOptions] = useState<{ id: string; name: string }[]>([]);
+  const [houseOptions, setHouseOptions] = useState<HouseOption[]>([]);
   const [selectedResearchBase, setSelectedResearchBase] = useState<string>('全部');
   const [selectedPotential, setSelectedPotential] = useState<'高' | '中' | '低'>('中');
   const [selectedLocation, setSelectedLocation] = useState<'主幹道上' | '周邊有公共設施'>('主幹道上');
@@ -39,10 +96,7 @@ const App: React.FC = () => {
     }
 
     setError(null);
-    const normalizedSearch = trimmedSchoolName.replace(/\s+/g, '').toLocaleLowerCase();
-    const matchedHouse = houseOptions.find(({ name }) =>
-      name.replace(/\s+/g, '').toLocaleLowerCase().includes(normalizedSearch)
-    );
+    const matchedHouse = findHouseMatch(houseOptions, trimmedSchoolName);
     if (!matchedHouse) {
       setError('找不到符合的宅院名稱。');
       return;
@@ -57,8 +111,6 @@ const App: React.FC = () => {
       handleSearch();
     }
   };
-
-  const exampleSchools = ['嘉義好宅1', '嘉義好宅2', '嘉義好宅3', '嘉義好宅4'];
 
   const handleDownloadPdf = async () => {
     const reportElement = document.getElementById('analysis-report');
