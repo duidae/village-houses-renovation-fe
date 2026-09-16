@@ -13,6 +13,8 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import FormControl from '@mui/material/FormControl';
 import Grid from '@mui/material/Grid';
+import IconButton from '@mui/material/IconButton';
+import InputAdornment from '@mui/material/InputAdornment';
 import InputLabel from '@mui/material/InputLabel';
 import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
@@ -23,6 +25,7 @@ import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import Alert from '@mui/material/Alert';
+import ClearIcon from '@mui/icons-material/Clear';
 
 interface HomePageProps {
   isLoading: boolean;
@@ -180,6 +183,23 @@ const HomePage: React.FC<HomePageProps> = ({
                           onKeyDown={handleKeyPress}
                           placeholder="輸入縣市、村里或宅院名稱"
                           variant="outlined"
+                          InputProps={{
+                            endAdornment: schoolName && (
+                              <InputAdornment position="end">
+                                <IconButton
+                                  size="small"
+                                  aria-label="清除搜尋"
+                                  onMouseDown={(event) => event.preventDefault()}
+                                  onClick={() => {
+                                    setSchoolName('');
+                                    setSelectedResearchBase('全部');
+                                  }}
+                                >
+                                  <ClearIcon fontSize="small" />
+                                </IconButton>
+                              </InputAdornment>
+                            ),
+                          }}
                         />
                         {isSearchFocused && matchedHouses.length > 0 && !hasExactMatch && (
                           <Paper
