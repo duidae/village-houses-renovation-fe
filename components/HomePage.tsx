@@ -223,6 +223,23 @@ const HomePage: React.FC<HomePageProps> = ({
             <Grid container spacing={3} sx={{ mt: 2 }}>
               <Grid item xs={12} sm={6} md={2.4}>
                 <FormControl fullWidth sx={{ bgcolor: 'background.paper', borderRadius: 3 }}>
+                  <InputLabel>研究基地</InputLabel>
+                  <Select
+                    value={selectedResearchBase}
+                    label="研究基地"
+                    onChange={(e) => setSelectedResearchBase(e.target.value)}
+                  >
+                    <MenuItem value="全部">全部</MenuItem>
+                    {houseOptions.map((house) => (
+                      <MenuItem key={house.id} value={house.id}>
+                        {house.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} sm={6} md={2.4}>
+                <FormControl fullWidth sx={{ bgcolor: 'background.paper', borderRadius: 3 }}>
                   <InputLabel>宅院標的</InputLabel>
                   <Select
                     value={selectedResearchBase}
@@ -255,6 +272,7 @@ const HomePage: React.FC<HomePageProps> = ({
                 </FormControl>
               </Grid>
 
+              {/*
               <Grid item xs={12} sm={6} md={2.4}>
                 <FormControl fullWidth sx={{ bgcolor: 'background.paper', borderRadius: 3 }}>
                   <InputLabel>區位與生活機能</InputLabel>
@@ -289,6 +307,7 @@ const HomePage: React.FC<HomePageProps> = ({
                   </Select>
                 </FormControl>
               </Grid>
+              */}
 
               <Grid item xs={12} sm={6} md={2.4}>
                 <FormControl fullWidth sx={{ bgcolor: 'background.paper', borderRadius: 3 }}>
