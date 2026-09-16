@@ -5,7 +5,7 @@ import { AnalysisDashboard } from './AnalysisDashboard';
 import { LoadingSpinner } from './LoadingSpinner';
 import MapBlock from './MapBlock';
 import { mockAnalysisData } from '../mocks/analysisData';
-import { buildAnalysisDataForRecord, fetchVillageHouses, type VillageHouseRecord } from '../services/villageHousesService';
+import { buildAnalysisDataForRecord, fetchVillageHouses, researchAreaLabel, type VillageHouseRecord } from '../services/villageHousesService';
 import { fetchProperties } from '../services/propertiesService';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -90,6 +90,13 @@ const HomePage: React.FC<HomePageProps> = ({
         .filter(({ name }) => name.replace(/\s+/g, '').toLocaleLowerCase().includes(normalizedSearch))
         .slice(0, 8)
     : [];
+  const researchAreaOptions = Array.from(
+    new Set(
+      villageHouses
+        .map((house) => researchAreaLabel(house))
+        .filter((area) => area.trim().length > 0)
+    )
+  );
   const selectedHouse = villageHouses.find((house) => house.id === selectedResearchBase);
   const selectedAnalysis = selectedHouse
     ? buildAnalysisDataForRecord(mockAnalysisData, selectedHouse)
@@ -250,9 +257,9 @@ const HomePage: React.FC<HomePageProps> = ({
                     onChange={(e) => setSelectedResearchBase(e.target.value)}
                   >
                     <MenuItem value="全部">全部</MenuItem>
-                    {houseOptions.map((house) => (
-                      <MenuItem key={house.id} value={house.id}>
-                        {house.name}
+                    {researchAreaOptions.map((area) => (
+                      <MenuItem key={area} value={area}>
+                        {area}
                       </MenuItem>
                     ))}
                   </Select>

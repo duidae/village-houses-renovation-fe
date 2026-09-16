@@ -208,7 +208,14 @@ export function toPropertyMarker(record: VillageHouseRecord): PropertyMarker {
     renovationStatus: 'planning',
     price: estimatePrice(record),
     score: estimateScore(record),
+    county: record.county,
+    township: record.township,
+    village: record.village,
   };
+}
+
+export function researchAreaLabel(record: Pick<VillageHouseRecord, 'county' | 'township' | 'village'>): string {
+  return `${record.county}${record.township}${record.village}`;
 }
 
 export function toPropertyMarkers(records: VillageHouseRecord[]): PropertyMarker[] {

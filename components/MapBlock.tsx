@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import shp from 'shpjs';
 import type { PropertyMarker } from '../mocks/properties';
 import { fetchProperties } from '../services/propertiesService';
+import { researchAreaLabel } from '../services/villageHousesService';
 
 const defaultCenter = [23.4789, 120.447];
 const defaultZoom = 8;
@@ -78,13 +79,14 @@ const MapBlock: React.FC<MapBlockProps> = ({
     fetchProperties().then(setProperties);
   }, []);
 
-  const visibleProperties = useMemo(
-    () =>
-      selectedResearchBase === '全部'
-        ? properties
-        : properties.filter((property) => property.id === selectedResearchBase),
-    [properties, selectedResearchBase]
-  );
+  const visibleProperties = useMemo(() => {
+    if (selectedResearchBase === '全部') return properties;
+
+    const byHouse = properties.filter((property) => property.id === selectedResearchBase);
+    if (byHouse.length > 0) return byHouse;
+
+    return properties.filter((property) => researchAreaLabel(property) === selectedResearchBase);
+  }, [properties, selectedResearchBase]);
 
   React.useEffect(() => {
     setSelectedProperty(visibleProperties.length === 1 ? visibleProperties[0] : null);

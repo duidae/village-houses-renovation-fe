@@ -8,4 +8,7 @@ export interface PropertyMarker {
   renovationStatus: 'planning' | 'in-progress' | 'completed';
   price: number; // 單位：萬元
   score: number; // 整建潛力分數，範圍 1~100
+  county: string;
+  township: string;
+  village: string;
 }
