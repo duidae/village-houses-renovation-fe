@@ -223,10 +223,10 @@ const HomePage: React.FC<HomePageProps> = ({
             <Grid container spacing={3} sx={{ mt: 2 }}>
               <Grid item xs={12} sm={6} md={2.4}>
                 <FormControl fullWidth sx={{ bgcolor: 'background.paper', borderRadius: 3 }}>
-                  <InputLabel>研究基地</InputLabel>
+                  <InputLabel>宅院標的</InputLabel>
                   <Select
                     value={selectedResearchBase}
-                    label="研究基地"
+                    label="宅院標的"
                     onChange={(e) => setSelectedResearchBase(e.target.value)}
                   >
                     <MenuItem value="全部">全部</MenuItem>
