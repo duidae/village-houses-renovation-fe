@@ -101,6 +101,9 @@ const HomePage: React.FC<HomePageProps> = ({
   const selectedAnalysis = selectedHouse
     ? buildAnalysisDataForRecord(mockAnalysisData, selectedHouse)
     : null;
+  const researchBaseSelectValue = selectedHouse
+    ? researchAreaLabel(selectedHouse)
+    : selectedResearchBase;
 
   useEffect(() => {
     setIsAnalysisVisible(false);
@@ -252,7 +255,7 @@ const HomePage: React.FC<HomePageProps> = ({
                 <FormControl fullWidth sx={{ bgcolor: 'background.paper', borderRadius: 3 }}>
                   <InputLabel>研究基地</InputLabel>
                   <Select
-                    value={selectedResearchBase}
+                    value={researchBaseSelectValue}
                     label="研究基地"
                     onChange={(e) => setSelectedResearchBase(e.target.value)}
                   >
