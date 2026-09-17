@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import type { AnalysisData } from '../types';
 import { AnalysisDashboard } from './AnalysisDashboard';
 import { LoadingSpinner } from './LoadingSpinner';
 import MapBlock from './MapBlock';
@@ -30,12 +28,10 @@ import ClearIcon from '@mui/icons-material/Clear';
 interface HomePageProps {
   isLoading: boolean;
   error: string | null;
-  analysisData: AnalysisData | null;
   schoolName: string;
   setSchoolName: React.Dispatch<React.SetStateAction<string>>;
   handleSearch: (searchSchoolName?: string) => Promise<void>;
   handleKeyPress: (event: React.KeyboardEvent<HTMLInputElement>) => void;
-  isGeneratingPdf: boolean;
   selectedResearchBase: string;
   setSelectedResearchBase: React.Dispatch<React.SetStateAction<string>>;
   selectedPotential: '全部' | '高' | '中' | '低';
@@ -51,12 +47,10 @@ interface HomePageProps {
 const HomePage: React.FC<HomePageProps> = ({
   isLoading,
   error,
-  analysisData,
   schoolName,
   setSchoolName,
   handleSearch,
   handleKeyPress,
-  isGeneratingPdf,
   selectedResearchBase,
   setSelectedResearchBase,
   selectedPotential,
@@ -68,7 +62,6 @@ const HomePage: React.FC<HomePageProps> = ({
   selectedReuse,
   setSelectedReuse,
 }) => {
-  const navigate = useNavigate();
   const [houseOptions, setHouseOptions] = useState<{ id: string; name: string }[]>([]);
   const [villageHouses, setVillageHouses] = useState<VillageHouseRecord[]>([]);
   const [isAnalysisVisible, setIsAnalysisVisible] = useState(false);
@@ -143,17 +136,7 @@ const HomePage: React.FC<HomePageProps> = ({
         </Alert>
       )}
 
-      {analysisData ? (
-        <>
-          <Stack direction="row" justifyContent="flex-end" sx={{ mb: 2 }}>
-            <Button variant="outlined" onClick={() => navigate('/analysis/case')}>
-              查看個案分析
-            </Button>
-          </Stack>
-          <AnalysisDashboard id="analysis-report" data={analysisData} />
-        </>
-      ) : (
-        <Card sx={{ position: 'relative', overflow: selectedResearchBase === '全部' ? 'hidden' : 'visible', bgcolor: 'background.paper', boxShadow: 5, borderRadius: 4, p: 3, mb: 1, flex: selectedResearchBase === '全部' ? 1 : '0 0 auto', display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+      <Card sx={{ position: 'relative', overflow: selectedResearchBase === '全部' ? 'hidden' : 'visible', bgcolor: 'background.paper', boxShadow: 5, borderRadius: 4, p: 3, mb: 1, flex: selectedResearchBase === '全部' ? 1 : '0 0 auto', display: 'flex', flexDirection: 'column', minHeight: 0 }}>
           <CardContent sx={{ position: 'relative', py: 2, flexShrink: 0 }}>
             <Grid container spacing={4} alignItems="flex-start">
               <Grid item xs={12} md={6} sx={{ position: 'relative', zIndex: 2 }}>
@@ -237,7 +220,7 @@ const HomePage: React.FC<HomePageProps> = ({
                         variant="contained"
                         size="medium"
                         onClick={() => handleSearch()}
-                        disabled={isLoading || isGeneratingPdf}
+                        disabled={isLoading}
                       >
                         搜尋
                       </Button>
@@ -389,8 +372,7 @@ const HomePage: React.FC<HomePageProps> = ({
               <AnalysisDashboard id="case-analysis-report" data={selectedAnalysis} />
             </Box>
           )}
-        </Card>
-      )}
+      </Card>
     </Box>
   );
 };

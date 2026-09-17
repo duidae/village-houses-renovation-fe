@@ -1,8 +1,5 @@
 
 import React, { useState, useCallback, useEffect } from 'react';
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
-import type { AnalysisData } from './types';
 import HomePage from './components/HomePage';
 import CaseAnalysisPage from './components/CaseAnalysisPage';
 import CasePage from './components/CasePage';
@@ -71,9 +68,7 @@ const findHouseMatch = (houseOptions: HouseOption[], searchText: string): HouseO
 
 const App: React.FC = () => {
   const [schoolName, setSchoolName] = useState<string>('');
-  const [analysisData, setAnalysisData] = useState<AnalysisData | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [isGeneratingPdf, setIsGeneratingPdf] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [houseOptions, setHouseOptions] = useState<HouseOption[]>([]);
   const [selectedResearchBase, setSelectedResearchBase] = useState<string>('全部');
@@ -112,53 +107,6 @@ const App: React.FC = () => {
     }
   };
 
-  const handleDownloadPdf = async () => {
-    const reportElement = document.getElementById('analysis-report');
-    if (!reportElement || !analysisData) return;
-
-    setIsGeneratingPdf(true);
-
-    try {
-      const canvas = await html2canvas(reportElement, {
-        scale: 2,
-        useCORS: true,
-        backgroundColor: '#ffffff',
-        onclone: (document) => {
-          document.body.style.backgroundColor = '#ffffff';
-        },
-      });
-
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = pdf.internal.pageSize.getHeight();
-      const canvasWidth = canvas.width;
-      const canvasHeight = canvas.height;
-      const ratio = canvasWidth / pdfWidth;
-      const scaledCanvasHeight = canvasHeight / ratio;
-
-      let heightLeft = scaledCanvasHeight;
-      let position = 0;
-
-      pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, scaledCanvasHeight);
-      heightLeft -= pdfHeight;
-
-      while (heightLeft > 0) {
-        position = position - pdfHeight;
-        pdf.addPage();
-        pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, scaledCanvasHeight);
-        heightLeft -= pdfHeight;
-      }
-
-      pdf.save(`ReSchool 分析報告 - ${analysisData.basicInfo.name}.pdf`);
-    } catch (err) {
-      console.error('Error generating PDF:', err);
-      setError('無法生成 PDF 報告，請稍後再試。');
-    } finally {
-      setIsGeneratingPdf(false);
-    }
-  };
-
   return (
 
   <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column', bgcolor: 'grey.100', color: 'text.primary', py: 2 }}>
@@ -170,12 +118,10 @@ const App: React.FC = () => {
             <HomePage
               isLoading={isLoading}
               error={error}
-              analysisData={analysisData}
               schoolName={schoolName}
               setSchoolName={setSchoolName}
               handleSearch={handleSearch}
               handleKeyPress={handleKeyPress}
-              isGeneratingPdf={isGeneratingPdf}
               selectedResearchBase={selectedResearchBase}
               setSelectedResearchBase={setSelectedResearchBase}
               selectedPotential={selectedPotential}
@@ -189,7 +135,7 @@ const App: React.FC = () => {
             />
           }
         />
-        <Route path="/analysis/case" element={<CaseAnalysisPage analysisData={analysisData ?? mockAnalysisData} />} />
+        <Route path="/analysis/case" element={<CaseAnalysisPage analysisData={mockAnalysisData} />} />
         <Route path="/cases/:id" element={<CasePage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
