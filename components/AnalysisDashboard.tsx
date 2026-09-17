@@ -645,8 +645,18 @@ export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id, 
   const sections = [
     { condition: true, component: (
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="space-y-6">
+             <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm h-full flex flex-col justify-between">
+                <div>
+                  <h3 className="text-xl font-semibold mb-2 text-center text-brand-text">3. 潛力指標 (CPI)</h3>
+                  <CpiGauge score={potentialIndex.cpiScore} />
+                </div>
+                <p className="text-center text-brand-subtext mt-2 px-2"><HighlightedText text={potentialIndex.summary} /></p>
+                 <p className="text-center text-sm text-slate-400 mt-4 px-2">* 指數為模型估算，計算參考公式：<br/><span className="font-mono text-brand-accent">CPI = (交通x0.4) + (環境x0.3) + (面積x0.2) + (校齡x0.1)</span></p>
+            </div>
+        </div>
         <div className="lg:col-span-2 space-y-6">
-            <Section title="1. 校地基礎資訊" icon={<BuildingIcon className="w-6 h-6"/>}>
+            <Section title="1. 宅院基礎資訊" icon={<BuildingIcon className="w-6 h-6"/>}>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                     <InfoItem icon={<CalendarIcon className="w-6 h-6"/>} label="創校年份" value={basicInfo.foundedYear} unit={`(${new Date().getFullYear() - basicInfo.foundedYear} 年校齡)`}/>
                     <InfoItem icon={<AreaIcon className="w-6 h-6"/>} label="校地面積" value={basicInfo.areaSqM.toLocaleString()} unit="m²" />
@@ -695,16 +705,6 @@ export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id, 
                     </div>
                 )}
             </Section>
-        </div>
-        <div className="space-y-6">
-             <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm h-full flex flex-col justify-between">
-                <div>
-                  <h3 className="text-xl font-semibold mb-2 text-center text-brand-text">3. 潛力指標 (CPI)</h3>
-                  <CpiGauge score={potentialIndex.cpiScore} />
-                </div>
-                <p className="text-center text-brand-subtext mt-2 px-2"><HighlightedText text={potentialIndex.summary} /></p>
-                 <p className="text-center text-sm text-slate-400 mt-4 px-2">* 指數為模型估算，計算參考公式：<br/><span className="font-mono text-brand-accent">CPI = (交通x0.4) + (環境x0.3) + (面積x0.2) + (校齡x0.1)</span></p>
-            </div>
         </div>
       </div>
     )},
