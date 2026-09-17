@@ -43,6 +43,7 @@ const HighlightedText: React.FC<{ text: string | undefined | null; styleType?: '
 interface AnalysisDashboardProps {
   data: AnalysisData;
   id?: string;
+  hideMap?: boolean;
 }
 
 const InfoItem: React.FC<{ icon: React.ReactNode; label: string; value: string | number; unit?: string }> = ({ icon, label, value, unit }) => (
@@ -539,7 +540,7 @@ const Section: React.FC<{title: string, icon: React.ReactNode, children: React.R
 );
 
 
-export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id }) => {
+export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id, hideMap = false }) => {
   const { 
       basicInfo, environmentalAnalysis, potentialIndex, recommendations, strategicRecommendations, 
       impactAssessment, pastCases, recentNews, cityPopulation, schoolEnrollment, pestAnalysis, 
@@ -551,6 +552,7 @@ export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id }
   const [mapLoaded, setMapLoaded] = useState(false);
 
   useEffect(() => {
+    if (hideMap) return;
     if ((window as any).L) {
       setMapLoaded(true);
       return;
@@ -565,10 +567,10 @@ export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id }
     script.async = true;
     script.onload = () => setMapLoaded(true);
     document.body.appendChild(script);
-  }, []);
+  }, [hideMap]);
 
   useEffect(() => {
-    if (!mapLoaded) return;
+    if (hideMap || !mapLoaded) return;
     const L = (window as any).L;
     const container = document.getElementById(mapContainerId);
     if (!container) return;
@@ -629,7 +631,7 @@ export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id }
     return () => {
       map.remove();
     };
-  }, [mapLoaded, mapContainerId, basicInfo.latitude, basicInfo.longitude, basicInfo.name]);
+  }, [hideMap, mapLoaded, mapContainerId, basicInfo.latitude, basicInfo.longitude, basicInfo.name]);
 
   const [activeTab, setActiveTab] = useState<'school' | 'city'>('school');
   
@@ -823,7 +825,9 @@ export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id }
                     </a>
                 </p>
             </div>
-            <div id={mapContainerId} className="h-64 rounded-lg overflow-hidden border-2 border-slate-200 bg-slate-50" />
+            {!hideMap && (
+                <div id={mapContainerId} className="h-64 rounded-lg overflow-hidden border-2 border-slate-200 bg-slate-50" />
+            )}
         </div>
         
       {visibleSections.map((section, index) => {
