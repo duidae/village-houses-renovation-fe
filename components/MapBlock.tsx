@@ -62,7 +62,7 @@ const MapBlock: React.FC<MapBlockProps> = ({
   const [villageBoundaries, setVillageBoundaries] = useState<any>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
   const [enabledMapLayers, setEnabledMapLayers] = useState<Record<string, boolean>>(
-    () => Object.fromEntries(mapLayerSources.map(({ id }) => [id, true]))
+    () => Object.fromEntries(mapLayerSources.map(({ id }) => [id, false]))
   );
   const enabledMapLayersRef = useRef(enabledMapLayers);
   const mapRef = useRef<any>(null);
