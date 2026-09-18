@@ -22,6 +22,12 @@ const mapLayerSources = [
   },
 ];
 
+const VILLAGE_BOUNDARIES_URL = '/village-boundaries.geojson';
+
+// The government boundary data uses 臺 (traditional) while our data sometimes
+// uses 台 (common variant) for 台中/台南/台北/台東 etc.
+const normalizeAreaText = (value: string) => value.replace(/台/g, '臺');
+
 const formatPrice = (price: number) => `${price.toLocaleString('zh-TW')} 萬`;
 
 const getScoreLevelColor = (score: number) => {
@@ -53,6 +59,7 @@ const MapBlock: React.FC<MapBlockProps> = ({
     null
   );
   const [properties, setProperties] = useState<PropertyMarker[]>([]);
+  const [villageBoundaries, setVillageBoundaries] = useState<any>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
   const [enabledMapLayers, setEnabledMapLayers] = useState<Record<string, boolean>>(
     () => Object.fromEntries(mapLayerSources.map(({ id }) => [id, true]))
@@ -79,6 +86,13 @@ const MapBlock: React.FC<MapBlockProps> = ({
     fetchProperties().then(setProperties);
   }, []);
 
+  React.useEffect(() => {
+    fetch(VILLAGE_BOUNDARIES_URL)
+      .then((res) => res.json())
+      .then(setVillageBoundaries)
+      .catch((error) => console.error('Unable to load village boundaries:', error));
+  }, []);
+
   const visibleProperties = useMemo(() => {
     if (selectedResearchBase === '全部') return properties;
 
@@ -87,6 +101,27 @@ const MapBlock: React.FC<MapBlockProps> = ({
 
     return properties.filter((property) => researchAreaLabel(property) === selectedResearchBase);
   }, [properties, selectedResearchBase]);
+
+  // The area a boundary should be drawn for: either selectedResearchBase is
+  // already a county+township+village string, or it's a single house's id,
+  // in which case we derive that house's area.
+  const activeResearchArea = useMemo(() => {
+    if (selectedResearchBase === '全部') return null;
+    const selectedHouse = properties.find((property) => property.id === selectedResearchBase);
+    return selectedHouse ? researchAreaLabel(selectedHouse) : selectedResearchBase;
+  }, [properties, selectedResearchBase]);
+
+  const activeBoundaryFeature = useMemo(() => {
+    if (!activeResearchArea || !villageBoundaries) return null;
+    return villageBoundaries.features.find(
+      (feature: any) =>
+        normalizeAreaText(researchAreaLabel({
+          county: feature.properties.COUNTYNAME,
+          township: feature.properties.TOWNNAME,
+          village: feature.properties.VILLNAME,
+        })) === normalizeAreaText(activeResearchArea)
+    ) ?? null;
+  }, [activeResearchArea, villageBoundaries]);
 
   React.useEffect(() => {
     setSelectedProperty(visibleProperties.length === 1 ? visibleProperties[0] : null);
@@ -179,6 +214,23 @@ const MapBlock: React.FC<MapBlockProps> = ({
 
     loadShapeLayers();
 
+    // Draw the selected research area's village boundary, if we have one
+    if (activeBoundaryFeature) {
+      const boundaryLayer = L.geoJSON(activeBoundaryFeature, {
+        style: {
+          color: '#dc2626',
+          weight: 3,
+          fillColor: '#dc2626',
+          fillOpacity: 0.06,
+          dashArray: '6 4',
+        },
+      }).addTo(map);
+
+      if (visibleProperties.length !== 1) {
+        map.fitBounds(boundaryLayer.getBounds(), { padding: [24, 24] });
+      }
+    }
+
     // Add markers for each property
     visibleProperties.forEach((property) => {
       const statusColor = {
@@ -262,7 +314,7 @@ const MapBlock: React.FC<MapBlockProps> = ({
       mapLayerGroupsRef.current = {};
       map.remove();
     };
-  }, [mapLoaded, visibleProperties]);
+  }, [mapLoaded, visibleProperties, activeBoundaryFeature]);
 
   const getStatusText = (status: string) => {
     const statusMap: Record<string, string> = {
