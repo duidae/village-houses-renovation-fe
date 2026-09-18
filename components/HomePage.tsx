@@ -62,27 +62,28 @@ const HomePage: React.FC<HomePageProps> = ({
   selectedReuse,
   setSelectedReuse,
 }) => {
-  const [houseOptions, setHouseOptions] = useState<{ id: string; name: string }[]>([]);
+  const [houseOptions, setHouseOptions] = useState<
+    { id: string; name: string; county: string; township: string; village: string }[]
+  >([]);
   const [villageHouses, setVillageHouses] = useState<VillageHouseRecord[]>([]);
   const [isAnalysisVisible, setIsAnalysisVisible] = useState(false);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
 
   useEffect(() => {
     fetchProperties().then((properties) =>
-      setHouseOptions(properties.map((p) => ({ id: p.id, name: p.name })))
+      setHouseOptions(
+        properties.map((p) => ({
+          id: p.id,
+          name: p.name,
+          county: p.county,
+          township: p.township,
+          village: p.village,
+        }))
+      )
     );
     fetchVillageHouses().then(setVillageHouses);
   }, []);
 
-  const normalizedSearch = schoolName.trim().replace(/\s+/g, '').toLocaleLowerCase();
-  const hasExactMatch = houseOptions.some(
-    ({ name }) => name.replace(/\s+/g, '').toLocaleLowerCase() === normalizedSearch
-  );
-  const matchedHouses = normalizedSearch
-    ? houseOptions
-        .filter(({ name }) => name.replace(/\s+/g, '').toLocaleLowerCase().includes(normalizedSearch))
-        .slice(0, 8)
-    : [];
   const researchAreaOptions = Array.from(
     new Set(
       villageHouses
@@ -97,6 +98,20 @@ const HomePage: React.FC<HomePageProps> = ({
   const researchBaseSelectValue = selectedHouse
     ? researchAreaLabel(selectedHouse)
     : selectedResearchBase;
+  const filteredHouseOptions =
+    researchBaseSelectValue === '全部'
+      ? houseOptions
+      : houseOptions.filter((house) => researchAreaLabel(house) === researchBaseSelectValue);
+
+  const normalizedSearch = schoolName.trim().replace(/\s+/g, '').toLocaleLowerCase();
+  const hasExactMatch = filteredHouseOptions.some(
+    ({ name }) => name.replace(/\s+/g, '').toLocaleLowerCase() === normalizedSearch
+  );
+  const matchedHouses = normalizedSearch
+    ? filteredHouseOptions
+        .filter(({ name }) => name.replace(/\s+/g, '').toLocaleLowerCase().includes(normalizedSearch))
+        .slice(0, 8)
+    : [];
 
   useEffect(() => {
     setIsAnalysisVisible(false);
@@ -260,7 +275,7 @@ const HomePage: React.FC<HomePageProps> = ({
                     onChange={(e) => setSelectedResearchBase(e.target.value)}
                   >
                     <MenuItem value="全部">全部</MenuItem>
-                    {houseOptions.map((house) => (
+                    {filteredHouseOptions.map((house) => (
                       <MenuItem key={house.id} value={house.id}>
                         {house.name}
                       </MenuItem>
