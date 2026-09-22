@@ -675,14 +675,14 @@ export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id, 
             </div>
         </div>
         <div className="lg:col-span-2 space-y-6">
-            <Section title="1. 宅院基礎資訊" icon={<BuildingIcon className="w-6 h-6"/>}>
+            <Section title="宅院基礎資訊" icon={<BuildingIcon className="w-6 h-6"/>}>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                     <InfoItem icon={<CalendarIcon className="w-6 h-6"/>} label="創校年份" value={basicInfo.foundedYear} unit={`(${new Date().getFullYear() - basicInfo.foundedYear} 年校齡)`}/>
                     <InfoItem icon={<AreaIcon className="w-6 h-6"/>} label="校地面積" value={basicInfo.areaSqM.toLocaleString()} unit="m²" />
                     <InfoItem icon={<BuildingIcon className="w-6 h-6"/>} label="建築覆蓋率" value={`${basicInfo.buildingCoverage}%`} />
                 </div>
             </Section>
-            <Section title="2. 周邊環境分析" icon={<MountainIcon className="w-6 h-6"/>}>
+            <Section title="周邊環境分析" icon={<MountainIcon className="w-6 h-6"/>}>
                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                     <InfoItem icon={<MountainIcon className="w-6 h-6"/>} label="地形 / 海拔" value={environmentalAnalysis.terrain} unit={`${environmentalAnalysis.avgElevationM} m`} />
                     <InfoItem icon={<WaveIcon className="w-6 h-6"/>} label="距海岸" value={environmentalAnalysis.coastDistanceKm} unit="km" />
