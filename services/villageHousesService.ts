@@ -235,6 +235,12 @@ export function buildAnalysisDataForRecord(base: AnalysisData, record: VillageHo
       latitude: record.lat,
       longitude: record.lng,
     },
+    potentialIndex: {
+      ...base.potentialIndex,
+      // Use the same score MapBlock shows for this house (via toPropertyMarker)
+      // so the analysis dashboard's 整建分數 matches the map marker's.
+      cpiScore: estimateScore(record),
+    },
     environmentalAnalysis: {
       ...base.environmentalAnalysis,
       localAttractions: record.localCultureAndFestivals.length > 0

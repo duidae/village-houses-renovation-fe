@@ -60,9 +60,22 @@ const InfoItem: React.FC<{ icon: React.ReactNode; label: string; value: string |
   </div>
 );
 
+const getScoreLevelColor = (score: number) => {
+    if (score >= 80) return '#ef4444'; // high - red
+    if (score >= 60) return '#f97316'; // mid - orange
+    return '#9ca3af'; // low - grey
+};
+
+const getScoreLevelText = (score: number) => {
+    if (score >= 80) return '高';
+    if (score >= 60) return '中';
+    return '低';
+};
+
 const CpiGauge: React.FC<{ score: number }> = ({ score }) => {
     const data = [ { name: 'Score', value: score }, { name: 'Remaining', value: 100 - score }, ];
-    const COLORS = ['#2dd4bf', '#e2e8f0']; // teal-400, slate-200
+    const levelColor = getScoreLevelColor(score);
+    const COLORS = [levelColor, '#e2e8f0']; // level color, slate-200
 
     return (
         <div className="relative w-full h-48 sm:h-64">
@@ -71,12 +84,18 @@ const CpiGauge: React.FC<{ score: number }> = ({ score }) => {
                     <Pie data={data} cx="50%" cy="50%" startAngle={180} endAngle={0} innerRadius="70%" outerRadius="100%" fill="#8884d8" paddingAngle={2} dataKey="value" stroke="none">
                         {data.map((entry, index) => (<Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />))}
                     </Pie>
-                    <Tooltip formatter={(value: number) => [`${value}`, '分數']} contentStyle={{ backgroundColor: '#f8fafc', borderColor: '#cbd5e1', color: '#0f172a' }}/>
+                    <Tooltip formatter={(value: number) => [`${value}`, '整建分數']} contentStyle={{ backgroundColor: '#f8fafc', borderColor: '#cbd5e1', color: '#0f172a' }}/>
                 </PieChart>
             </ResponsiveContainer>
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/3 text-center">
-                <p className="text-4xl sm:text-5xl font-bold text-brand-accent">{score}</p>
-                <p className="text-sm text-brand-subtext">潛力指數</p>
+                <p className="text-4xl sm:text-5xl font-bold" style={{ color: levelColor }}>{score}</p>
+                <p className="text-sm text-brand-subtext">整建分數</p>
+                <span
+                    className="inline-block mt-1 px-2 py-0.5 rounded-full text-xs font-bold text-white"
+                    style={{ backgroundColor: levelColor }}
+                >
+                    整建潛力 - {getScoreLevelText(score)}
+                </span>
             </div>
         </div>
     );
@@ -648,7 +667,7 @@ export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id, 
         <div className="space-y-6">
              <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm h-full flex flex-col justify-between">
                 <div>
-                  <h3 className="text-xl font-semibold mb-2 text-center text-brand-text">3. 潛力指標 (CPI)</h3>
+                  <h3 className="text-xl font-semibold mb-2 text-center text-brand-text">整建分數</h3>
                   <CpiGauge score={potentialIndex.cpiScore} />
                 </div>
                 <p className="text-center text-brand-subtext mt-2 px-2"><HighlightedText text={potentialIndex.summary} /></p>
