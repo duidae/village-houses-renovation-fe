@@ -262,8 +262,9 @@ const MapBlock: React.FC<MapBlockProps> = ({
             box-shadow: 0 1.5px 6px rgba(0,0,0,0.25);
             white-space: nowrap;
             margin-bottom: 3px;
+            text-align: center;
           ">
-            ${formatPrice(property.price)} · 分數 ${property.score}
+            ${property.name}<br/>${formatPrice(property.price)} · 分數 ${property.score}
           </div>
           <div style="
             background-color: ${scoreColor};
