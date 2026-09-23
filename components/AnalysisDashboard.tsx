@@ -76,7 +76,7 @@ const CpiGauge: React.FC<{ score: number }> = ({ score }) => {
     const COLORS = [levelColor, '#e2e8f0']; // level color, slate-200
 
     return (
-        <div className="relative w-full h-48 sm:h-64">
+        <div className="relative w-full h-48 ">
              <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                     <Pie data={data} cx="50%" cy="50%" startAngle={180} endAngle={0} innerRadius="70%" outerRadius="100%" fill="#8884d8" paddingAngle={2} dataKey="value" stroke="none">
@@ -95,6 +95,25 @@ const CpiGauge: React.FC<{ score: number }> = ({ score }) => {
                     整建潛力 - {getScoreLevelText(score)}
                 </span>
             </div>
+        </div>
+    );
+};
+
+const CpiGaugeLegend: React.FC = () => {
+    const levels = [
+        { label: '高', range: '80 分以上', color: getScoreLevelColor(80) },
+        { label: '中', range: '60 - 79 分', color: getScoreLevelColor(60) },
+        { label: '低', range: '60 分以下', color: getScoreLevelColor(0) },
+    ];
+    return (
+        <div className="flex justify-center flex-wrap gap-x-4 gap-y-1 mt-2">
+            {levels.map((level) => (
+                <div key={level.label} className="flex items-center gap-1.5 text-xs text-brand-subtext">
+                    <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: level.color }} />
+                    <span className="font-semibold" style={{ color: level.color }}>{level.label}</span>
+                    <span>{level.range}</span>
+                </div>
+            ))}
         </div>
     );
 };
@@ -179,8 +198,8 @@ const FiveForcesAnalysisChart: React.FC<{ data: FiveForcesAnalysis }> = ({ data 
     );
 };
 
-const Section: React.FC<{title: string, icon: React.ReactNode, children: React.ReactNode}> = ({ title, icon, children }) => (
-    <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+const Section: React.FC<{title: string, icon: React.ReactNode, children: React.ReactNode, className?: string}> = ({ title, icon, children, className = '' }) => (
+    <div className={`bg-white p-6 rounded-xl border border-slate-200 shadow-sm ${className}`}>
         <h3 className="text-xl font-semibold mb-4 text-brand-text flex items-center">
             {icon}<span className="ml-3">{title}</span>
         </h3>
@@ -286,26 +305,16 @@ export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id, 
     { condition: true, component: (
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="space-y-6">
-             <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm h-full flex flex-col justify-between">
+             <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
                 <div>
                   <h3 className="text-xl font-semibold mb-2 text-center text-brand-text">整建分數</h3>
                   <CpiGauge score={potentialIndex.cpiScore} />
+                  <CpiGaugeLegend />
                 </div>
             </div>
-        </div>
-        <div className="lg:col-span-2 space-y-6">
-            <Section title="宅院基本資料" icon={<BuildingIcon className="w-6 h-6"/>}>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                    <InfoItem icon={<BuildingIcon className="w-6 h-6"/>} label="建築型態" value={basicInfo.buildingType || '未提供'} />
-                    <InfoItem icon={<BuildingOffice2Icon className="w-6 h-6"/>} label="樓層數" value={basicInfo.floorCount ?? '未提供'} unit={basicInfo.floorCount ? '層' : undefined} />
-                    <InfoItem icon={<HistoryIcon className="w-6 h-6"/>} label="文資身分" value={basicInfo.isHeritage ? '是' : '否'} />
-                    <InfoItem icon={<LeafIcon className="w-6 h-6"/>} label="農村再生社區" value={basicInfo.isRuralRevitalizationCommunity ? '是' : '否'} />
-                    <InfoItem icon={<UserGroupIcon className="w-6 h-6"/>} label="社區組織運作狀況" value={basicInfo.communityOrgStatus || '未提供'} />
-                </div>
-            </Section>
             {hasLocalFlavor && (
                 <Section title="周邊環境特色" icon={<MountainIcon className="w-6 h-6"/>}>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 gap-6">
                         {environmentalAnalysis.localAttractions?.length > 0 && (
                             <div>
                                 <div className="flex items-center mb-2">
@@ -336,11 +345,22 @@ export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id, 
                 </Section>
             )}
         </div>
+        <div className="lg:col-span-2 space-y-6 flex flex-col">
+            <Section title="宅院基本資料" icon={<BuildingIcon className="w-6 h-6"/>} className="h-full">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                    <InfoItem icon={<BuildingIcon className="w-6 h-6"/>} label="建築型態" value={basicInfo.buildingType || '未提供'} />
+                    <InfoItem icon={<BuildingOffice2Icon className="w-6 h-6"/>} label="樓層數" value={basicInfo.floorCount ?? '未提供'} unit={basicInfo.floorCount ? '層' : undefined} />
+                    <InfoItem icon={<HistoryIcon className="w-6 h-6"/>} label="文資身分" value={basicInfo.isHeritage ? '是' : '否'} />
+                    <InfoItem icon={<LeafIcon className="w-6 h-6"/>} label="農村再生社區" value={basicInfo.isRuralRevitalizationCommunity ? '是' : '否'} />
+                    <InfoItem icon={<UserGroupIcon className="w-6 h-6"/>} label="社區組織運作狀況" value={basicInfo.communityOrgStatus || '未提供'} />
+                </div>
+            </Section>
+        </div>
       </div>
     )},
-    { condition: true, component: <Section title="產業競爭環境 (Five Forces) 分析" icon={<ShieldIcon className="w-6 h-6"/>}><FiveForcesAnalysisChart data={fiveForcesAnalysis} /></Section> },
+    { condition: true, component: <Section title="宅院面向分析" icon={<ShieldIcon className="w-6 h-6"/>}><FiveForcesAnalysisChart data={fiveForcesAnalysis} /></Section> },
     { condition: cityPopulation && cityPopulation.length > 0, component: (
-        <Section title="所在城市人口趨勢" icon={<UsersIcon className="w-6 h-6"/>}>
+        <Section title="宅院區域人口結構" icon={<UsersIcon className="w-6 h-6"/>}>
             <PopulationChart data={cityPopulation} />
             <p className="text-xs text-slate-400 text-center mt-2">資料來源：中華民國內政部戶政司</p>
         </Section>
