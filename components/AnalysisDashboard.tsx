@@ -338,6 +338,7 @@ export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id, 
         </div>
       </div>
     )},
+    { condition: true, component: <Section title="產業競爭環境 (Five Forces) 分析" icon={<ShieldIcon className="w-6 h-6"/>}><FiveForcesAnalysisChart data={fiveForcesAnalysis} /></Section> },
     { condition: cityPopulation && cityPopulation.length > 0, component: (
         <Section title="所在城市人口趨勢" icon={<UsersIcon className="w-6 h-6"/>}>
             <PopulationChart data={cityPopulation} />
@@ -350,7 +351,6 @@ export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id, 
             <p className="text-xs text-slate-400 text-center mt-2">資料來源：中華民國教育部統計處</p>
         </Section>
     )},
-    { condition: true, component: <Section title="產業競爭環境 (Five Forces) 分析" icon={<ShieldIcon className="w-6 h-6"/>}><FiveForcesAnalysisChart data={fiveForcesAnalysis} /></Section> },
   ];
   
   const visibleSections = sections.filter(s => s.condition);
