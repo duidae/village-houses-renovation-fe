@@ -234,6 +234,11 @@ export function buildAnalysisDataForRecord(base: AnalysisData, record: VillageHo
       address: `${record.county}${record.township}${record.village}${record.community}`,
       latitude: record.lat,
       longitude: record.lng,
+      buildingType: record.buildingType || base.basicInfo.buildingType,
+      floorCount: record.floorCount,
+      isHeritage: record.isHeritage,
+      isRuralRevitalizationCommunity: record.isRuralRevitalizationCommunity,
+      communityOrgStatus: record.communityOrgStatus || base.basicInfo.communityOrgStatus,
     },
     potentialIndex: {
       ...base.potentialIndex,

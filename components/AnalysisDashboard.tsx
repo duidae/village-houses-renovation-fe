@@ -2,10 +2,8 @@
 
 import React, { FC, useEffect, useState } from 'react';
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip, LineChart, Line, XAxis, YAxis, CartesianGrid, Legend, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
-import { AnalysisData, NewsItem, PopulationDataPoint, SchoolEnrollmentDataPoint, FiveForcesAnalysis, PestAnalysis, InternalHealthMetrics, SwotAnalysis, MetricItem, StrategicRecommendation, ImpactAssessment, ImpactMetric, TrendProjection, TransformationAlternative, PastCase, Recommendation } from '../types';
-import { BuildingIcon, CalendarIcon, AreaIcon, MountainIcon, WaveIcon, RiverIcon, TrainIcon, LightbulbIcon, HistoryIcon, NewspaperIcon, UsersIcon, TrendingUpIcon, ShieldIcon, GlobeIcon, ClipboardListIcon, PuzzleIcon, HeartbeatIcon, MapPinIcon, SparklesIcon, KeyIcon, CpuChipIcon, BuildingOffice2Icon, PaintBrushIcon, ChartBarIcon, LeafIcon, ListBulletIcon, UserGroupIcon, ExclamationTriangleIcon } from './icons';
-
-// --- Keyword Highlighting Component & Definitions ---
+import { AnalysisData, PopulationDataPoint, SchoolEnrollmentDataPoint, FiveForcesAnalysis } from '../types';
+import { BuildingIcon, MountainIcon, HistoryIcon, UsersIcon, TrendingUpIcon, ShieldIcon, MapPinIcon, SparklesIcon, BuildingOffice2Icon, LeafIcon, UserGroupIcon } from './icons';
 
 const LABEL_STYLE = 'bg-teal-500/10 text-teal-700 ring-1 ring-teal-500/20';
 const UNDERLINE_STYLE = 'no-underline border-b-2 border-teal-500/50 font-medium text-teal-700';
@@ -101,26 +99,6 @@ const CpiGauge: React.FC<{ score: number }> = ({ score }) => {
     );
 };
 
-const NewsSection: React.FC<{news: NewsItem[]}> = ({ news }) => {
-    if (!news || news.length === 0) return <p className="text-brand-subtext text-center py-8">無相關動態資訊。</p>;
-    return (
-        <div className="space-y-4">
-            {news.map((item, index) => (
-                <div key={index} className="bg-slate-50 border border-slate-200 p-4 rounded-lg flex items-start space-x-4 shadow-sm">
-                    <NewspaperIcon className="w-6 h-6 text-brand-accent flex-shrink-0 mt-1"/>
-                    <div>
-                        <div className="flex justify-between items-baseline">
-                            <h5 className="font-semibold text-brand-text">{item.title}</h5>
-                            <span className="text-xs text-slate-500 ml-4 whitespace-nowrap">{item.date}</span>
-                        </div>
-                        <p className="text-sm text-brand-subtext mt-1"><HighlightedText text={item.summary} /></p>
-                    </div>
-                </div>
-            ))}
-        </div>
-    );
-};
-
 const PopulationChart: React.FC<{ data: PopulationDataPoint[] }> = ({ data }) => {
     const sortedData = [...data].sort((a, b) => a.year - b.year);
     return (
@@ -153,97 +131,6 @@ const SchoolEnrollmentChart: React.FC<{ data: SchoolEnrollmentDataPoint[] }> = (
                     <Line type="monotone" dataKey="studentCount" stroke="#14b8a6" strokeWidth={2} activeDot={{ r: 8 }} name="全校學生數" />
                 </LineChart>
             </ResponsiveContainer>
-        </div>
-    );
-};
-
-const TrendProjectionChart: React.FC<{
-    cityPopulation: PopulationDataPoint[];
-    schoolEnrollment: SchoolEnrollmentDataPoint[];
-    trendProjection: TrendProjection;
-}> = ({ cityPopulation, schoolEnrollment, trendProjection }) => {
-    // 1. Create a map of historical data
-    const historicalMap = new Map();
-    cityPopulation.forEach(d => historicalMap.set(d.year, { ...historicalMap.get(d.year), population: d.population }));
-    schoolEnrollment.forEach(d => historicalMap.set(d.year, { ...historicalMap.get(d.year), studentCount: d.studentCount }));
-    const historicalData = Array.from(historicalMap.entries()).map(([year, data]) => ({ year, ...data })).sort((a, b) => a.year - b.year);
-
-    // 2. Create projection data for chart, including last historical point for connection
-    const lastHistoricalPoint = historicalData[historicalData.length-1];
-
-    const projectionForChart = [
-        {
-            year: lastHistoricalPoint.year,
-            projectedPopulation: lastHistoricalPoint.population,
-            projectedStudentCount: lastHistoricalPoint.studentCount,
-        },
-        ...trendProjection.projectionData.map(p => ({
-            year: p.year,
-            projectedPopulation: p.projectedPopulation,
-            projectedStudentCount: p.projectedStudentCount,
-        }))
-    ];
-
-    // 3. Merge historical and projection data
-    const finalDataMap = new Map();
-    historicalData.forEach(d => finalDataMap.set(d.year, {
-        year: d.year,
-        population: d.population,
-        studentCount: d.studentCount,
-    }));
-    projectionForChart.forEach(p => {
-        const existing = finalDataMap.get(p.year) || { year: p.year };
-        finalDataMap.set(p.year, {
-            ...existing,
-            projectedPopulation: p.projectedPopulation,
-            projectedStudentCount: p.projectedStudentCount,
-        });
-    });
-
-    const finalChartData = Array.from(finalDataMap.values()).sort((a, b) => a.year - b.year);
-
-    return (
-        <div className="space-y-6">
-            <div className="w-full h-96 bg-slate-50 p-4 rounded-lg border border-slate-200 shadow-sm">
-                <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={finalChartData} margin={{ top: 5, right: 30, left: 30, bottom: 5 }}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#cbd5e1" />
-                        <XAxis dataKey="year" stroke="#475569" />
-                        <YAxis yAxisId="left" stroke="#14b8a6" label={{ value: '城市人口', angle: -90, position: 'insideLeft', fill: '#14b8a6', style: {textAnchor: 'middle'} }} tickFormatter={(value) => new Intl.NumberFormat('en-US', { notation: 'compact', compactDisplay: 'short' }).format(value as number)} />
-                        <YAxis yAxisId="right" orientation="right" stroke="#f59e0b" label={{ value: '學生人數', angle: 90, position: 'insideRight', fill: '#f59e0b', style: {textAnchor: 'middle'} }} tickFormatter={(value) => new Intl.NumberFormat('en-US', { notation: 'compact', compactDisplay: 'short' }).format(value as number)} />
-                        <Tooltip contentStyle={{ backgroundColor: '#f8fafc', borderColor: '#cbd5e1', color: '#0f172a' }} />
-                        <Legend wrapperStyle={{ color: '#475569', paddingTop: '10px' }} />
-
-                        <Line yAxisId="left" type="monotone" dataKey="population" stroke="#14b8a6" strokeWidth={2} activeDot={{ r: 6 }} name="歷史人口" connectNulls />
-                        <Line yAxisId="left" type="monotone" dataKey="projectedPopulation" stroke="#14b8a6" strokeWidth={2} strokeDasharray="5 5" name="預估人口" connectNulls />
-                        
-                        <Line yAxisId="right" type="monotone" dataKey="studentCount" stroke="#f59e0b" strokeWidth={2} activeDot={{ r: 6 }} name="歷史學生數" connectNulls />
-                        <Line yAxisId="right" type="monotone" dataKey="projectedStudentCount" stroke="#f59e0b" strokeWidth={2} strokeDasharray="5 5" name="預估學生數" connectNulls />
-                    </LineChart>
-                </ResponsiveContainer>
-            </div>
-            <p className="text-brand-subtext text-center max-w-3xl mx-auto leading-relaxed"><HighlightedText text={trendProjection.analysis} /></p>
-        </div>
-    );
-};
-
-// --- New Strategic Analysis Components ---
-
-const PestAnalysisDisplay: React.FC<{ data: PestAnalysis }> = ({ data }) => {
-    const items = [
-        { title: 'Political (政策)', content: data.political, color: 'text-sky-500' },
-        { title: 'Economic (經濟)', content: data.economic, color: 'text-emerald-500' },
-        { title: 'Social (社會)', content: data.social, color: 'text-amber-500' },
-        { title: 'Technological (技術)', content: data.technological, color: 'text-violet-500' },
-    ];
-    return (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {items.map(item => (
-                <div key={item.title} className="bg-slate-50 p-4 rounded-lg border border-slate-200 shadow-sm">
-                    <h4 className={`font-bold text-lg ${item.color}`}>{item.title}</h4>
-                    <p className="text-slate-600 text-sm mt-2 leading-relaxed"><HighlightedText text={item.content} /></p>
-                </div>
-            ))}
         </div>
     );
 };
@@ -292,263 +179,6 @@ const FiveForcesAnalysisChart: React.FC<{ data: FiveForcesAnalysis }> = ({ data 
     );
 };
 
-const InternalHealthDisplay: React.FC<{ data: InternalHealthMetrics }> = ({ data }) => {
-    const categories = [
-        { title: "招生指標", metrics: data.enrollment, color: "border-sky-500" },
-        { title: "財務指標", metrics: data.financial, color: "border-emerald-500" },
-        { title: "品牌與品質", metrics: data.brand, color: "border-amber-500" },
-        { title: "營運能力", metrics: data.operational, color: "border-violet-500" }
-    ];
-
-    const MetricCard: React.FC<{ item: MetricItem }> = ({ item }) => (
-        <div className="bg-slate-50 p-3 rounded-md border border-slate-200 shadow-sm">
-            <div className="flex justify-between items-center">
-                <p className="text-sm font-semibold text-brand-text">{item.metric}</p>
-                <p className="text-sm font-bold text-brand-accent bg-slate-100 px-2 py-0.5 rounded">{item.value}</p>
-            </div>
-            <p className="text-xs text-slate-600 mt-1 leading-relaxed"><HighlightedText text={item.analysis} /></p>
-        </div>
-    );
-
-    return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {categories.map(cat => (
-                <div key={cat.title} className={`border-l-4 ${cat.color} pl-4`}>
-                    <h4 className="font-bold text-lg text-brand-text mb-3">{cat.title}</h4>
-                    <div className="space-y-3">
-                        {cat.metrics.map(metric => <MetricCard key={metric.metric} item={metric} />)}
-                    </div>
-                </div>
-            ))}
-        </div>
-    );
-};
-
-const SwotAnalysisDisplay: React.FC<{ data: SwotAnalysis }> = ({ data }) => {
-    const items = [
-        { title: 'Strengths (優勢)', items: data.strengths, bgColor: 'bg-emerald-500/10', textColor: 'text-emerald-700' },
-        { title: 'Weaknesses (劣勢)', items: data.weaknesses, bgColor: 'bg-red-500/10', textColor: 'text-red-600' },
-        { title: 'Opportunities (機會)', items: data.opportunities, bgColor: 'bg-sky-500/10', textColor: 'text-sky-700' },
-        { title: 'Threats (威脅)', items: data.threats, bgColor: 'bg-amber-500/10', textColor: 'text-amber-700' },
-    ];
-    return (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {items.map(item => (
-                <div key={item.title} className={`p-4 rounded-lg ${item.bgColor}`}>
-                    <h4 className={`font-bold text-lg mb-2 ${item.textColor}`}>{item.title}</h4>
-                    <ul className="list-disc list-inside space-y-1 text-brand-subtext text-sm leading-relaxed">
-                        {item.items.map((point, index) => <li key={index}><HighlightedText text={point} /></li>)}
-                    </ul>
-                </div>
-            ))}
-        </div>
-    );
-};
-
-const StrategicRecommendationsDisplay: React.FC<{ recommendations: StrategicRecommendation[] }> = ({ recommendations }) => {
-    const getCardStyle = (type: StrategicRecommendation['type']) => {
-        switch (type) {
-            case '產業升級型':
-                return {
-                    icon: <CpuChipIcon className="w-6 h-6 text-sky-500" />,
-                    borderColor: 'border-sky-200',
-                    bgColor: 'bg-sky-50',
-                    textColor: 'text-sky-600',
-                    labelClass: 'bg-sky-100 text-sky-700 ring-1 ring-sky-200',
-                };
-            case '社會需求型':
-                return {
-                    icon: <BuildingOffice2Icon className="w-6 h-6 text-emerald-500" />,
-                    borderColor: 'border-emerald-200',
-                    bgColor: 'bg-emerald-50',
-                    textColor: 'text-emerald-600',
-                    labelClass: 'bg-emerald-100 text-emerald-700 ring-1 ring-emerald-200',
-                };
-            case '地方再生型':
-                return {
-                    icon: <PaintBrushIcon className="w-6 h-6 text-amber-500" />,
-                    borderColor: 'border-amber-200',
-                    bgColor: 'bg-amber-50',
-                    textColor: 'text-amber-600',
-                    labelClass: 'bg-amber-100 text-amber-700 ring-1 ring-amber-200',
-                };
-            default:
-                return {
-                    icon: <LightbulbIcon className="w-6 h-6 text-slate-500" />,
-                    borderColor: 'border-slate-200',
-                    bgColor: 'bg-slate-50',
-                    textColor: 'text-slate-600',
-                    labelClass: 'bg-slate-100 text-slate-700 ring-1 ring-slate-200',
-                };
-        }
-    };
-
-    const policyTagStyle = "bg-brand-secondary/10 text-teal-700 border border-brand-secondary/30 hover:bg-brand-secondary/20";
-
-    return (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {recommendations.map((rec, index) => {
-                const style = getCardStyle(rec.type);
-                return (
-                    <div key={index} className={`p-5 rounded-lg border ${style.borderColor} ${style.bgColor} flex flex-col space-y-4`}>
-                        <div className="flex items-center space-x-3">
-                            {style.icon}
-                            <span className={`font-semibold text-sm px-3 py-1 rounded-full ${style.bgColor} border ${style.borderColor} ${style.textColor}`}>{rec.type}</span>
-                        </div>
-                        <h4 className="font-bold text-lg text-brand-text">{rec.project}</h4>
-                        <p className="text-brand-subtext text-sm flex-grow leading-relaxed"><span className="font-semibold text-slate-500">理由：</span><HighlightedText text={rec.reason} styleType="label" customLabelClass={style.labelClass} /></p>
-                        {rec.policyAlignment && rec.policyAlignment.length > 0 && (
-                            <div>
-                                <h5 className="text-sm font-semibold text-slate-500 mb-2">可對接政策：</h5>
-                                <div className="flex flex-wrap gap-2">
-                                    {rec.policyAlignment.map((policy, pIndex) => (
-                                        <span key={pIndex} className={`text-xs py-1 px-3 rounded-full transition-colors cursor-default ${policyTagStyle}`}>
-                                            {policy}
-                                        </span>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                );
-            })}
-        </div>
-    );
-};
-
-const ImpactAssessmentDisplay: React.FC<{ data: ImpactAssessment }> = ({ data }) => {
-    const { economic, social, sustainability, summary } = data;
-    
-    const categories = [
-        { title: "經濟效益", metrics: economic, icon: <TrendingUpIcon className="w-8 h-8 text-sky-500" />, color: "border-sky-500", textColor: "text-sky-600" },
-        { title: "社會效益", metrics: social, icon: <UsersIcon className="w-8 h-8 text-emerald-500" />, color: "border-emerald-500", textColor: "text-emerald-600" },
-        { title: "永續效益", metrics: sustainability, icon: <LeafIcon className="w-8 h-8 text-amber-500" />, color: "border-amber-500", textColor: "text-amber-600" }
-    ];
-
-    const MetricCard: React.FC<{ item: ImpactMetric }> = ({ item }) => (
-        <div className="bg-slate-50 border border-slate-200 p-4 rounded-lg transform transition-transform hover:scale-105 shadow-sm">
-            <p className="font-semibold text-brand-text">{item.metric}</p>
-            <p className="text-2xl font-bold text-brand-accent my-1">{item.value}</p>
-            <p className="text-xs text-brand-subtext leading-relaxed"><HighlightedText text={item.description} /></p>
-        </div>
-    );
-
-    return (
-        <div className="space-y-8">
-            <p className="text-center text-brand-subtext text-lg max-w-3xl mx-auto leading-relaxed border-t border-b border-slate-200 py-4"><HighlightedText text={summary} /></p>
-
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {categories.map(cat => (
-                    <div key={cat.title} className={`p-5 rounded-xl bg-slate-50 border-2 ${cat.color}/30`}>
-                        <div className="flex items-center space-x-3 mb-4">
-                            {cat.icon}
-                            <h4 className={`text-xl font-bold ${cat.textColor}`}>{cat.title}</h4>
-                        </div>
-                        <div className="space-y-4">
-                            {cat.metrics.map((metric, index) => <MetricCard key={index} item={metric} />)}
-                        </div>
-                    </div>
-                ))}
-            </div>
-        </div>
-    );
-};
-
-const TransformationAlternativesDisplay: React.FC<{ alternatives: TransformationAlternative[] }> = ({ alternatives }) => {
-  return (
-    <div className="space-y-8">
-      {alternatives.map((alt, index) => (
-        <div key={index} className="bg-slate-50 p-5 rounded-lg border border-slate-200 shadow-sm transition-shadow hover:shadow-lg hover:border-slate-300">
-          <div className="flex items-center mb-4">
-            <SparklesIcon className="w-6 h-6 text-amber-500 mr-3 flex-shrink-0" />
-            <h4 className="font-bold text-lg text-brand-text">{alt.title}</h4>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-6">
-            {/* Left Column: Descriptions */}
-            <div className="space-y-4">
-              <p className="text-brand-subtext text-sm leading-relaxed"><span className="font-semibold text-slate-500">描述：</span><HighlightedText text={alt.description} /></p>
-              <p className="text-brand-subtext text-sm leading-relaxed"><span className="font-semibold text-slate-500">對接分析：</span><HighlightedText text={alt.alignment} /></p>
-            </div>
-
-            {/* Right Column: Steps, Partners, Risks */}
-            <div className="space-y-4">
-              <div>
-                <h5 className="text-md font-semibold text-brand-text mb-2 flex items-center"><ListBulletIcon className="w-5 h-5 mr-2 text-sky-500"/>執行步驟</h5>
-                <ol className="list-decimal list-inside space-y-1 text-sm text-brand-subtext pl-2">
-                  {alt.implementationSteps.map((step, i) => <li key={i}><HighlightedText text={step}/></li>)}
-                </ol>
-              </div>
-               <div>
-                <h5 className="text-md font-semibold text-brand-text mb-2 flex items-center"><UserGroupIcon className="w-5 h-5 mr-2 text-emerald-500"/>關鍵合作夥伴</h5>
-                <div className="flex flex-wrap gap-2">
-                    {alt.keyPartners.map((partner, i) => (
-                        <span key={i} className="text-xs bg-emerald-100 text-emerald-700 py-1 px-3 rounded-full">{partner}</span>
-                    ))}
-                </div>
-              </div>
-               <div>
-                <h5 className="text-md font-semibold text-brand-text mb-2 flex items-center"><ExclamationTriangleIcon className="w-5 h-5 mr-2 text-red-500"/>風險與對策</h5>
-                 <p className="text-sm text-brand-subtext leading-relaxed"><HighlightedText text={alt.riskAnalysis}/></p>
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-6 pt-4 border-t border-slate-200">
-            <h5 className="text-md font-semibold text-brand-text mb-3">潛在效益</h5>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {alt.potentialImpact.map((impact, i) => (
-                <div key={i} className="bg-white border border-slate-200 p-3 rounded-md">
-                  <p className="font-semibold text-sm text-brand-text">{impact.metric}</p>
-                  <p className="text-xl font-bold text-brand-accent my-1">{impact.value}</p>
-                  <p className="text-xs text-brand-subtext"><HighlightedText text={impact.description} /></p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-};
-
-const RecommendationsDisplay: React.FC<{ recommendations: Recommendation[] }> = ({ recommendations }) => (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {recommendations.map((rec, index) => (
-            <div key={index} className="bg-slate-50 p-5 rounded-lg border border-slate-200 transform hover:scale-105 hover:border-slate-300 transition-all duration-300 shadow-sm">
-                <div className="flex items-center mb-3">
-                    <LightbulbIcon className="w-6 h-6 text-amber-500 mr-3"/>
-                    <h4 className="font-bold text-lg text-brand-text">{rec.title}</h4>
-                </div>
-                <p className="text-brand-subtext text-sm mb-3 leading-relaxed"><HighlightedText text={rec.description} styleType="label" /></p>
-                <div className="text-xs text-brand-accent bg-teal-500/10 p-2 rounded-md leading-relaxed"><span className="font-semibold">理由：</span><HighlightedText text={rec.reason} styleType="label" /></div>
-            </div>
-        ))}
-    </div>
-);
-
-const PastCasesDisplay: React.FC<{ pastCases: PastCase[] }> = ({ pastCases }) => (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {pastCases.map((pcase, index) => (
-            <div key={index} className="bg-slate-50 p-5 rounded-lg border border-slate-200 flex flex-col space-y-3 shadow-sm">
-                <div className="flex items-center">
-                    <HistoryIcon className="w-6 h-6 text-brand-accent mr-3 flex-shrink-0"/>
-                    <div>
-                        <h4 className="font-bold text-lg text-brand-text">{pcase.schoolName}</h4>
-                        <p className="text-xs text-slate-500">{pcase.location}</p>
-                    </div>
-                </div>
-                <div className="text-sm space-y-2 text-brand-subtext leading-relaxed">
-                    <p><span className="font-semibold text-slate-500">原始條件：</span><HighlightedText text={pcase.originalCondition} styleType="label" /></p>
-                    <p><span className="font-semibold text-slate-500">活化主題：</span><span className="font-semibold text-amber-600"><HighlightedText text={pcase.revitalizationTheme} styleType="label" /></span></p>
-                    <p><span className="font-semibold text-slate-500">最終成果：</span><HighlightedText text={pcase.outcome} styleType="label" /></p>
-                </div>
-            </div>
-        ))}
-    </div>
-);
-
-
 const Section: React.FC<{title: string, icon: React.ReactNode, children: React.ReactNode}> = ({ title, icon, children }) => (
     <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
         <h3 className="text-xl font-semibold mb-4 text-brand-text flex items-center">
@@ -560,11 +190,9 @@ const Section: React.FC<{title: string, icon: React.ReactNode, children: React.R
 
 
 export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id, hideMap = false }) => {
-  const { 
-      basicInfo, environmentalAnalysis, potentialIndex, recommendations, strategicRecommendations, 
-      impactAssessment, pastCases, recentNews, cityPopulation, schoolEnrollment, pestAnalysis, 
-      fiveForcesAnalysis, internalHealthMetrics, swotAnalysis, trendProjection,
-      transformationAlternatives
+  const {
+      basicInfo, environmentalAnalysis, potentialIndex, cityPopulation, schoolEnrollment,
+      fiveForcesAnalysis,
   } = data;
   const mapLink = `https://www.openstreetmap.org/?mlat=${basicInfo.latitude}&mlon=${basicInfo.longitude}#map=18/${basicInfo.latitude}/${basicInfo.longitude}`;
   const mapContainerId = `analysis-map-${id || 'default'}`;
@@ -652,15 +280,8 @@ export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id, 
     };
   }, [hideMap, mapLoaded, mapContainerId, basicInfo.latitude, basicInfo.longitude, basicInfo.name]);
 
-  const [activeTab, setActiveTab] = useState<'school' | 'city'>('school');
-  
-  const hasRevitalizationData = (strategicRecommendations && strategicRecommendations.length > 0) || (impactAssessment && (impactAssessment.economic.length > 0 || impactAssessment.social.length > 0 || impactAssessment.sustainability.length > 0)) || (recommendations && recommendations.length > 0) || (pastCases && pastCases.length > 0);
-  const hasTransformationData = transformationAlternatives && transformationAlternatives.length > 0;
-  
-  const [activeStrategyTab, setActiveStrategyTab] = useState<'revitalization' | 'transformation'>(
-    hasTransformationData ? 'transformation' : 'revitalization'
-  );
-  
+  const hasLocalFlavor = (environmentalAnalysis.localAttractions?.length > 0) || (environmentalAnalysis.localSpecialtyFoods?.length > 0);
+
   const sections = [
     { condition: true, component: (
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -670,74 +291,52 @@ export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id, 
                   <h3 className="text-xl font-semibold mb-2 text-center text-brand-text">整建分數</h3>
                   <CpiGauge score={potentialIndex.cpiScore} />
                 </div>
-                <p className="text-center text-brand-subtext mt-2 px-2"><HighlightedText text={potentialIndex.summary} /></p>
-                 <p className="text-center text-sm text-slate-400 mt-4 px-2">* 指數為模型估算，計算參考公式：<br/><span className="font-mono text-brand-accent">CPI = (交通x0.4) + (環境x0.3) + (面積x0.2) + (校齡x0.1)</span></p>
             </div>
         </div>
         <div className="lg:col-span-2 space-y-6">
-            <Section title="宅院基礎資訊" icon={<BuildingIcon className="w-6 h-6"/>}>
+            <Section title="宅院基本資料" icon={<BuildingIcon className="w-6 h-6"/>}>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                    <InfoItem icon={<CalendarIcon className="w-6 h-6"/>} label="創校年份" value={basicInfo.foundedYear} unit={`(${new Date().getFullYear() - basicInfo.foundedYear} 年校齡)`}/>
-                    <InfoItem icon={<AreaIcon className="w-6 h-6"/>} label="校地面積" value={basicInfo.areaSqM.toLocaleString()} unit="m²" />
-                    <InfoItem icon={<BuildingIcon className="w-6 h-6"/>} label="建築覆蓋率" value={`${basicInfo.buildingCoverage}%`} />
+                    <InfoItem icon={<BuildingIcon className="w-6 h-6"/>} label="建築型態" value={basicInfo.buildingType || '未提供'} />
+                    <InfoItem icon={<BuildingOffice2Icon className="w-6 h-6"/>} label="樓層數" value={basicInfo.floorCount ?? '未提供'} unit={basicInfo.floorCount ? '層' : undefined} />
+                    <InfoItem icon={<HistoryIcon className="w-6 h-6"/>} label="文資身分" value={basicInfo.isHeritage ? '是' : '否'} />
+                    <InfoItem icon={<LeafIcon className="w-6 h-6"/>} label="農村再生社區" value={basicInfo.isRuralRevitalizationCommunity ? '是' : '否'} />
+                    <InfoItem icon={<UserGroupIcon className="w-6 h-6"/>} label="社區組織運作狀況" value={basicInfo.communityOrgStatus || '未提供'} />
                 </div>
             </Section>
-            <Section title="周邊環境分析" icon={<MountainIcon className="w-6 h-6"/>}>
-                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                    <InfoItem icon={<MountainIcon className="w-6 h-6"/>} label="地形 / 海拔" value={environmentalAnalysis.terrain} unit={`${environmentalAnalysis.avgElevationM} m`} />
-                    <InfoItem icon={<WaveIcon className="w-6 h-6"/>} label="距海岸" value={environmentalAnalysis.coastDistanceKm} unit="km" />
-                    <InfoItem icon={<RiverIcon className="w-6 h-6"/>} label="距河川" value={environmentalAnalysis.riverDistanceKm} unit="km" />
-                    <InfoItem icon={<TrainIcon className="w-6 h-6"/>} label="最近車站" value={environmentalAnalysis.nearestStation} />
-                    <InfoItem icon={<TrainIcon className="w-6 h-6"/>} label="交通分數" value={`${environmentalAnalysis.transportationScore} / 10`} />
-                </div>
-                {(environmentalAnalysis.localAttractions?.length > 0 || environmentalAnalysis.localSpecialtyFoods?.length > 0) && (
-                    <div className="mt-6 pt-6 border-t border-slate-200">
-                        <h4 className="text-md font-semibold text-brand-text mb-4">區域特色</h4>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {environmentalAnalysis.localAttractions?.length > 0 && (
-                                <div>
-                                    <div className="flex items-center mb-2">
-                                        <MapPinIcon className="w-5 h-5 text-sky-400 mr-2" />
-                                        <h5 className="font-semibold text-brand-subtext">特色景點</h5>
-                                    </div>
-                                    <div className="flex flex-wrap gap-2">
-                                        {environmentalAnalysis.localAttractions.map((item, index) => (
-                                            <span key={index} className="text-sm bg-sky-100 text-sky-700 py-1 px-3 rounded-full">{item}</span>
-                                        ))}
-                                    </div>
+            {hasLocalFlavor && (
+                <Section title="周邊環境特色" icon={<MountainIcon className="w-6 h-6"/>}>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {environmentalAnalysis.localAttractions?.length > 0 && (
+                            <div>
+                                <div className="flex items-center mb-2">
+                                    <MapPinIcon className="w-5 h-5 text-sky-400 mr-2" />
+                                    <h5 className="font-semibold text-brand-subtext">特色景點</h5>
                                 </div>
-                            )}
-                            {environmentalAnalysis.localSpecialtyFoods?.length > 0 && (
-                                <div>
-                                    <div className="flex items-center mb-2">
-                                        <SparklesIcon className="w-5 h-5 text-amber-400 mr-2" />
-                                        <h5 className="font-semibold text-brand-subtext">特色美食</h5>
-                                    </div>
-                                    <div className="flex flex-wrap gap-2">
-                                        {environmentalAnalysis.localSpecialtyFoods.map((item, index) => (
-                                            <span key={index} className="text-sm bg-amber-100 text-amber-700 py-1 px-3 rounded-full">{item}</span>
-                                        ))}
-                                    </div>
+                                <div className="flex flex-wrap gap-2">
+                                    {environmentalAnalysis.localAttractions.map((item, index) => (
+                                        <span key={index} className="text-sm bg-sky-100 text-sky-700 py-1 px-3 rounded-full">{item}</span>
+                                    ))}
                                 </div>
-                            )}
-                        </div>
+                            </div>
+                        )}
+                        {environmentalAnalysis.localSpecialtyFoods?.length > 0 && (
+                            <div>
+                                <div className="flex items-center mb-2">
+                                    <SparklesIcon className="w-5 h-5 text-amber-400 mr-2" />
+                                    <h5 className="font-semibold text-brand-subtext">特色美食</h5>
+                                </div>
+                                <div className="flex flex-wrap gap-2">
+                                    {environmentalAnalysis.localSpecialtyFoods.map((item, index) => (
+                                        <span key={index} className="text-sm bg-amber-100 text-amber-700 py-1 px-3 rounded-full">{item}</span>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
                     </div>
-                )}
-            </Section>
+                </Section>
+            )}
         </div>
       </div>
-    )},
-    { condition: (recentNews?.schoolNews?.length > 0) || (recentNews?.cityNews?.length > 0), component: (
-        <Section title="近期相關動態" icon={<NewspaperIcon className="w-6 h-6"/>}>
-            <div className="flex space-x-2 border-b border-slate-200 mb-4">
-                <button onClick={() => setActiveTab('school')} className={`px-4 py-2 text-sm font-medium rounded-t-lg transition-colors ${activeTab === 'school' ? 'bg-brand-secondary text-white' : 'text-brand-subtext hover:bg-slate-100'}`}>學校近期動態</button>
-                <button onClick={() => setActiveTab('city')} className={`px-4 py-2 text-sm font-medium rounded-t-lg transition-colors ${activeTab === 'city' ? 'bg-brand-secondary text-white' : 'text-brand-subtext hover:bg-slate-100'}`}>城市近期動態</button>
-            </div>
-            <div>
-                {activeTab === 'school' && <NewsSection news={recentNews.schoolNews} />}
-                {activeTab === 'city' && <NewsSection news={recentNews.cityNews} />}
-            </div>
-        </Section>
     )},
     { condition: cityPopulation && cityPopulation.length > 0, component: (
         <Section title="所在城市人口趨勢" icon={<UsersIcon className="w-6 h-6"/>}>
@@ -751,77 +350,7 @@ export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id, 
             <p className="text-xs text-slate-400 text-center mt-2">資料來源：中華民國教育部統計處</p>
         </Section>
     )},
-     { condition: trendProjection && trendProjection.projectionData.length > 0, component: (
-        <Section title="未來 5 年趨勢推估" icon={<ChartBarIcon className="w-6 h-6"/>}>
-            <TrendProjectionChart 
-                cityPopulation={cityPopulation}
-                schoolEnrollment={schoolEnrollment}
-                trendProjection={trendProjection}
-            />
-        </Section>
-    )},
-    { condition: true, component: <Section title="外部宏觀環境 (PEST) 分析" icon={<GlobeIcon className="w-6 h-6"/>}><PestAnalysisDisplay data={pestAnalysis} /></Section> },
     { condition: true, component: <Section title="產業競爭環境 (Five Forces) 分析" icon={<ShieldIcon className="w-6 h-6"/>}><FiveForcesAnalysisChart data={fiveForcesAnalysis} /></Section> },
-    { condition: true, component: <Section title="內部營運健康度指標" icon={<ClipboardListIcon className="w-6 h-6"/>}><InternalHealthDisplay data={internalHealthMetrics} /></Section> },
-    { condition: true, component: <Section title="策略定位 (SWOT) 整合分析" icon={<PuzzleIcon className="w-6 h-6"/>}><SwotAnalysisDisplay data={swotAnalysis} /></Section> },
-    { condition: hasRevitalizationData || hasTransformationData, component: (
-        <Section title="策略與轉型建議" icon={<KeyIcon className="w-6 h-6" />}>
-          <div className="flex space-x-2 border-b border-slate-200 mb-6">
-            {hasTransformationData && (
-              <button
-                onClick={() => setActiveStrategyTab('transformation')}
-                className={`px-4 py-2 text-sm font-medium rounded-t-lg transition-colors ${activeStrategyTab === 'transformation' ? 'bg-brand-secondary text-white' : 'text-brand-subtext hover:bg-slate-100'}`}
-              >
-                多元轉型營運建議
-              </button>
-            )}
-            {hasRevitalizationData && (
-              <button
-                onClick={() => setActiveStrategyTab('revitalization')}
-                className={`px-4 py-2 text-sm font-medium rounded-t-lg transition-colors ${activeStrategyTab === 'revitalization' ? 'bg-brand-secondary text-white' : 'text-brand-subtext hover:bg-slate-100'}`}
-              >
-                策略性活化建議
-              </button>
-            )}
-          </div>
-          <div key={activeStrategyTab}>
-            {activeStrategyTab === 'revitalization' && hasRevitalizationData && (
-              <div className="space-y-12">
-                {recommendations && recommendations.length > 0 && (
-                  <div>
-                    <h4 className="text-lg font-semibold text-brand-text mb-4 border-l-4 border-amber-500 pl-3">初步活化方向建議</h4>
-                    <RecommendationsDisplay recommendations={recommendations} />
-                  </div>
-                )}
-                {pastCases && pastCases.length > 0 && (
-                  <div>
-                    <h4 className="text-lg font-semibold text-brand-text mb-4 border-l-4 border-violet-500 pl-3">相似條件活化案例</h4>
-                    <PastCasesDisplay pastCases={pastCases} />
-                  </div>
-                )}
-                {strategicRecommendations && strategicRecommendations.length > 0 && (
-                  <div>
-                    <h4 className="text-lg font-semibold text-brand-text mb-4 border-l-4 border-sky-500 pl-3">策略性活化方向分析</h4>
-                    <StrategicRecommendationsDisplay recommendations={strategicRecommendations} />
-                  </div>
-                )}
-                {impactAssessment && (impactAssessment.economic.length > 0 || impactAssessment.social.length > 0 || impactAssessment.sustainability.length > 0) && (
-                  <div>
-                    <h4 className="text-lg font-semibold text-brand-text mb-4 border-l-4 border-emerald-500 pl-3">預期效益與影響力評估</h4>
-                    <ImpactAssessmentDisplay data={impactAssessment} />
-                  </div>
-                )}
-              </div>
-            )}
-            {activeStrategyTab === 'transformation' && hasTransformationData && (
-              <div>
-                <TransformationAlternativesDisplay alternatives={transformationAlternatives} />
-              </div>
-            )}
-          </div>
-        </Section>
-      ),
-    },
   ];
   
   const visibleSections = sections.filter(s => s.condition);
