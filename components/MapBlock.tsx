@@ -359,7 +359,7 @@ const MapBlock: React.FC<MapBlockProps> = ({
         </div>
 
         {/* Right Panel - Selected Property Details */}
-        <div className="flex flex-col min-h-0">
+        <div className={`${selectedProperty ? 'flex' : 'hidden md:flex'} flex-col min-h-0`}>
           <div className="bg-slate-50 p-5 rounded-lg border border-slate-200 flex-1 min-h-0 overflow-y-auto">
             <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
               {selectedProperty ? '宅院重點摘要' : '選擇宅院'}
