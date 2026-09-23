@@ -24,6 +24,8 @@ import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import Alert from '@mui/material/Alert';
 import ClearIcon from '@mui/icons-material/Clear';
+import { useTheme } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
 
 interface HomePageProps {
   isLoading: boolean;
@@ -68,6 +70,9 @@ const HomePage: React.FC<HomePageProps> = ({
   const [villageHouses, setVillageHouses] = useState<VillageHouseRecord[]>([]);
   const [isAnalysisVisible, setIsAnalysisVisible] = useState(false);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
+  const controlSize = isSmallScreen ? 'small' : 'medium';
 
   useEffect(() => {
     fetchProperties().then((properties) =>
@@ -184,6 +189,7 @@ const HomePage: React.FC<HomePageProps> = ({
                       <Box sx={{ position: 'relative', flex: 1 }}>
                         <TextField
                           fullWidth
+                          size={controlSize}
                           value={schoolName}
                           onChange={(e) => setSchoolName(e.target.value)}
                           onFocus={() => setIsSearchFocused(true)}
@@ -233,7 +239,7 @@ const HomePage: React.FC<HomePageProps> = ({
                       </Box>
                       <Button
                         variant="contained"
-                        size="medium"
+                        size={controlSize}
                         onClick={() => handleSearch()}
                         disabled={isLoading}
                       >
@@ -250,7 +256,7 @@ const HomePage: React.FC<HomePageProps> = ({
 
             <Grid container spacing={3} sx={{ mt: 2 }}>
               <Grid item xs={12} sm={6} md={2.4}>
-                <FormControl fullWidth sx={{ bgcolor: 'background.paper', borderRadius: 3 }}>
+                <FormControl fullWidth size={controlSize} sx={{ bgcolor: 'background.paper', borderRadius: 3 }}>
                   <InputLabel>研究基地</InputLabel>
                   <Select
                     value={researchBaseSelectValue}
@@ -267,7 +273,7 @@ const HomePage: React.FC<HomePageProps> = ({
                 </FormControl>
               </Grid>
               <Grid item xs={12} sm={6} md={2.4}>
-                <FormControl fullWidth sx={{ bgcolor: 'background.paper', borderRadius: 3 }}>
+                <FormControl fullWidth size={controlSize} sx={{ bgcolor: 'background.paper', borderRadius: 3 }}>
                   <InputLabel>宅院標的</InputLabel>
                   <Select
                     value={selectedResearchBase}
@@ -285,7 +291,7 @@ const HomePage: React.FC<HomePageProps> = ({
               </Grid>
 
               <Grid item xs={12} sm={6} md={2.4}>
-                <FormControl fullWidth sx={{ bgcolor: 'background.paper', borderRadius: 3 }}>
+                <FormControl fullWidth size={controlSize} sx={{ bgcolor: 'background.paper', borderRadius: 3 }}>
                   <InputLabel>整建潛力</InputLabel>
                   <Select
                     value={selectedPotential}
@@ -338,7 +344,7 @@ const HomePage: React.FC<HomePageProps> = ({
               */}
 
               <Grid item xs={12} sm={6} md={2.4}>
-                <FormControl fullWidth sx={{ bgcolor: 'background.paper', borderRadius: 3 }}>
+                <FormControl fullWidth size={controlSize} sx={{ bgcolor: 'background.paper', borderRadius: 3 }}>
                   <InputLabel>再利用類型方向</InputLabel>
                   <Select
                     value={selectedReuse}
