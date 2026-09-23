@@ -344,7 +344,7 @@ export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id, 
             <p className="text-xs text-slate-400 text-center mt-2">資料來源：中華民國內政部戶政司</p>
         </Section>
     )},
-    { condition: schoolEnrollment && schoolEnrollment.length > 0, component: (
+    { condition: false, component: (
         <Section title="學校近年學生人數趨勢" icon={<TrendingUpIcon className="w-6 h-6"/>}>
             <SchoolEnrollmentChart data={schoolEnrollment} />
             <p className="text-xs text-slate-400 text-center mt-2">資料來源：中華民國教育部統計處</p>
@@ -392,10 +392,7 @@ export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id, 
           // For all subsequent visible sections, increment counter and inject title.
           sectionCounter++;
           const originalTitle = component.props.title;
-          const titleWithoutNumber = originalTitle.replace(/^\d+\.\s*/, '');
-          const newTitle = `${sectionCounter}. ${titleWithoutNumber}`;
-          
-          return React.cloneElement(component, { key: index, title: newTitle });
+          return React.cloneElement(component, { key: index, title: originalTitle });
       })}
     </div>
   );
