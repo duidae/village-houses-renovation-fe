@@ -72,7 +72,7 @@ const App: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [houseOptions, setHouseOptions] = useState<HouseOption[]>([]);
   const [selectedResearchBase, setSelectedResearchBase] = useState<string>('全部');
-  const [selectedPotential, setSelectedPotential] = useState<'高' | '中' | '低'>('中');
+  const [selectedPotential, setSelectedPotential] = useState<'全部' | '高' | '中' | '低'>('全部');
   const [selectedLocation, setSelectedLocation] = useState<'主幹道上' | '周邊有公共設施'>('主幹道上');
   const [selectedBuilding, setSelectedBuilding] = useState<'一條龍' | '單伸手' | '三合院' | '水泥連棟式' | '具歷史價值'>('一條龍');
   const [selectedReuse, setSelectedReuse] = useState<'綠色照顧據點' | '戶外開放空間' | '地方文化展示館' | '農村體驗空間' | '青年創業基地'>('綠色照顧據點');

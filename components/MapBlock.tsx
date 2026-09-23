@@ -45,6 +45,7 @@ const getScoreLevelText = (score: number) => {
 interface MapBlockProps {
   selectedResearchBase?: string;
   onSelectResearchBase?: (researchBaseId: string) => void;
+  selectedPotential?: '全部' | '高' | '中' | '低';
   onViewAnalysis?: () => void;
   showAnalysisButton?: boolean;
 }
@@ -52,6 +53,7 @@ interface MapBlockProps {
 const MapBlock: React.FC<MapBlockProps> = ({
   selectedResearchBase = '全部',
   onSelectResearchBase,
+  selectedPotential = '全部',
   onViewAnalysis,
   showAnalysisButton = true,
 }) => {
@@ -94,13 +96,18 @@ const MapBlock: React.FC<MapBlockProps> = ({
   }, []);
 
   const visibleProperties = useMemo(() => {
-    if (selectedResearchBase === '全部') return properties;
+    const byResearchBase = (() => {
+      if (selectedResearchBase === '全部') return properties;
 
-    const byHouse = properties.filter((property) => property.id === selectedResearchBase);
-    if (byHouse.length > 0) return byHouse;
+      const byHouse = properties.filter((property) => property.id === selectedResearchBase);
+      if (byHouse.length > 0) return byHouse;
 
-    return properties.filter((property) => researchAreaLabel(property) === selectedResearchBase);
-  }, [properties, selectedResearchBase]);
+      return properties.filter((property) => researchAreaLabel(property) === selectedResearchBase);
+    })();
+
+    if (selectedPotential === '全部') return byResearchBase;
+    return byResearchBase.filter((property) => getScoreLevelText(property.score) === selectedPotential);
+  }, [properties, selectedResearchBase, selectedPotential]);
 
   // The area a boundary should be drawn for: either selectedResearchBase is
   // already a county+township+village string, or it's a single house's id,

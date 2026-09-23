@@ -27,6 +27,12 @@ import ClearIcon from '@mui/icons-material/Clear';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 
+const getPotentialLevel = (score: number): '高' | '中' | '低' => {
+  if (score >= 80) return '高';
+  if (score >= 60) return '中';
+  return '低';
+};
+
 interface HomePageProps {
   isLoading: boolean;
   error: string | null;
@@ -65,7 +71,7 @@ const HomePage: React.FC<HomePageProps> = ({
   setSelectedReuse,
 }) => {
   const [houseOptions, setHouseOptions] = useState<
-    { id: string; name: string; county: string; township: string; village: string }[]
+    { id: string; name: string; county: string; township: string; village: string; score: number }[]
   >([]);
   const [villageHouses, setVillageHouses] = useState<VillageHouseRecord[]>([]);
   const [isAnalysisVisible, setIsAnalysisVisible] = useState(false);
@@ -83,6 +89,7 @@ const HomePage: React.FC<HomePageProps> = ({
           county: p.county,
           township: p.township,
           village: p.village,
+          score: p.score,
         }))
       )
     );
@@ -103,10 +110,9 @@ const HomePage: React.FC<HomePageProps> = ({
   const researchBaseSelectValue = selectedHouse
     ? researchAreaLabel(selectedHouse)
     : selectedResearchBase;
-  const filteredHouseOptions =
-    researchBaseSelectValue === '全部'
-      ? houseOptions
-      : houseOptions.filter((house) => researchAreaLabel(house) === researchBaseSelectValue);
+  const filteredHouseOptions = houseOptions
+    .filter((house) => researchBaseSelectValue === '全部' || researchAreaLabel(house) === researchBaseSelectValue)
+    .filter((house) => selectedPotential === '全部' || getPotentialLevel(house.score) === selectedPotential);
 
   const normalizedSearch = schoolName.trim().replace(/\s+/g, '').toLocaleLowerCase();
   const hasExactMatch = filteredHouseOptions.some(
@@ -381,6 +387,7 @@ const HomePage: React.FC<HomePageProps> = ({
             <MapBlock
               selectedResearchBase={selectedResearchBase}
               onSelectResearchBase={setSelectedResearchBase}
+              selectedPotential={selectedPotential}
               onViewAnalysis={scrollToAnalysis}
               showAnalysisButton={!isAnalysisVisible}
             />
