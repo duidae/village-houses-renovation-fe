@@ -205,7 +205,6 @@ export function toPropertyMarker(record: VillageHouseRecord): PropertyMarker {
     description: `「${record.buildingType || '未分類'}」建築，位於${record.township}${record.village}${
       industriesText ? `，在地產業：${industriesText}` : ''
     }`,
-    renovationStatus: 'planning',
     price: estimatePrice(record),
     score: estimateScore(record),
     county: record.county,

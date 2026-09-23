@@ -240,11 +240,6 @@ const MapBlock: React.FC<MapBlockProps> = ({
 
     // Add markers for each property
     visibleProperties.forEach((property) => {
-      const statusColor = {
-        planning: '#fbbf24', // amber
-        'in-progress': '#60a5fa', // blue
-        completed: '#4ade80', // green
-      }[property.renovationStatus];
       const scoreColor = getScoreLevelColor(property.score);
       const isHighScore = property.score >= 80;
 
@@ -303,9 +298,6 @@ const MapBlock: React.FC<MapBlockProps> = ({
           <h3 style="margin: 0 0 6px 0; font-size: 14px; font-weight: bold;">${property.name}</h3>
           <p style="margin: 0 0 10px 0; font-size: 13px; font-weight: bold; color: #0f172a;">${formatPrice(property.price)}</p>
           <p style="margin: 0 0 10px 0; font-size: 12px;">${property.description}</p>
-          <span style="display: inline-block; padding: 4px 8px; border-radius: 4px; background-color: ${statusColor}; color: white; font-size: 11px; font-weight: bold;">
-            ${getStatusText(property.renovationStatus)}
-          </span>
         </div>
       `);
 
@@ -323,15 +315,6 @@ const MapBlock: React.FC<MapBlockProps> = ({
       map.remove();
     };
   }, [mapLoaded, visibleProperties, activeBoundaryFeature]);
-
-  const getStatusText = (status: string) => {
-    const statusMap: Record<string, string> = {
-      planning: '規劃中',
-      'in-progress': '施工中',
-      completed: '已完成',
-    };
-    return statusMap[status] || status;
-  };
 
   return (
     <div className="relative bg-white p-6 rounded-xl border border-slate-200 shadow-sm h-full min-h-0 overflow-hidden flex flex-col">
@@ -437,27 +420,6 @@ const MapBlock: React.FC<MapBlockProps> = ({
                   <p className="text-sm font-mono text-slate-700">
                     {selectedProperty.lat.toFixed(4)}, {selectedProperty.lng.toFixed(4)}
                   </p>
-                </div>
-
-                
-
-                {/* Status */}
-                <div>
-                  <p className="text-xs text-slate-500 uppercase mb-2">
-                    整建進度
-                  </p>
-                  <span
-                    className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white"
-                    style={{
-                      backgroundColor: {
-                        planning: '#fbbf24',
-                        'in-progress': '#60a5fa',
-                        completed: '#4ade80',
-                      }[selectedProperty.renovationStatus],
-                    }}
-                  >
-                    {getStatusText(selectedProperty.renovationStatus)}
-                  </span>
                 </div>
 
                 {/* GSV View */}
