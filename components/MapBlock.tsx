@@ -13,12 +13,21 @@ const mapLayerSources = [
     label: '重點區域',
     url: '/layers/key_area-20260912T112510Z-1-001.zip',
     color: '#0f766e',
+    type: 'shp' as const,
   },
   {
     id: 'public-facilities',
     label: '公共設施',
     url: '/layers/public-20260912T112511Z-1-001.zip',
     color: '#2563eb',
+    type: 'shp' as const,
+  },
+  {
+    id: 'public-facilities-geojson',
+    label: '公共設施資料',
+    url: '/public-facilities.geojson',
+    color: '#9333ea',
+    type: 'geojson' as const,
   },
 ];
 
@@ -188,9 +197,9 @@ const MapBlock: React.FC<MapBlockProps> = ({
 
     const loadShapeLayers = async () => {
       await Promise.all(
-        mapLayerSources.map(async ({ id, url, color }) => {
+        mapLayerSources.map(async ({ id, url, color, type }) => {
           try {
-            const geoJson = await shp(url);
+            const geoJson = type === 'geojson' ? await fetch(url).then((res) => res.json()) : await shp(url);
             if (layersCancelled) return;
 
             const layer = L.geoJSON(geoJson, {
