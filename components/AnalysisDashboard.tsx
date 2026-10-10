@@ -319,7 +319,7 @@ export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id, 
                             <div>
                                 <div className="flex items-center mb-2">
                                     <MapPinIcon className="w-5 h-5 text-sky-400 mr-2" />
-                                    <h5 className="font-semibold text-brand-subtext">特色景點</h5>
+                                    <h5 className="font-semibold text-brand-subtext">地方特色活動與宗教文化</h5>
                                 </div>
                                 <div className="flex flex-wrap gap-2">
                                     {environmentalAnalysis.localAttractions.map((item, index) => (
@@ -332,7 +332,7 @@ export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id, 
                             <div>
                                 <div className="flex items-center mb-2">
                                     <SparklesIcon className="w-5 h-5 text-amber-400 mr-2" />
-                                    <h5 className="font-semibold text-brand-subtext">特色美食</h5>
+                                    <h5 className="font-semibold text-brand-subtext">在地產業類型</h5>
                                 </div>
                                 <div className="flex flex-wrap gap-2">
                                     {environmentalAnalysis.localSpecialtyFoods.map((item, index) => (

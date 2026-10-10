@@ -167,7 +167,7 @@ const HomePage: React.FC<HomePageProps> = ({
             <Grid container spacing={4} alignItems="flex-start">
               <Grid item xs={12} md={6} sx={{ position: 'relative', zIndex: 2 }}>
                 <Typography variant="overline" component="p" sx={{ fontSize: '20px', letterSpacing: 2, mb: 2, color: 'primary.main' }}>
-                  農村好宅整建活化平台
+                  農村空間活化與特色建築物整建平台
                 </Typography>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2, flexWrap: 'wrap' }}>
                   <Box
@@ -177,7 +177,7 @@ const HomePage: React.FC<HomePageProps> = ({
                     sx={{ width: 56, height: 56, borderRadius: 2, objectFit: 'contain' }}
                   />
                   <Typography variant="h3" component="h1" sx={{ fontWeight: 800 }}>
-                    農村好##
+                    農村好宅##
                   </Typography>
                 </Box>
                 <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 700 }}>
