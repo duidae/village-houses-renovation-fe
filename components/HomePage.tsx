@@ -261,7 +261,7 @@ const HomePage: React.FC<HomePageProps> = ({
             </Grid>
 
             <Grid container spacing={3} sx={{ mt: 2 }}>
-              <Grid item xs={12} sm={6} md={2.4}>
+              <Grid item xs={12} sm={6} md={2}>
                 <FormControl fullWidth size={controlSize} sx={{ bgcolor: 'background.paper', borderRadius: 3 }}>
                   <InputLabel>研究基地</InputLabel>
                   <Select
@@ -278,7 +278,7 @@ const HomePage: React.FC<HomePageProps> = ({
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={12} sm={6} md={2.4}>
+              <Grid item xs={12} sm={6} md={2}>
                 <FormControl fullWidth size={controlSize} sx={{ bgcolor: 'background.paper', borderRadius: 3 }}>
                   <InputLabel>宅院標的</InputLabel>
                   <Select
@@ -296,7 +296,7 @@ const HomePage: React.FC<HomePageProps> = ({
                 </FormControl>
               </Grid>
 
-              <Grid item xs={12} sm={6} md={2.4}>
+              <Grid item xs={12} sm={6} md={2}>
                 <FormControl fullWidth size={controlSize} sx={{ bgcolor: 'background.paper', borderRadius: 3 }}>
                   <InputLabel>整建潛力</InputLabel>
                   <Select
@@ -313,7 +313,7 @@ const HomePage: React.FC<HomePageProps> = ({
               </Grid>
 
               {/*
-              <Grid item xs={12} sm={6} md={2.4}>
+              <Grid item xs={12} sm={6} md={2}>
                 <FormControl fullWidth sx={{ bgcolor: 'background.paper', borderRadius: 3 }}>
                   <InputLabel>區位與生活機能</InputLabel>
                   <Select
@@ -327,7 +327,7 @@ const HomePage: React.FC<HomePageProps> = ({
                 </FormControl>
               </Grid>
 
-              <Grid item xs={12} sm={6} md={2.4}>
+              <Grid item xs={12} sm={6} md={2}>
                 <FormControl fullWidth sx={{ bgcolor: 'background.paper', borderRadius: 3 }}>
                   <InputLabel>建築條件</InputLabel>
                   <Select
@@ -349,7 +349,7 @@ const HomePage: React.FC<HomePageProps> = ({
               </Grid>
               */}
 
-              <Grid item xs={12} sm={6} md={2.4}>
+              <Grid item xs={12} sm={6} md={2}>
                 <FormControl fullWidth size={controlSize} sx={{ bgcolor: 'background.paper', borderRadius: 3 }}>
                   <InputLabel>再利用類型方向</InputLabel>
                   <Select
@@ -387,7 +387,7 @@ const HomePage: React.FC<HomePageProps> = ({
                 </FormControl>
               </Grid>
 
-              <Grid item xs={12} sm={6} md={2.4}>
+              <Grid item xs={12} sm={6} md={2}>
                 <FormControl fullWidth size={controlSize} sx={{ bgcolor: 'background.paper', borderRadius: 3 }}>
                   <InputLabel>社區連結</InputLabel>
                   <Select
@@ -403,7 +403,7 @@ const HomePage: React.FC<HomePageProps> = ({
                 </FormControl>
               </Grid>
 
-              <Grid item xs={12} sm={6} md={2.4}>
+              <Grid item xs={12} sm={6} md={2}>
                 <FormControl fullWidth size={controlSize} sx={{ bgcolor: 'background.paper', borderRadius: 3 }}>
                   <InputLabel>建築物狀況</InputLabel>
                   <Select
