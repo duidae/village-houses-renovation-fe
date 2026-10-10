@@ -358,19 +358,63 @@ const HomePage: React.FC<HomePageProps> = ({
                     onChange={(e) =>
                       setSelectedReuse(
                         e.target.value as
-                          | '綠色照顧據點'
-                          | '戶外開放空間'
-                          | '地方文化展示館'
-                          | '農村體驗空間'
-                          | '青年創業基地'
+                          | '照顧療育服務型'
+                          | '社區生活共享型'
+                          | '文化保存展示型'
+                          | '地方技藝培育型'
+                          | '食農教育體驗型'
+                          | '產業加工營運型'
+                          | '青年創業共創型'
+                          | '農遊體驗服務型'
+                          | '社區安全韌性型'
+                          | '兒少/數位共學服務型'
+                          | '社區健康促進型'
                       )
                     }
                   >
-                    <MenuItem value="綠色照顧據點">綠色照顧據點</MenuItem>
-                    <MenuItem value="戶外開放空間">戶外開放空間</MenuItem>
-                    <MenuItem value="地方文化展示館">地方文化展示館</MenuItem>
-                    <MenuItem value="農村體驗空間">農村體驗空間</MenuItem>
-                    <MenuItem value="青年創業基地">青年創業基地</MenuItem>
+                    <MenuItem value="照顧療育服務型">照顧療育服務型</MenuItem>
+                    <MenuItem value="社區生活共享型">社區生活共享型</MenuItem>
+                    <MenuItem value="文化保存展示型">文化保存展示型</MenuItem>
+                    <MenuItem value="地方技藝培育型">地方技藝培育型</MenuItem>
+                    <MenuItem value="食農教育體驗型">食農教育體驗型</MenuItem>
+                    <MenuItem value="產業加工營運型">產業加工營運型</MenuItem>
+                    <MenuItem value="青年創業共創型">青年創業共創型</MenuItem>
+                    <MenuItem value="農遊體驗服務型">農遊體驗服務型</MenuItem>
+                    <MenuItem value="社區安全韌性型">社區安全韌性型</MenuItem>
+                    <MenuItem value="兒少/數位共學服務型">兒少/數位共學服務型</MenuItem>
+                    <MenuItem value="社區健康促進型">社區健康促進型</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+
+              <Grid item xs={12} sm={6} md={2.4}>
+                <FormControl fullWidth size={controlSize} sx={{ bgcolor: 'background.paper', borderRadius: 3 }}>
+                  <InputLabel>社區連結</InputLabel>
+                  <Select
+                    value={selectedPotential}
+                    label="社區連結"
+                    onChange={(e) => setSelectedPotential(e.target.value as '全部' | '高' | '中' | '低')}
+                  >
+                    <MenuItem value="全部">全部</MenuItem>
+                    <MenuItem value="高">高</MenuItem>
+                    <MenuItem value="中">中</MenuItem>
+                    <MenuItem value="低">低</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+
+              <Grid item xs={12} sm={6} md={2.4}>
+                <FormControl fullWidth size={controlSize} sx={{ bgcolor: 'background.paper', borderRadius: 3 }}>
+                  <InputLabel>建築物狀況</InputLabel>
+                  <Select
+                    value={selectedPotential}
+                    label="建築物狀況"
+                    onChange={(e) => setSelectedPotential(e.target.value as '全部' | '高' | '中' | '低')}
+                  >
+                    <MenuItem value="全部">全部</MenuItem>
+                    <MenuItem value="高">高</MenuItem>
+                    <MenuItem value="中">中</MenuItem>
+                    <MenuItem value="低">低</MenuItem>
                   </Select>
                 </FormControl>
               </Grid>
