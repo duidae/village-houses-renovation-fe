@@ -37,8 +37,6 @@ const VILLAGE_BOUNDARIES_URL = '/village-boundaries.geojson';
 // uses 台 (common variant) for 台中/台南/台北/台東 etc.
 const normalizeAreaText = (value: string) => value.replace(/台/g, '臺');
 
-const formatPrice = (price: number) => `${price.toLocaleString('zh-TW')} 萬`;
-
 const getScoreLevelColor = (score: number) => {
   if (score >= 80) return '#ef4444'; // high - red
   if (score >= 60) return '#f97316'; // mid - orange
@@ -268,7 +266,7 @@ const MapBlock: React.FC<MapBlockProps> = ({
             margin-bottom: 3px;
             text-align: center;
           ">
-            ${property.name}<br/>${formatPrice(property.price)} · 分數 ${property.score}
+            ${property.name}<br/>分數 ${property.score}
           </div>
           <div style="
             background-color: ${scoreColor};
@@ -305,7 +303,6 @@ const MapBlock: React.FC<MapBlockProps> = ({
       marker.bindPopup(`
         <div style="font-family: sans-serif; color: #333;">
           <h3 style="margin: 0 0 6px 0; font-size: 14px; font-weight: bold;">${property.name}</h3>
-          <p style="margin: 0 0 10px 0; font-size: 13px; font-weight: bold; color: #0f172a;">${formatPrice(property.price)}</p>
           <p style="margin: 0 0 10px 0; font-size: 12px;">${property.description}</p>
         </div>
       `);
@@ -404,14 +401,6 @@ const MapBlock: React.FC<MapBlockProps> = ({
                   <p className="text-xs text-slate-500 uppercase">名稱</p>
                   <p className="text-sm font-semibold text-slate-900">
                     {selectedProperty.name}
-                  </p>
-                </div>
-
-                {/* Price */}
-                <div>
-                  <p className="text-xs text-slate-500 uppercase">價格</p>
-                  <p className="text-sm font-semibold text-slate-900">
-                    {formatPrice(selectedProperty.price)}
                   </p>
                 </div>
 
