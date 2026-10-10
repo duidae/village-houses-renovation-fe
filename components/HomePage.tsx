@@ -393,12 +393,12 @@ const HomePage: React.FC<HomePageProps> = ({
                   <Select
                     value={selectedPotential}
                     label="社區連結"
-                    onChange={(e) => setSelectedPotential(e.target.value as '全部' | '高' | '中' | '低')}
+                    onChange={(e) => setSelectedPotential(e.target.value as '全部' | '地點佳，主幹道上' | '有公共設施，方圓半徑300公尺內有迎毗設施' | '交通佳，至最近公共運輸站點的直線距離<=300m')}
                   >
                     <MenuItem value="全部">全部</MenuItem>
-                    <MenuItem value="高">高</MenuItem>
-                    <MenuItem value="中">中</MenuItem>
-                    <MenuItem value="低">低</MenuItem>
+                    <MenuItem value="地點佳，主幹道上">地點佳，主幹道上</MenuItem>
+                    <MenuItem value="有公共設施，方圓半徑300公尺內有迎毗設施">有公共設施，方圓半徑300公尺內有迎毗設施</MenuItem>
+                    <MenuItem value="交通佳，至最近公共運輸站點的直線距離<=300m">{'交通佳，至最近公共運輸站點的直線距離<=300m'}</MenuItem>
                   </Select>
                 </FormControl>
               </Grid>
@@ -409,12 +409,11 @@ const HomePage: React.FC<HomePageProps> = ({
                   <Select
                     value={selectedPotential}
                     label="建築物狀況"
-                    onChange={(e) => setSelectedPotential(e.target.value as '全部' | '高' | '中' | '低')}
+                    onChange={(e) => setSelectedPotential(e.target.value as '全部' | '結構狀態良好' | '維護狀態良好')}
                   >
                     <MenuItem value="全部">全部</MenuItem>
-                    <MenuItem value="高">高</MenuItem>
-                    <MenuItem value="中">中</MenuItem>
-                    <MenuItem value="低">低</MenuItem>
+                    <MenuItem value="結構狀態良好">結構狀態良好</MenuItem>
+                    <MenuItem value="維護狀態良好">維護狀態良好</MenuItem>
                   </Select>
                 </FormControl>
               </Grid>
