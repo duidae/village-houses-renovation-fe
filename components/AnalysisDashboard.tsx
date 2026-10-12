@@ -2,7 +2,7 @@
 
 import React, { FC, useEffect, useState } from 'react';
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip, LineChart, Line, XAxis, YAxis, CartesianGrid, Legend, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
-import { AnalysisData, PopulationDataPoint, SchoolEnrollmentDataPoint, FiveForcesAnalysis } from '../types';
+import { AnalysisData, PopulationDataPoint, PopulationStructure, SchoolEnrollmentDataPoint, FiveForcesAnalysis } from '../types';
 import { BuildingIcon, MountainIcon, HistoryIcon, UsersIcon, TrendingUpIcon, ShieldIcon, MapPinIcon, SparklesIcon, BuildingOffice2Icon, LeafIcon, UserGroupIcon } from './icons';
 
 const LABEL_STYLE = 'bg-teal-500/10 text-teal-700 ring-1 ring-teal-500/20';
@@ -118,20 +118,94 @@ const CpiGaugeLegend: React.FC = () => {
     );
 };
 
+const compactNumber = (value: number) => new Intl.NumberFormat('en-US', { notation: 'compact', compactDisplay: 'short' }).format(value);
+
 const PopulationChart: React.FC<{ data: PopulationDataPoint[] }> = ({ data }) => {
     const sortedData = [...data].sort((a, b) => a.year - b.year);
+    const hasHouseholds = sortedData.some(d => d.households);
     return (
         <div className="w-full h-80 bg-slate-50 p-4 rounded-lg border border-slate-200 shadow-sm">
             <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={sortedData} margin={{ top: 5, right: 20, left: 30, bottom: 5 }}>
+                <LineChart data={sortedData} margin={{ top: 5, right: hasHouseholds ? 10 : 20, left: 10, bottom: 5 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#cbd5e1" />
                     <XAxis dataKey="year" stroke="#475569" />
-                    <YAxis stroke="#475569" tickFormatter={(value) => new Intl.NumberFormat('en-US', { notation: 'compact', compactDisplay: 'short' }).format(value as number)} domain={[0, (dataMax: number) => Math.ceil(dataMax * 1.1)]} />
-                    <Tooltip contentStyle={{ backgroundColor: '#f8fafc', borderColor: '#cbd5e1', color: '#0f172a' }} formatter={(value: number) => [value.toLocaleString(), '人口數']} />
+                    <YAxis yAxisId="population" stroke="#14b8a6" tickFormatter={(value) => compactNumber(value as number)} domain={[0, (dataMax: number) => Math.ceil(dataMax * 1.1)]} />
+                    {hasHouseholds && (
+                        <YAxis yAxisId="households" orientation="right" stroke="#6366f1" tickFormatter={(value) => compactNumber(value as number)} domain={[0, (dataMax: number) => Math.ceil(dataMax * 1.1)]} />
+                    )}
+                    <Tooltip contentStyle={{ backgroundColor: '#f8fafc', borderColor: '#cbd5e1', color: '#0f172a' }} formatter={(value: number, name: string) => [value.toLocaleString(), name]} />
                     <Legend wrapperStyle={{ color: '#475569' }} />
-                    <Line type="monotone" dataKey="population" stroke="#14b8a6" strokeWidth={2} activeDot={{ r: 8 }} name="人口數" />
+                    <Line yAxisId="population" type="monotone" dataKey="population" stroke="#14b8a6" strokeWidth={2} activeDot={{ r: 8 }} name="人口數" />
+                    {hasHouseholds && (
+                        <Line yAxisId="households" type="monotone" dataKey="households" stroke="#6366f1" strokeWidth={2} activeDot={{ r: 8 }} name="戶數" />
+                    )}
                 </LineChart>
             </ResponsiveContainer>
+        </div>
+    );
+};
+
+const BreakdownDonut: React.FC<{ title: string; items: { name: string; value: number; color: string }[] }> = ({ title, items }) => {
+    const total = items.reduce((sum, item) => sum + item.value, 0);
+    if (total === 0) return null;
+    return (
+        <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 shadow-sm">
+            <h4 className="font-semibold text-brand-text text-center mb-2">{title}</h4>
+            <div className="relative w-full h-44">
+                <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                        <Pie data={items} dataKey="value" nameKey="name" innerRadius="60%" outerRadius="90%" paddingAngle={2} stroke="none">
+                            {items.map(item => <Cell key={item.name} fill={item.color} />)}
+                        </Pie>
+                        <Tooltip contentStyle={{ backgroundColor: '#f8fafc', borderColor: '#cbd5e1', color: '#0f172a' }} formatter={(value: number, name: string) => [`${value.toLocaleString()} 人 (${((value / total) * 100).toFixed(1)}%)`, name]} />
+                    </PieChart>
+                </ResponsiveContainer>
+                <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                    <p className="text-lg font-bold text-brand-text">{total.toLocaleString()}</p>
+                    <p className="text-xs text-brand-subtext">總人口</p>
+                </div>
+            </div>
+            <ul className="mt-3 space-y-1">
+                {items.map(item => (
+                    <li key={item.name} className="flex items-center justify-between text-sm">
+                        <span className="flex items-center gap-2 text-brand-subtext">
+                            <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: item.color }} />
+                            {item.name}
+                        </span>
+                        <span className="font-medium text-brand-text">
+                            {item.value.toLocaleString()} 人 <span className="text-brand-subtext font-normal">({((item.value / total) * 100).toFixed(1)}%)</span>
+                        </span>
+                    </li>
+                ))}
+            </ul>
+        </div>
+    );
+};
+
+const PopulationSummary: React.FC<{ data: PopulationDataPoint[]; structure?: PopulationStructure | null }> = ({ data, structure }) => {
+    const latest = [...data].sort((a, b) => b.year - a.year)[0];
+    return (
+        <div className="space-y-4 mb-4">
+            {latest && (
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <InfoItem icon={<UsersIcon className="w-6 h-6"/>} label={`人口數 (${latest.year})`} value={latest.population.toLocaleString()} unit="人" />
+                    <InfoItem icon={<BuildingIcon className="w-6 h-6"/>} label={`戶數 (${latest.year})`} value={latest.households ? latest.households.toLocaleString() : '未提供'} unit={latest.households ? '戶' : undefined} />
+                    <InfoItem icon={<UserGroupIcon className="w-6 h-6"/>} label="平均每戶人數" value={latest.households ? (latest.population / latest.households).toFixed(2) : '未提供'} unit={latest.households ? '人/戶' : undefined} />
+                </div>
+            )}
+            {structure && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <BreakdownDonut title="性別" items={[
+                        { name: '男', value: structure.male, color: '#0ea5e9' },
+                        { name: '女', value: structure.female, color: '#f43f5e' },
+                    ]} />
+                    <BreakdownDonut title="年齡結構" items={[
+                        { name: '幼年人口 (0-14歲)', value: structure.youth, color: '#22c55e' },
+                        { name: '青壯年人口 (15-64歲)', value: structure.workingAge, color: '#14b8a6' },
+                        { name: '老年人口 (65歲以上)', value: structure.elderly, color: '#f59e0b' },
+                    ]} />
+                </div>
+            )}
         </div>
     );
 };
@@ -210,7 +284,7 @@ const Section: React.FC<{title: string, icon: React.ReactNode, children: React.R
 
 export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id, hideMap = false }) => {
   const {
-      basicInfo, environmentalAnalysis, potentialIndex, cityPopulation, schoolEnrollment,
+      basicInfo, environmentalAnalysis, potentialIndex, cityPopulation, populationStructure, schoolEnrollment,
       fiveForcesAnalysis,
   } = data;
   const mapLink = `https://www.openstreetmap.org/?mlat=${basicInfo.latitude}&mlon=${basicInfo.longitude}#map=18/${basicInfo.latitude}/${basicInfo.longitude}`;
@@ -361,6 +435,7 @@ export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id, 
     { condition: true, component: <Section title="宅院面向分析" icon={<ShieldIcon className="w-6 h-6"/>}><FiveForcesAnalysisChart data={fiveForcesAnalysis} /></Section> },
     { condition: cityPopulation && cityPopulation.length > 0, component: (
         <Section title="宅院區域人口結構" icon={<UsersIcon className="w-6 h-6"/>}>
+            <PopulationSummary data={cityPopulation} structure={populationStructure} />
             <PopulationChart data={cityPopulation} />
             <p className="text-xs text-slate-400 text-center mt-2">資料來源：中華民國內政部戶政司</p>
         </Section>

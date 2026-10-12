@@ -24,6 +24,15 @@ export interface PotentialIndex {
 export interface PopulationDataPoint {
   year: number;
   population: number;
+  households?: number;
+}
+
+export interface PopulationStructure {
+  male: number;
+  female: number;
+  youth: number; // 幼年人口 0-14
+  workingAge: number; // 壯年人口 15-64
+  elderly: number; // 老年人口 65+
 }
 
 export interface SchoolEnrollmentDataPoint {
@@ -52,6 +61,7 @@ export interface AnalysisData {
   environmentalAnalysis: EnvironmentalAnalysis;
   potentialIndex: PotentialIndex;
   cityPopulation: PopulationDataPoint[];
+  populationStructure?: PopulationStructure | null;
   schoolEnrollment: SchoolEnrollmentDataPoint[];
   fiveForcesAnalysis: FiveForcesAnalysis;
 }

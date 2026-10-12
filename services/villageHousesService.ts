@@ -1,4 +1,4 @@
-import type { AnalysisData } from '../types';
+import type { AnalysisData, PopulationStructure } from '../types';
 import type { PropertyMarker } from '../mocks/properties';
 
 const CSV_URL =
@@ -23,7 +23,8 @@ export interface VillageHouseRecord {
   buildingType: string;
   floorCount: number | null;
   isHeritage: boolean;
-  populationHistory: { year: number; population: number }[];
+  populationHistory: { year: number; population: number; households?: number }[];
+  populationStructure: PopulationStructure | null;
 }
 
 // Handles quoted fields (with embedded commas/newlines) and "" escaping, since
@@ -109,7 +110,13 @@ export function parseVillageHouses(csvText: string): VillageHouseRecord[] {
   const populationCols = POPULATION_ROC_YEARS.map((rocYear) => ({
     year: rocYear + ROC_YEAR_OFFSET,
     idx: col(`社會-歷年人數(${rocYear})`),
+    householdIdx: col(`社會-歷年戶數(${rocYear})`),
   }));
+  const idxYouth = col('社會-人口結構-幼年人口(0-14)');
+  const idxWorkingAge = col('社會-人口結構-壯年人口(15-64)');
+  const idxElderly = col('社會-人口結構-老年人口(65UP)');
+  const idxMale = col('社會-性別(男)');
+  const idxFemale = col('社會-性別(女)');
 
   const records: VillageHouseRecord[] = [];
   for (let i = headerIndex + 1; i < rows.length; i++) {
@@ -125,6 +132,15 @@ export function parseVillageHouses(csvText: string): VillageHouseRecord[] {
       [lat, lng] = [lng, lat];
     }
     if (Number.isNaN(lat) || Number.isNaN(lng)) continue;
+
+    const structure: PopulationStructure = {
+      male: toCount(r[idxMale]),
+      female: toCount(r[idxFemale]),
+      youth: toCount(r[idxYouth]),
+      workingAge: toCount(r[idxWorkingAge]),
+      elderly: toCount(r[idxElderly]),
+    };
+    const hasStructure = Object.values(structure).some((v) => v > 0);
 
     records.push({
       id: r[idxId],
@@ -142,8 +158,13 @@ export function parseVillageHouses(csvText: string): VillageHouseRecord[] {
       floorCount: r[idxFloors] ? Number(r[idxFloors]) || null : null,
       isHeritage: r[idxHeritage] === '具文資身分' || r[idxHeritage] === '是',
       populationHistory: populationCols
-        .map(({ year, idx }) => ({ year, population: toCount(r[idx]) }))
+        .map(({ year, idx, householdIdx }) => ({
+          year,
+          population: toCount(r[idx]),
+          households: toCount(r[householdIdx]) || undefined,
+        }))
         .filter((p) => p.population > 0),
+      populationStructure: hasStructure ? structure : null,
     });
   }
   return records;
@@ -255,7 +276,8 @@ export function buildAnalysisDataForRecord(base: AnalysisData, record: VillageHo
         : base.environmentalAnalysis.localSpecialtyFoods,
     },
     cityPopulation: record.populationHistory.length > 0
-      ? record.populationHistory.map((p) => ({ year: p.year, population: p.population }))
+      ? record.populationHistory.map((p) => ({ year: p.year, population: p.population, households: p.households }))
       : base.cityPopulation,
+    populationStructure: record.populationStructure,
   };
 }
