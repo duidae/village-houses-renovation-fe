@@ -16,6 +16,7 @@ export interface VillageHouseRecord {
   township: string;
   village: string;
   community: string;
+  isInKeyArea: boolean;
   isRuralRevitalizationCommunity: boolean;
   communityOrgStatus: string;
   localIndustries: string[];
@@ -100,6 +101,7 @@ export function parseVillageHouses(csvText: string): VillageHouseRecord[] {
   const idxTownship = col('所在地-鄉鎮');
   const idxVillage = col('所在地-村里');
   const idxCommunity = col('所在地-所在社區');
+  const idxKeyArea = col('是否位在農村發展重點區');
   const idxRuralRevital = col('是否為農村再生社區');
   const idxCommunityOrg = col('社會-社區組織運作狀況');
   const idxIndustries = col('社會-在地產業類型');
@@ -150,6 +152,7 @@ export function parseVillageHouses(csvText: string): VillageHouseRecord[] {
       township: r[idxTownship] ?? '',
       village: r[idxVillage] ?? '',
       community: r[idxCommunity] ?? '',
+      isInKeyArea: r[idxKeyArea] === '是',
       isRuralRevitalizationCommunity: r[idxRuralRevital] === '是',
       communityOrgStatus: r[idxCommunityOrg] ?? '',
       localIndustries: splitList(r[idxIndustries]),
@@ -231,6 +234,8 @@ export function toPropertyMarker(record: VillageHouseRecord): PropertyMarker {
     county: record.county,
     township: record.township,
     village: record.village,
+    isInKeyArea: record.isInKeyArea,
+    isRuralRevitalizationCommunity: record.isRuralRevitalizationCommunity,
   };
 }
 

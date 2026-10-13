@@ -10,4 +10,6 @@ export interface PropertyMarker {
   county: string;
   township: string;
   village: string;
+  isInKeyArea?: boolean; // 是否位在農村發展重點區
+  isRuralRevitalizationCommunity?: boolean; // 是否為農村再生社區
 }

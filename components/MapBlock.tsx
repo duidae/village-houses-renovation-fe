@@ -4,6 +4,7 @@ import shp from 'shpjs';
 import type { PropertyMarker } from '../mocks/properties';
 import { fetchProperties } from '../services/propertiesService';
 import { researchAreaLabel } from '../services/villageHousesService';
+import { LeafIcon, MapPinIcon } from './icons';
 
 const defaultCenter = [23.4789, 120.447];
 const defaultZoom = 8;
@@ -411,6 +412,24 @@ const MapBlock: React.FC<MapBlockProps> = ({
                     {selectedProperty.score}
                   </span>
                 </div>
+
+                {/* Policy designations */}
+                {(selectedProperty.isInKeyArea || selectedProperty.isRuralRevitalizationCommunity) && (
+                  <div className="flex flex-wrap gap-2">
+                    {selectedProperty.isInKeyArea && (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-teal-100 px-2.5 py-1 text-xs font-semibold text-teal-800">
+                        <MapPinIcon className="h-4 w-4" />
+                        重點區內
+                      </span>
+                    )}
+                    {selectedProperty.isRuralRevitalizationCommunity && (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-lime-100 px-2.5 py-1 text-xs font-semibold text-lime-800">
+                        <LeafIcon className="h-4 w-4" />
+                        農村再生社區
+                      </span>
+                    )}
+                  </div>
+                )}
 
                 {/* Property ID */}
                 <div>
