@@ -21,6 +21,7 @@ const mapLayerSources = [
     url: '/layers/public-20260912T112511Z-1-001.zip',
     color: '#2563eb',
     type: 'shp' as const,
+    labelField: 'Name',
   },
   {
     id: 'public-facilities-geojson',
@@ -32,6 +33,13 @@ const mapLayerSources = [
 ];
 
 const VILLAGE_BOUNDARIES_URL = '/village-boundaries.geojson';
+
+// Feature name labels are hidden below this zoom so they don't clutter the
+// county-level overview.
+const LAYER_LABEL_MIN_ZOOM = 14;
+
+const escapeHtml = (value: string) =>
+  value.replace(/[&<>"']/g, (char) => `&#${char.charCodeAt(0)};`);
 
 // The government boundary data uses 臺 (traditional) while our data sometimes
 // uses 台 (common variant) for 台中/台南/台北/台東 etc.
@@ -191,11 +199,18 @@ const MapBlock: React.FC<MapBlockProps> = ({
       maxZoom: 19,
     }).addTo(map);
 
+    const updateLabelVisibility = () => {
+      mapContainer.classList.toggle('map-labels-hidden', map.getZoom() < LAYER_LABEL_MIN_ZOOM);
+    };
+    updateLabelVisibility();
+    map.on('zoomend', updateLabelVisibility);
+
     let layersCancelled = false;
 
     const loadShapeLayers = async () => {
       await Promise.all(
-        mapLayerSources.map(async ({ id, url, color, type }) => {
+        mapLayerSources.map(async ({ id, url, color, type, ...source }) => {
+          const labelField = 'labelField' in source ? source.labelField : undefined;
           try {
             const geoJson = type === 'geojson' ? await fetch(url).then((res) => res.json()) : await shp(url);
             if (layersCancelled) return;
@@ -216,6 +231,15 @@ const MapBlock: React.FC<MapBlockProps> = ({
                   fillOpacity: 0.9,
                   weight: 2,
                 }),
+              onEachFeature: (feature: { properties?: Record<string, unknown> }, featureLayer: any) => {
+                const name = labelField ? feature.properties?.[labelField] : undefined;
+                if (typeof name !== 'string' || !name.trim()) return;
+                featureLayer.bindTooltip(escapeHtml(name.trim()), {
+                  permanent: true,
+                  direction: 'center',
+                  className: 'map-feature-label',
+                });
+              },
             });
             mapLayerGroupsRef.current[id] = layer;
             if (enabledMapLayersRef.current[id]) layer.addTo(map);
