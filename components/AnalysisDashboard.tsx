@@ -462,7 +462,7 @@ export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id, 
     { condition: true, component: <Section title="宅院面向分析" icon={<ShieldIcon className="w-6 h-6"/>}><AspectAnalysisChart data={aspectAnalysis} /></Section> },
     { condition: reuseTypes && reuseTypes.length > 0, component: <Section title="再利用類型建議" icon={<LightbulbIcon className="w-6 h-6"/>}><ReuseTypeSuggestions types={reuseTypes} /></Section> },
     { condition: cityPopulation && cityPopulation.length > 0, component: (
-        <Section title="宅院區域人口結構" icon={<UsersIcon className="w-6 h-6"/>}>
+        <Section title="社會資料" icon={<UsersIcon className="w-6 h-6"/>}>
             <PopulationSummary data={cityPopulation} structure={populationStructure} />
             <PopulationChart data={cityPopulation} />
             <p className="text-xs text-slate-400 text-center mt-2">資料來源：中華民國內政部戶政司</p>
