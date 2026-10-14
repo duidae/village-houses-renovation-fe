@@ -66,6 +66,24 @@ export interface AnalysisData {
   fiveForcesAnalysis: FiveForcesAnalysis;
 }
 
+// --- Search Filters ---
+
+export const REUSE_TYPES = [
+  '照顧療育服務型',
+  '社區生活共享型',
+  '文化保存展示型',
+  '地方技藝培育型',
+  '食農教育體驗型',
+  '產業加工營運型',
+  '青年創業共創型',
+  '農遊體驗服務型',
+  '社區安全韌性型',
+  '兒少/數位共學服務型',
+  '社區健康促進型',
+] as const;
+
+export type ReuseFilter = '全部' | (typeof REUSE_TYPES)[number];
+
 // --- Caching and History ---
 
 export interface CacheEntry {

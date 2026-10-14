@@ -5,6 +5,7 @@ import CaseAnalysisPage from './components/CaseAnalysisPage';
 import CasePage from './components/CasePage';
 import { mockAnalysisData } from './mocks/analysisData';
 import { fetchProperties } from './services/propertiesService';
+import type { ReuseFilter } from './types';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
@@ -75,7 +76,7 @@ const App: React.FC = () => {
   const [selectedPotential, setSelectedPotential] = useState<'全部' | '高' | '中' | '低'>('全部');
   const [selectedLocation, setSelectedLocation] = useState<'主幹道上' | '周邊有公共設施'>('主幹道上');
   const [selectedBuilding, setSelectedBuilding] = useState<'一條龍' | '單伸手' | '三合院' | '水泥連棟式' | '具歷史價值'>('一條龍');
-  const [selectedReuse, setSelectedReuse] = useState<'綠色照顧據點' | '戶外開放空間' | '地方文化展示館' | '農村體驗空間' | '青年創業基地'>('綠色照顧據點');
+  const [selectedReuse, setSelectedReuse] = useState<ReuseFilter>('全部');
 
   useEffect(() => {
     fetchProperties()

@@ -5,6 +5,7 @@ import MapBlock from './MapBlock';
 import { mockAnalysisData } from '../mocks/analysisData';
 import { buildAnalysisDataForRecord, fetchVillageHouses, researchAreaLabel, type VillageHouseRecord } from '../services/villageHousesService';
 import { fetchProperties } from '../services/propertiesService';
+import { REUSE_TYPES, type ReuseFilter } from '../types';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
@@ -48,8 +49,8 @@ interface HomePageProps {
   setSelectedLocation: React.Dispatch<React.SetStateAction<'主幹道上' | '周邊有公共設施'>>;
   selectedBuilding: '一條龍' | '單伸手' | '三合院' | '水泥連棟式' | '具歷史價值';
   setSelectedBuilding: React.Dispatch<React.SetStateAction<'一條龍' | '單伸手' | '三合院' | '水泥連棟式' | '具歷史價值'>>;
-  selectedReuse: '綠色照顧據點' | '戶外開放空間' | '地方文化展示館' | '農村體驗空間' | '青年創業基地';
-  setSelectedReuse: React.Dispatch<React.SetStateAction<'綠色照顧據點' | '戶外開放空間' | '地方文化展示館' | '農村體驗空間' | '青年創業基地'>>;
+  selectedReuse: ReuseFilter;
+  setSelectedReuse: React.Dispatch<React.SetStateAction<ReuseFilter>>;
 }
 
 const HomePage: React.FC<HomePageProps> = ({
@@ -357,32 +358,14 @@ const HomePage: React.FC<HomePageProps> = ({
                     label="再利用類型方向"
                     onChange={(e) =>
                       setSelectedReuse(
-                        e.target.value as
-                          | '照顧療育服務型'
-                          | '社區生活共享型'
-                          | '文化保存展示型'
-                          | '地方技藝培育型'
-                          | '食農教育體驗型'
-                          | '產業加工營運型'
-                          | '青年創業共創型'
-                          | '農遊體驗服務型'
-                          | '社區安全韌性型'
-                          | '兒少/數位共學服務型'
-                          | '社區健康促進型'
+                        e.target.value as ReuseFilter
                       )
                     }
                   >
-                    <MenuItem value="照顧療育服務型">照顧療育服務型</MenuItem>
-                    <MenuItem value="社區生活共享型">社區生活共享型</MenuItem>
-                    <MenuItem value="文化保存展示型">文化保存展示型</MenuItem>
-                    <MenuItem value="地方技藝培育型">地方技藝培育型</MenuItem>
-                    <MenuItem value="食農教育體驗型">食農教育體驗型</MenuItem>
-                    <MenuItem value="產業加工營運型">產業加工營運型</MenuItem>
-                    <MenuItem value="青年創業共創型">青年創業共創型</MenuItem>
-                    <MenuItem value="農遊體驗服務型">農遊體驗服務型</MenuItem>
-                    <MenuItem value="社區安全韌性型">社區安全韌性型</MenuItem>
-                    <MenuItem value="兒少/數位共學服務型">兒少/數位共學服務型</MenuItem>
-                    <MenuItem value="社區健康促進型">社區健康促進型</MenuItem>
+                    <MenuItem value="全部">全部</MenuItem>
+                    {REUSE_TYPES.map((type) => (
+                      <MenuItem key={type} value={type}>{type}</MenuItem>
+                    ))}
                   </Select>
                 </FormControl>
               </Grid>
