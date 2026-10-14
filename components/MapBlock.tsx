@@ -6,7 +6,7 @@ import { fetchProperties } from '../services/propertiesService';
 import { researchAreaLabel } from '../services/villageHousesService';
 import { DEFAULT_FILTERS, hasActiveCriteria, matchesFilters } from '../services/houseFilters';
 import type { HouseFilters } from '../types';
-import { LeafIcon, MapPinIcon } from './icons';
+import { ExternalLinkIcon, LeafIcon, MapPinIcon } from './icons';
 
 const defaultCenter = [23.4789, 120.447];
 const defaultZoom = 8;
@@ -497,9 +497,12 @@ const MapBlock: React.FC<MapBlockProps> = ({
                 {/* Case Analysis Link */}
                 <Link
                   to={`/cases/${selectedProperty.id}`}
-                  className="block w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2 px-4 rounded-lg transition-colors text-center text-sm"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex w-full items-center justify-center gap-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2 px-4 rounded-lg transition-colors text-center text-sm"
                 >
                   📊 查看完整分析報告
+                  <ExternalLinkIcon className="h-4 w-4" />
                 </Link>
               </div>
             ) : (
