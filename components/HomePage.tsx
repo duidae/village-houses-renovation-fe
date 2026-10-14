@@ -85,6 +85,9 @@ const HomePage: React.FC<HomePageProps> = ({
     : null;
   const filteredHouseOptions = houseOptions.filter((house) => matchesFilters(house, filters));
   const isHouseSelected = filters.houseId !== '全部';
+  // The dropdown lists every house matching the criteria, but once a house is
+  // picked the map shows only that one, so the count follows the map.
+  const shownHouseCount = isHouseSelected ? 1 : filteredHouseOptions.length;
   const setFilter = (patch: Partial<HouseFilters>) =>
     setFilters((current) => updateFilters(current, patch, houseOptions));
 
@@ -372,10 +375,10 @@ const HomePage: React.FC<HomePageProps> = ({
               </Grid>
             </Grid>
             <Stack direction="row" spacing={2} alignItems="center" sx={{ mt: 2 }}>
-              <Typography variant="body2" color={filteredHouseOptions.length === 0 ? 'error' : 'text.secondary'}>
-                {filteredHouseOptions.length === 0
+              <Typography variant="body2" color={shownHouseCount === 0 ? 'error' : 'text.secondary'}>
+                {shownHouseCount === 0
                   ? '沒有符合條件的宅院，請調整篩選條件'
-                  : `符合條件：${filteredHouseOptions.length} / ${houseOptions.length} 筆宅院`}
+                  : `符合條件：${shownHouseCount} / ${houseOptions.length} 筆宅院`}
               </Typography>
               {(hasActiveCriteria(filters) || isHouseSelected) && (
                 <Button
