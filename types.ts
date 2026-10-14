@@ -10,6 +10,12 @@ export interface BasicInfo {
   isHeritage: boolean;
   isRuralRevitalizationCommunity: boolean;
   communityOrgStatus: string;
+  // 代表性地段地號 (E.宅院土地資料)
+  landSection?: string; // 地段
+  landNumber?: string; // 地號
+  landArea?: string; // 土地面積
+  landUseZone?: string; // 土地使用分區
+  landUseSurveyCategory?: string; // 國土利用調查類別
 }
 
 export interface EnvironmentalAnalysis {

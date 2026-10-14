@@ -25,6 +25,11 @@ export interface VillageHouseRecord {
   buildingType: string;
   floorCount: number | null;
   isHeritage: boolean;
+  landSection: string;
+  landNumber: string;
+  landArea: string;
+  landUseZone: string;
+  landUseSurveyCategory: string;
   populationHistory: { year: number; population: number; households?: number }[];
   populationStructure: PopulationStructure | null;
 }
@@ -110,6 +115,11 @@ export function parseVillageHouses(csvText: string): VillageHouseRecord[] {
   const idxFloors = col('樓層數(街景判斷)');
   const idxHeritage = col('身分屬性(是否具文資身分)');
   const idxBuildingType = col('建築型態');
+  const idxLandSection = col('地段');
+  const idxLandNumber = col('地號');
+  const idxLandArea = col('土地面積');
+  const idxLandUseZone = col('土地使用功能分區');
+  const idxLandUseCategory = col('土地使用類別');
   const populationCols = POPULATION_ROC_YEARS.map((rocYear) => ({
     year: rocYear + ROC_YEAR_OFFSET,
     idx: col(`社會-歷年人數(${rocYear})`),
@@ -161,6 +171,11 @@ export function parseVillageHouses(csvText: string): VillageHouseRecord[] {
       buildingType: r[idxBuildingType] ?? '',
       floorCount: r[idxFloors] ? Number(r[idxFloors]) || null : null,
       isHeritage: r[idxHeritage] === '具文資身分' || r[idxHeritage] === '是',
+      landSection: r[idxLandSection]?.trim() ?? '',
+      landNumber: r[idxLandNumber]?.trim() ?? '',
+      landArea: r[idxLandArea]?.trim() ?? '',
+      landUseZone: r[idxLandUseZone]?.trim() ?? '',
+      landUseSurveyCategory: r[idxLandUseCategory]?.trim() ?? '',
       populationHistory: populationCols
         .map(({ year, idx, householdIdx }) => ({
           year,
@@ -268,6 +283,11 @@ export function buildAnalysisDataForRecord(base: AnalysisData, record: VillageHo
       isHeritage: record.isHeritage,
       isRuralRevitalizationCommunity: record.isRuralRevitalizationCommunity,
       communityOrgStatus: record.communityOrgStatus || base.basicInfo.communityOrgStatus,
+      landSection: record.landSection,
+      landNumber: record.landNumber,
+      landArea: record.landArea,
+      landUseZone: record.landUseZone,
+      landUseSurveyCategory: record.landUseSurveyCategory,
     },
     potentialIndex: {
       ...base.potentialIndex,

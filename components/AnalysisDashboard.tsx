@@ -3,7 +3,7 @@
 import React, { FC, useEffect, useState } from 'react';
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip, LineChart, Line, XAxis, YAxis, CartesianGrid, Legend, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
 import { AnalysisData, PopulationDataPoint, PopulationStructure, SchoolEnrollmentDataPoint, FiveForcesAnalysis } from '../types';
-import { BuildingIcon, MountainIcon, HistoryIcon, UsersIcon, TrendingUpIcon, ShieldIcon, MapPinIcon, SparklesIcon, BuildingOffice2Icon, LeafIcon, UserGroupIcon } from './icons';
+import { BuildingIcon, MountainIcon, HistoryIcon, UsersIcon, TrendingUpIcon, ShieldIcon, MapPinIcon, SparklesIcon, BuildingOffice2Icon, LeafIcon, UserGroupIcon, ClipboardListIcon, ListBulletIcon, AreaIcon, GlobeIcon, ChartBarIcon } from './icons';
 
 const LABEL_STYLE = 'bg-teal-500/10 text-teal-700 ring-1 ring-teal-500/20';
 const UNDERLINE_STYLE = 'no-underline border-b-2 border-teal-500/50 font-medium text-teal-700';
@@ -425,11 +425,15 @@ export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id, 
         <div className="lg:col-span-2 space-y-6 flex flex-col">
             <Section title="宅院基本資料" icon={<BuildingIcon className="w-6 h-6"/>} className="h-full">
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                    <InfoItem icon={<BuildingIcon className="w-6 h-6"/>} label="建築型態" value={basicInfo.buildingType || '未提供'} />
+                    <InfoItem icon={<ClipboardListIcon className="w-6 h-6"/>} label="宅院代號" value={basicInfo.name} />
                     <InfoItem icon={<BuildingOffice2Icon className="w-6 h-6"/>} label="樓層數" value={basicInfo.floorCount ?? '未提供'} unit={basicInfo.floorCount ? '層' : undefined} />
                     <InfoItem icon={<HistoryIcon className="w-6 h-6"/>} label="文資身分" value={basicInfo.isHeritage ? '是' : '否'} />
-                    <InfoItem icon={<LeafIcon className="w-6 h-6"/>} label="農村再生社區" value={basicInfo.isRuralRevitalizationCommunity ? '是' : '否'} />
-                    <InfoItem icon={<UserGroupIcon className="w-6 h-6"/>} label="社區組織運作狀況" value={basicInfo.communityOrgStatus || '未提供'} />
+                    <InfoItem icon={<MapPinIcon className="w-6 h-6"/>} label="GPS 座標 (緯度, 經度)" value={`${basicInfo.latitude.toFixed(6)}, ${basicInfo.longitude.toFixed(6)}`} />
+                    <InfoItem icon={<MapPinIcon className="w-6 h-6"/>} label="地段" value={basicInfo.landSection || '未提供'} />
+                    <InfoItem icon={<ListBulletIcon className="w-6 h-6"/>} label="地號" value={basicInfo.landNumber || '未提供'} />
+                    <InfoItem icon={<AreaIcon className="w-6 h-6"/>} label="面積" value={basicInfo.landArea || '未提供'} />
+                    <InfoItem icon={<GlobeIcon className="w-6 h-6"/>} label="土地使用分區" value={basicInfo.landUseZone || '未提供'} />
+                    <InfoItem icon={<ChartBarIcon className="w-6 h-6"/>} label="國土利用調查類別" value={basicInfo.landUseSurveyCategory || '未提供'} />
                 </div>
             </Section>
         </div>
