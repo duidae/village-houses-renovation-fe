@@ -1,5 +1,6 @@
 import type { AnalysisData, PopulationStructure } from '../types';
 import type { PropertyMarker } from '../mocks/properties';
+import { estimateReuseTypes, mockCondition, mockConnectivity } from '../mocks/houseAttributes';
 
 const CSV_URL =
   'https://docs.google.com/spreadsheets/d/e/2PACX-1vTsaWfKW2CrtMoHJ3F_M0gV4C5dCg6FdPGSNTkI00MwDrr99okfDYt6TpZPyO3X8w/pub?gid=318668856&single=true&output=csv';
@@ -236,6 +237,9 @@ export function toPropertyMarker(record: VillageHouseRecord): PropertyMarker {
     village: record.village,
     isInKeyArea: record.isInKeyArea,
     isRuralRevitalizationCommunity: record.isRuralRevitalizationCommunity,
+    reuseTypes: estimateReuseTypes(record),
+    connectivity: mockConnectivity(record),
+    condition: mockCondition(record),
   };
 }
 

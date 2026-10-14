@@ -82,7 +82,32 @@ export const REUSE_TYPES = [
   '社區健康促進型',
 ] as const;
 
-export type ReuseFilter = '全部' | (typeof REUSE_TYPES)[number];
+export type ReuseType = (typeof REUSE_TYPES)[number];
+export type ReuseFilter = '全部' | ReuseType;
+
+export const POTENTIAL_LEVELS = ['高', '中', '低'] as const;
+export type PotentialLevel = (typeof POTENTIAL_LEVELS)[number];
+
+export const CONNECTIVITY_OPTIONS = [
+  '地點佳，主幹道上',
+  '有公共設施，方圓半徑300公尺內有迎毗設施',
+  '交通佳，至最近公共運輸站點的直線距離<=300m',
+] as const;
+export type ConnectivityOption = (typeof CONNECTIVITY_OPTIONS)[number];
+
+export const CONDITION_OPTIONS = ['結構狀態良好', '維護狀態良好'] as const;
+export type ConditionOption = (typeof CONDITION_OPTIONS)[number];
+
+// Every filter is single-select and independent; a house must satisfy all of
+// them at once. '全部' means the filter is not applied.
+export interface HouseFilters {
+  area: string; // researchAreaLabel (縣市+鄉鎮+村里)
+  houseId: string;
+  potential: '全部' | PotentialLevel;
+  reuse: ReuseFilter;
+  connectivity: '全部' | ConnectivityOption;
+  condition: '全部' | ConditionOption;
+}
 
 // --- Caching and History ---
 

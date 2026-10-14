@@ -5,7 +5,9 @@ import MapBlock from './MapBlock';
 import { mockAnalysisData } from '../mocks/analysisData';
 import { buildAnalysisDataForRecord, fetchVillageHouses, researchAreaLabel, type VillageHouseRecord } from '../services/villageHousesService';
 import { fetchProperties } from '../services/propertiesService';
-import { REUSE_TYPES, type ReuseFilter } from '../types';
+import { CONDITION_OPTIONS, CONNECTIVITY_OPTIONS, POTENTIAL_LEVELS, REUSE_TYPES, type HouseFilters } from '../types';
+import type { PropertyMarker } from '../mocks/properties';
+import { DEFAULT_FILTERS, hasActiveCriteria, matchesFilters, updateFilters } from '../services/houseFilters';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
@@ -28,12 +30,6 @@ import ClearIcon from '@mui/icons-material/Clear';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 
-const getPotentialLevel = (score: number): '高' | '中' | '低' => {
-  if (score >= 80) return '高';
-  if (score >= 60) return '中';
-  return '低';
-};
-
 interface HomePageProps {
   isLoading: boolean;
   error: string | null;
@@ -41,16 +37,12 @@ interface HomePageProps {
   setSchoolName: React.Dispatch<React.SetStateAction<string>>;
   handleSearch: (searchSchoolName?: string) => Promise<void>;
   handleKeyPress: (event: React.KeyboardEvent<HTMLInputElement>) => void;
-  selectedResearchBase: string;
-  setSelectedResearchBase: React.Dispatch<React.SetStateAction<string>>;
-  selectedPotential: '全部' | '高' | '中' | '低';
-  setSelectedPotential: React.Dispatch<React.SetStateAction<'全部' | '高' | '中' | '低'>>;
+  filters: HouseFilters;
+  setFilters: React.Dispatch<React.SetStateAction<HouseFilters>>;
   selectedLocation: '主幹道上' | '周邊有公共設施';
   setSelectedLocation: React.Dispatch<React.SetStateAction<'主幹道上' | '周邊有公共設施'>>;
   selectedBuilding: '一條龍' | '單伸手' | '三合院' | '水泥連棟式' | '具歷史價值';
   setSelectedBuilding: React.Dispatch<React.SetStateAction<'一條龍' | '單伸手' | '三合院' | '水泥連棟式' | '具歷史價值'>>;
-  selectedReuse: ReuseFilter;
-  setSelectedReuse: React.Dispatch<React.SetStateAction<ReuseFilter>>;
 }
 
 const HomePage: React.FC<HomePageProps> = ({
@@ -60,20 +52,14 @@ const HomePage: React.FC<HomePageProps> = ({
   setSchoolName,
   handleSearch,
   handleKeyPress,
-  selectedResearchBase,
-  setSelectedResearchBase,
-  selectedPotential,
-  setSelectedPotential,
+  filters,
+  setFilters,
   selectedLocation,
   setSelectedLocation,
   selectedBuilding,
   setSelectedBuilding,
-  selectedReuse,
-  setSelectedReuse,
 }) => {
-  const [houseOptions, setHouseOptions] = useState<
-    { id: string; name: string; county: string; township: string; village: string; score: number }[]
-  >([]);
+  const [houseOptions, setHouseOptions] = useState<PropertyMarker[]>([]);
   const [villageHouses, setVillageHouses] = useState<VillageHouseRecord[]>([]);
   const [isAnalysisVisible, setIsAnalysisVisible] = useState(false);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
@@ -82,18 +68,7 @@ const HomePage: React.FC<HomePageProps> = ({
   const controlSize = isSmallScreen ? 'small' : 'medium';
 
   useEffect(() => {
-    fetchProperties().then((properties) =>
-      setHouseOptions(
-        properties.map((p) => ({
-          id: p.id,
-          name: p.name,
-          county: p.county,
-          township: p.township,
-          village: p.village,
-          score: p.score,
-        }))
-      )
-    );
+    fetchProperties().then(setHouseOptions);
     fetchVillageHouses().then(setVillageHouses);
   }, []);
 
@@ -104,16 +79,14 @@ const HomePage: React.FC<HomePageProps> = ({
         .filter((area) => area.trim().length > 0)
     )
   );
-  const selectedHouse = villageHouses.find((house) => house.id === selectedResearchBase);
+  const selectedHouse = villageHouses.find((house) => house.id === filters.houseId);
   const selectedAnalysis = selectedHouse
     ? buildAnalysisDataForRecord(mockAnalysisData, selectedHouse)
     : null;
-  const researchBaseSelectValue = selectedHouse
-    ? researchAreaLabel(selectedHouse)
-    : selectedResearchBase;
-  const filteredHouseOptions = houseOptions
-    .filter((house) => researchBaseSelectValue === '全部' || researchAreaLabel(house) === researchBaseSelectValue)
-    .filter((house) => selectedPotential === '全部' || getPotentialLevel(house.score) === selectedPotential);
+  const filteredHouseOptions = houseOptions.filter((house) => matchesFilters(house, filters));
+  const isHouseSelected = filters.houseId !== '全部';
+  const setFilter = (patch: Partial<HouseFilters>) =>
+    setFilters((current) => updateFilters(current, patch, houseOptions));
 
   const normalizedSearch = schoolName.trim().replace(/\s+/g, '').toLocaleLowerCase();
   const hasExactMatch = filteredHouseOptions.some(
@@ -152,7 +125,7 @@ const HomePage: React.FC<HomePageProps> = ({
         display: 'flex',
         flexDirection: 'column',
         minHeight: 0,
-        overflowY: selectedResearchBase === '全部' ? 'hidden' : 'auto',
+        overflowY: !isHouseSelected ? 'hidden' : 'auto',
       }}
     >
       {isLoading && <LoadingSpinner />}
@@ -163,7 +136,7 @@ const HomePage: React.FC<HomePageProps> = ({
         </Alert>
       )}
 
-      <Card sx={{ position: 'relative', overflow: selectedResearchBase === '全部' ? 'hidden' : 'visible', bgcolor: 'background.paper', boxShadow: 5, borderRadius: 4, p: 3, mb: 1, flex: selectedResearchBase === '全部' ? 1 : '0 0 auto', display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+      <Card sx={{ position: 'relative', overflow: !isHouseSelected ? 'hidden' : 'visible', bgcolor: 'background.paper', boxShadow: 5, borderRadius: 4, p: 3, mb: 1, flex: !isHouseSelected ? 1 : '0 0 auto', display: 'flex', flexDirection: 'column', minHeight: 0 }}>
           <CardContent sx={{ position: 'relative', py: 2, flexShrink: 0 }}>
             <Grid container spacing={4} alignItems="flex-start">
               <Grid item xs={12} md={6} sx={{ position: 'relative', zIndex: 2 }}>
@@ -213,7 +186,7 @@ const HomePage: React.FC<HomePageProps> = ({
                                   onMouseDown={(event) => event.preventDefault()}
                                   onClick={() => {
                                     setSchoolName('');
-                                    setSelectedResearchBase('全部');
+                                    setFilter({ houseId: '全部' });
                                   }}
                                 >
                                   <ClearIcon fontSize="small" />
@@ -234,7 +207,7 @@ const HomePage: React.FC<HomePageProps> = ({
                                   onMouseDown={(event) => {
                                     event.preventDefault();
                                     setSchoolName(house.name);
-                                    setSelectedResearchBase(house.id);
+                                    setFilter({ houseId: house.id });
                                   }}
                                 >
                                   {house.name}
@@ -266,9 +239,9 @@ const HomePage: React.FC<HomePageProps> = ({
                 <FormControl fullWidth size={controlSize} sx={{ bgcolor: 'background.paper', borderRadius: 3 }}>
                   <InputLabel>研究基地</InputLabel>
                   <Select
-                    value={researchBaseSelectValue}
+                    value={filters.area}
                     label="研究基地"
-                    onChange={(e) => setSelectedResearchBase(e.target.value)}
+                    onChange={(e) => setFilter({ area: e.target.value })}
                   >
                     <MenuItem value="全部">全部</MenuItem>
                     {researchAreaOptions.map((area) => (
@@ -283,9 +256,9 @@ const HomePage: React.FC<HomePageProps> = ({
                 <FormControl fullWidth size={controlSize} sx={{ bgcolor: 'background.paper', borderRadius: 3 }}>
                   <InputLabel>宅院標的</InputLabel>
                   <Select
-                    value={selectedResearchBase}
+                    value={filters.houseId}
                     label="宅院標的"
-                    onChange={(e) => setSelectedResearchBase(e.target.value)}
+                    onChange={(e) => setFilter({ houseId: e.target.value })}
                   >
                     <MenuItem value="全部">全部</MenuItem>
                     {filteredHouseOptions.map((house) => (
@@ -301,14 +274,14 @@ const HomePage: React.FC<HomePageProps> = ({
                 <FormControl fullWidth size={controlSize} sx={{ bgcolor: 'background.paper', borderRadius: 3 }}>
                   <InputLabel>整建潛力</InputLabel>
                   <Select
-                    value={selectedPotential}
+                    value={filters.potential}
                     label="整建潛力"
-                    onChange={(e) => setSelectedPotential(e.target.value as '全部' | '高' | '中' | '低')}
+                    onChange={(e) => setFilter({ potential: e.target.value as HouseFilters['potential'] })}
                   >
                     <MenuItem value="全部">全部</MenuItem>
-                    <MenuItem value="高">高</MenuItem>
-                    <MenuItem value="中">中</MenuItem>
-                    <MenuItem value="低">低</MenuItem>
+                    {POTENTIAL_LEVELS.map((level) => (
+                      <MenuItem key={level} value={level}>{level}</MenuItem>
+                    ))}
                   </Select>
                 </FormControl>
               </Grid>
@@ -354,13 +327,9 @@ const HomePage: React.FC<HomePageProps> = ({
                 <FormControl fullWidth size={controlSize} sx={{ bgcolor: 'background.paper', borderRadius: 3 }}>
                   <InputLabel>再利用類型方向</InputLabel>
                   <Select
-                    value={selectedReuse}
+                    value={filters.reuse}
                     label="再利用類型方向"
-                    onChange={(e) =>
-                      setSelectedReuse(
-                        e.target.value as ReuseFilter
-                      )
-                    }
+                    onChange={(e) => setFilter({ reuse: e.target.value as HouseFilters['reuse'] })}
                   >
                     <MenuItem value="全部">全部</MenuItem>
                     {REUSE_TYPES.map((type) => (
@@ -374,14 +343,14 @@ const HomePage: React.FC<HomePageProps> = ({
                 <FormControl fullWidth size={controlSize} sx={{ bgcolor: 'background.paper', borderRadius: 3 }}>
                   <InputLabel>社區連結</InputLabel>
                   <Select
-                    value={selectedPotential}
+                    value={filters.connectivity}
                     label="社區連結"
-                    onChange={(e) => setSelectedPotential(e.target.value as '全部' | '地點佳，主幹道上' | '有公共設施，方圓半徑300公尺內有迎毗設施' | '交通佳，至最近公共運輸站點的直線距離<=300m')}
+                    onChange={(e) => setFilter({ connectivity: e.target.value as HouseFilters['connectivity'] })}
                   >
                     <MenuItem value="全部">全部</MenuItem>
-                    <MenuItem value="地點佳，主幹道上">地點佳，主幹道上</MenuItem>
-                    <MenuItem value="有公共設施，方圓半徑300公尺內有迎毗設施">有公共設施，方圓半徑300公尺內有迎毗設施</MenuItem>
-                    <MenuItem value="交通佳，至最近公共運輸站點的直線距離<=300m">{'交通佳，至最近公共運輸站點的直線距離<=300m'}</MenuItem>
+                    {CONNECTIVITY_OPTIONS.map((option) => (
+                      <MenuItem key={option} value={option}>{option}</MenuItem>
+                    ))}
                   </Select>
                 </FormControl>
               </Grid>
@@ -390,30 +359,48 @@ const HomePage: React.FC<HomePageProps> = ({
                 <FormControl fullWidth size={controlSize} sx={{ bgcolor: 'background.paper', borderRadius: 3 }}>
                   <InputLabel>建築物狀況</InputLabel>
                   <Select
-                    value={selectedPotential}
+                    value={filters.condition}
                     label="建築物狀況"
-                    onChange={(e) => setSelectedPotential(e.target.value as '全部' | '結構狀態良好' | '維護狀態良好')}
+                    onChange={(e) => setFilter({ condition: e.target.value as HouseFilters['condition'] })}
                   >
                     <MenuItem value="全部">全部</MenuItem>
-                    <MenuItem value="結構狀態良好">結構狀態良好</MenuItem>
-                    <MenuItem value="維護狀態良好">維護狀態良好</MenuItem>
+                    {CONDITION_OPTIONS.map((option) => (
+                      <MenuItem key={option} value={option}>{option}</MenuItem>
+                    ))}
                   </Select>
                 </FormControl>
               </Grid>
             </Grid>
+            <Stack direction="row" spacing={2} alignItems="center" sx={{ mt: 2 }}>
+              <Typography variant="body2" color={filteredHouseOptions.length === 0 ? 'error' : 'text.secondary'}>
+                {filteredHouseOptions.length === 0
+                  ? '沒有符合條件的宅院，請調整篩選條件'
+                  : `符合條件：${filteredHouseOptions.length} / ${houseOptions.length} 筆宅院`}
+              </Typography>
+              {(hasActiveCriteria(filters) || isHouseSelected) && (
+                <Button
+                  size="small"
+                  onClick={() => {
+                    setSchoolName('');
+                    setFilters(DEFAULT_FILTERS);
+                  }}
+                >
+                  清除篩選
+                </Button>
+              )}
+            </Stack>
           </CardContent>
           <Box
             sx={{
-              flex: selectedResearchBase === '全部'
+              flex: !isHouseSelected
                 ? 1
                 : { xs: '0 0 auto', md: '0 0 max(24rem, min(70vh, calc(100dvh - 22.5rem)))' },
               minHeight: 0,
             }}
           >
             <MapBlock
-              selectedResearchBase={selectedResearchBase}
-              onSelectResearchBase={setSelectedResearchBase}
-              selectedPotential={selectedPotential}
+              filters={filters}
+              onSelectHouse={(houseId) => setFilter({ houseId })}
               onViewAnalysis={scrollToAnalysis}
               showAnalysisButton={!isAnalysisVisible}
             />

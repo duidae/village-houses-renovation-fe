@@ -5,7 +5,9 @@ import CaseAnalysisPage from './components/CaseAnalysisPage';
 import CasePage from './components/CasePage';
 import { mockAnalysisData } from './mocks/analysisData';
 import { fetchProperties } from './services/propertiesService';
-import type { ReuseFilter } from './types';
+import type { HouseFilters } from './types';
+import type { PropertyMarker } from './mocks/properties';
+import { DEFAULT_FILTERS, matchesFilters } from './services/houseFilters';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
@@ -51,7 +53,7 @@ const getNameEditDistance = (query: string, name: string): number => {
   return closestDistance;
 };
 
-const findHouseMatch = (houseOptions: HouseOption[], searchText: string): HouseOption | undefined => {
+const findHouseMatch = <T extends HouseOption>(houseOptions: T[], searchText: string): T | undefined => {
   const query = normalizeSearchText(searchText);
   if (!query) return undefined;
 
@@ -71,16 +73,14 @@ const App: React.FC = () => {
   const [schoolName, setSchoolName] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [houseOptions, setHouseOptions] = useState<HouseOption[]>([]);
-  const [selectedResearchBase, setSelectedResearchBase] = useState<string>('全部');
-  const [selectedPotential, setSelectedPotential] = useState<'全部' | '高' | '中' | '低'>('全部');
+  const [houseOptions, setHouseOptions] = useState<PropertyMarker[]>([]);
+  const [filters, setFilters] = useState<HouseFilters>(DEFAULT_FILTERS);
   const [selectedLocation, setSelectedLocation] = useState<'主幹道上' | '周邊有公共設施'>('主幹道上');
   const [selectedBuilding, setSelectedBuilding] = useState<'一條龍' | '單伸手' | '三合院' | '水泥連棟式' | '具歷史價值'>('一條龍');
-  const [selectedReuse, setSelectedReuse] = useState<ReuseFilter>('全部');
 
   useEffect(() => {
     fetchProperties()
-      .then((properties) => setHouseOptions(properties.map(({ id, name }) => ({ id, name }))))
+      .then(setHouseOptions)
       .catch((err: Error) => setError(err.message));
   }, []);
 
@@ -99,7 +99,13 @@ const App: React.FC = () => {
     }
 
     setSchoolName(matchedHouse.name);
-    setSelectedResearchBase(matchedHouse.id);
+    // A searched house is always shown: if the current criteria would hide it,
+    // reset them rather than selecting a house that isn't on the map.
+    setFilters((current) =>
+      matchesFilters(matchedHouse, current)
+        ? { ...current, houseId: matchedHouse.id }
+        : { ...DEFAULT_FILTERS, houseId: matchedHouse.id }
+    );
   }, [houseOptions, schoolName]);
 
   const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -123,16 +129,12 @@ const App: React.FC = () => {
               setSchoolName={setSchoolName}
               handleSearch={handleSearch}
               handleKeyPress={handleKeyPress}
-              selectedResearchBase={selectedResearchBase}
-              setSelectedResearchBase={setSelectedResearchBase}
-              selectedPotential={selectedPotential}
-              setSelectedPotential={setSelectedPotential}
+              filters={filters}
+              setFilters={setFilters}
               selectedLocation={selectedLocation}
               setSelectedLocation={setSelectedLocation}
               selectedBuilding={selectedBuilding}
               setSelectedBuilding={setSelectedBuilding}
-              selectedReuse={selectedReuse}
-              setSelectedReuse={setSelectedReuse}
             />
           }
         />

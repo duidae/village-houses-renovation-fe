@@ -4,6 +4,8 @@ import shp from 'shpjs';
 import type { PropertyMarker } from '../mocks/properties';
 import { fetchProperties } from '../services/propertiesService';
 import { researchAreaLabel } from '../services/villageHousesService';
+import { DEFAULT_FILTERS, hasActiveCriteria, matchesFilters } from '../services/houseFilters';
+import type { HouseFilters } from '../types';
 import { LeafIcon, MapPinIcon } from './icons';
 
 const defaultCenter = [23.4789, 120.447];
@@ -59,17 +61,15 @@ const getScoreLevelText = (score: number) => {
 };
 
 interface MapBlockProps {
-  selectedResearchBase?: string;
-  onSelectResearchBase?: (researchBaseId: string) => void;
-  selectedPotential?: '全部' | '高' | '中' | '低';
+  filters?: HouseFilters;
+  onSelectHouse?: (houseId: string) => void;
   onViewAnalysis?: () => void;
   showAnalysisButton?: boolean;
 }
 
 const MapBlock: React.FC<MapBlockProps> = ({
-  selectedResearchBase = '全部',
-  onSelectResearchBase,
-  selectedPotential = '全部',
+  filters = DEFAULT_FILTERS,
+  onSelectHouse,
   onViewAnalysis,
   showAnalysisButton = true,
 }) => {
@@ -112,27 +112,20 @@ const MapBlock: React.FC<MapBlockProps> = ({
   }, []);
 
   const visibleProperties = useMemo(() => {
-    const byResearchBase = (() => {
-      if (selectedResearchBase === '全部') return properties;
+    if (filters.houseId !== '全部') {
+      return properties.filter((property) => property.id === filters.houseId);
+    }
+    return properties.filter((property) => matchesFilters(property, filters));
+  }, [properties, filters]);
+  const isFiltered = hasActiveCriteria(filters);
 
-      const byHouse = properties.filter((property) => property.id === selectedResearchBase);
-      if (byHouse.length > 0) return byHouse;
-
-      return properties.filter((property) => researchAreaLabel(property) === selectedResearchBase);
-    })();
-
-    if (selectedPotential === '全部') return byResearchBase;
-    return byResearchBase.filter((property) => getScoreLevelText(property.score) === selectedPotential);
-  }, [properties, selectedResearchBase, selectedPotential]);
-
-  // The area a boundary should be drawn for: either selectedResearchBase is
-  // already a county+township+village string, or it's a single house's id,
-  // in which case we derive that house's area.
+  // The area a boundary should be drawn for: the 研究基地 filter, or else the
+  // selected house's own village.
   const activeResearchArea = useMemo(() => {
-    if (selectedResearchBase === '全部') return null;
-    const selectedHouse = properties.find((property) => property.id === selectedResearchBase);
-    return selectedHouse ? researchAreaLabel(selectedHouse) : selectedResearchBase;
-  }, [properties, selectedResearchBase]);
+    if (filters.area !== '全部') return filters.area;
+    const selectedHouse = properties.find((property) => property.id === filters.houseId);
+    return selectedHouse ? researchAreaLabel(selectedHouse) : null;
+  }, [properties, filters.area, filters.houseId]);
 
   const activeBoundaryFeature = useMemo(() => {
     if (!activeResearchArea || !villageBoundaries) return null;
@@ -148,7 +141,7 @@ const MapBlock: React.FC<MapBlockProps> = ({
 
   React.useEffect(() => {
     setSelectedProperty(visibleProperties.length === 1 ? visibleProperties[0] : null);
-  }, [selectedResearchBase, properties]);
+  }, [visibleProperties]);
 
   React.useEffect(() => {
     // Load Leaflet CSS and JS dynamically
@@ -334,9 +327,18 @@ const MapBlock: React.FC<MapBlockProps> = ({
 
       marker.on('click', () => {
         setSelectedProperty(property);
-        onSelectResearchBase?.(property.id);
+        onSelectHouse?.(property.id);
       });
     });
+
+    // With criteria applied but no village boundary to frame, zoom to the
+    // matching houses instead of the default overview.
+    if (isFiltered && !activeBoundaryFeature && visibleProperties.length > 1) {
+      map.fitBounds(
+        visibleProperties.map((property) => [property.lat, property.lng]),
+        { padding: [48, 48], maxZoom: 16 }
+      );
+    }
 
     // Cleanup function
     return () => {
@@ -345,7 +347,7 @@ const MapBlock: React.FC<MapBlockProps> = ({
       mapLayerGroupsRef.current = {};
       map.remove();
     };
-  }, [mapLoaded, visibleProperties, activeBoundaryFeature]);
+  }, [mapLoaded, visibleProperties, activeBoundaryFeature, isFiltered]);
 
   return (
     <div className="relative bg-white p-6 rounded-xl border border-slate-200 shadow-sm h-full min-h-0 overflow-hidden flex flex-col">
@@ -431,6 +433,20 @@ const MapBlock: React.FC<MapBlockProps> = ({
                   </div>
                 )}
 
+                {/* Suggested reuse types */}
+                {selectedProperty.reuseTypes.length > 0 && (
+                  <div>
+                    <p className="text-xs text-slate-500 uppercase mb-1">建議再利用類型（推估）</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {selectedProperty.reuseTypes.map((type) => (
+                        <span key={type} className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800">
+                          {type}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 {/* Property ID */}
                 <div>
                   <p className="text-xs text-slate-500 uppercase">宅院編號</p>
@@ -496,7 +512,7 @@ const MapBlock: React.FC<MapBlockProps> = ({
           </div>
         </div>
       </div>
-      {selectedResearchBase !== '全部' && onViewAnalysis && showAnalysisButton && (
+      {filters.houseId !== '全部' && onViewAnalysis && showAnalysisButton && (
         <button
           type="button"
           onClick={onViewAnalysis}
