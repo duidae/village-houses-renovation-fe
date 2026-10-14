@@ -309,5 +309,6 @@ export function buildAnalysisDataForRecord(base: AnalysisData, record: VillageHo
       : base.cityPopulation,
     populationStructure: record.populationStructure,
     aspectAnalysis: estimateAspectAnalysis(record),
+    reuseTypes: estimateReuseTypes(record),
   };
 }

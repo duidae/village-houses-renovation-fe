@@ -70,6 +70,7 @@ export interface AnalysisData {
   populationStructure?: PopulationStructure | null;
   schoolEnrollment: SchoolEnrollmentDataPoint[];
   aspectAnalysis: AspectAnalysis;
+  reuseTypes: ReuseType[]; // 再利用類型建議, same values as the 再利用類型方向 filter
 }
 
 // --- Search Filters ---
