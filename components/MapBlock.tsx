@@ -403,7 +403,7 @@ const MapBlock: React.FC<MapBlockProps> = ({
                 {/* Score */}
                 <div>
                   <p className="text-lg text-slate-500 uppercase mb-2">
-                    整建分數
+                    整建潛能分數
                   </p>
                   <span
                     className="inline-block px-3 py-1 rounded-full text-lg font-bold text-white"

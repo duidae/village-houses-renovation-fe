@@ -76,25 +76,28 @@ const CpiGauge: React.FC<{ score: number }> = ({ score }) => {
     const COLORS = [levelColor, '#e2e8f0']; // level color, slate-200
 
     return (
-        <div className="relative w-full h-48 ">
-             <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                    <Pie data={data} cx="50%" cy="50%" startAngle={180} endAngle={0} innerRadius="70%" outerRadius="100%" fill="#8884d8" paddingAngle={2} dataKey="value" stroke="none">
-                        {data.map((entry, index) => (<Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />))}
-                    </Pie>
-                    <Tooltip formatter={(value: number) => [`${value}`, '整建分數']} contentStyle={{ backgroundColor: '#f8fafc', borderColor: '#cbd5e1', color: '#0f172a' }}/>
-                </PieChart>
-            </ResponsiveContainer>
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/3 text-center">
-                <p className="text-4xl sm:text-5xl font-bold" style={{ color: levelColor }}>{score}</p>
-                <p className="text-sm text-brand-subtext">整建分數</p>
-                <span
-                    className="inline-block mt-1 px-2 py-0.5 rounded-full text-xs font-bold text-white"
-                    style={{ backgroundColor: levelColor }}
-                >
-                    整建潛力 - {getScoreLevelText(score)}
-                </span>
+        <div>
+            <div className="relative w-full h-40 ">
+                 <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                        <Pie data={data} cx="50%" cy="50%" startAngle={180} endAngle={0} innerRadius="70%" outerRadius="100%" fill="#8884d8" paddingAngle={2} dataKey="value" stroke="none">
+                            {data.map((entry, index) => (<Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />))}
+                        </Pie>
+                        <Tooltip formatter={(value: number) => [`${value}`, '整建潛能分數']} contentStyle={{ backgroundColor: '#f8fafc', borderColor: '#cbd5e1', color: '#0f172a' }}/>
+                    </PieChart>
+                </ResponsiveContainer>
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/3 text-center">
+                    <p className="text-4xl sm:text-5xl font-bold" style={{ color: levelColor }}>{score}</p>
+                    <p className="text-sm text-brand-subtext">整建潛能分數</p>
+                    <span
+                        className="inline-block mt-1 px-2 py-0.5 rounded-full text-xs font-bold text-white"
+                        style={{ backgroundColor: levelColor }}
+                    >
+                        整建潛力 - {getScoreLevelText(score)}
+                    </span>
+                </div>
             </div>
+            <p className="mt-2 text-xs text-brand-subtext text-center">說明: 分數越高代表越需要進行整建</p>
         </div>
     );
 };
@@ -381,7 +384,7 @@ export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id, 
         <div className="space-y-6">
              <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
                 <div>
-                  <h3 className="text-xl font-semibold mb-2 text-center text-brand-text">整建分數</h3>
+                  <h3 className="text-xl font-semibold mb-2 text-center text-brand-text">整建潛能分數</h3>
                   <CpiGauge score={potentialIndex.cpiScore} />
                   <CpiGaugeLegend />
                 </div>
