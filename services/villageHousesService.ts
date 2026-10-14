@@ -29,7 +29,11 @@ export interface VillageHouseRecord {
   landNumber: string;
   landArea: string;
   landUseZone: string;
-  landUseSurveyCategory: string;
+  landUseCategory: string;
+  landFunctionZone: string;
+  relatedPlans: string;
+  environmentalSensitivity: string;
+  streetViewUrl: string;
   populationHistory: { year: number; population: number; households?: number }[];
   populationStructure: PopulationStructure | null;
 }
@@ -120,6 +124,10 @@ export function parseVillageHouses(csvText: string): VillageHouseRecord[] {
   const idxLandArea = col('土地面積');
   const idxLandUseZone = col('土地使用功能分區');
   const idxLandUseCategory = col('土地使用類別');
+  const idxLandFunctionZone = col('國土功能分區');
+  const idxRelatedPlans = col('執行署內相關計畫');
+  const idxEnvSensitivity = col('環境-是否具環境敏感條件');
+  const idxStreetView = col('GSV照片(先以外連方式)');
   const populationCols = POPULATION_ROC_YEARS.map((rocYear) => ({
     year: rocYear + ROC_YEAR_OFFSET,
     idx: col(`社會-歷年人數(${rocYear})`),
@@ -175,7 +183,11 @@ export function parseVillageHouses(csvText: string): VillageHouseRecord[] {
       landNumber: r[idxLandNumber]?.trim() ?? '',
       landArea: r[idxLandArea]?.trim() ?? '',
       landUseZone: r[idxLandUseZone]?.trim() ?? '',
-      landUseSurveyCategory: r[idxLandUseCategory]?.trim() ?? '',
+      landUseCategory: r[idxLandUseCategory]?.trim() ?? '',
+      landFunctionZone: r[idxLandFunctionZone]?.trim() ?? '',
+      relatedPlans: r[idxRelatedPlans]?.trim() ?? '',
+      environmentalSensitivity: r[idxEnvSensitivity]?.trim() ?? '',
+      streetViewUrl: r[idxStreetView]?.trim() ?? '',
       populationHistory: populationCols
         .map(({ year, idx, householdIdx }) => ({
           year,
@@ -287,7 +299,17 @@ export function buildAnalysisDataForRecord(base: AnalysisData, record: VillageHo
       landNumber: record.landNumber,
       landArea: record.landArea,
       landUseZone: record.landUseZone,
-      landUseSurveyCategory: record.landUseSurveyCategory,
+      landUseCategory: record.landUseCategory,
+      landFunctionZone: record.landFunctionZone,
+      houseId: record.id,
+      county: record.county,
+      township: record.township,
+      village: record.village,
+      community: record.community,
+      isInKeyArea: record.isInKeyArea,
+      relatedPlans: record.relatedPlans,
+      environmentalSensitivity: record.environmentalSensitivity,
+      streetViewUrl: record.streetViewUrl,
     },
     potentialIndex: {
       ...base.potentialIndex,
@@ -310,5 +332,6 @@ export function buildAnalysisDataForRecord(base: AnalysisData, record: VillageHo
     populationStructure: record.populationStructure,
     aspectAnalysis: estimateAspectAnalysis(record),
     reuseTypes: estimateReuseTypes(record),
+    connectivity: mockConnectivity(record),
   };
 }

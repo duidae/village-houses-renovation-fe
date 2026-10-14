@@ -413,7 +413,7 @@ const HomePage: React.FC<HomePageProps> = ({
               id="case-analysis"
               sx={{ bgcolor: 'grey.50', borderRadius: 3, boxShadow: 2, mt: 3, p: { xs: 2, md: 3 }, minHeight: '100vh', scrollMarginTop: 16 }}
             >
-              <AnalysisDashboard id="case-analysis-report" data={selectedAnalysis} hideMap />
+              <AnalysisDashboard id="case-analysis-report" data={selectedAnalysis} />
             </Box>
           )}
       </Card>

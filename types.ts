@@ -3,6 +3,15 @@
 export interface BasicInfo {
   name: string;
   address: string;
+  houseId?: string; // 宅院ID/編號
+  county?: string;
+  township?: string;
+  village?: string;
+  community?: string; // 所在社區
+  isInKeyArea?: boolean; // 是否位在農村發展重點區
+  relatedPlans?: string; // 執行署內相關計畫
+  environmentalSensitivity?: string; // 環境-是否具環境敏感條件
+  streetViewUrl?: string; // GSV照片
   latitude: number;
   longitude: number;
   buildingType: string;
@@ -15,7 +24,8 @@ export interface BasicInfo {
   landNumber?: string; // 地號
   landArea?: string; // 土地面積
   landUseZone?: string; // 土地使用分區
-  landUseSurveyCategory?: string; // 國土利用調查類別
+  landUseCategory?: string; // 土地使用類別
+  landFunctionZone?: string; // 國土功能分區
 }
 
 export interface EnvironmentalAnalysis {
@@ -71,6 +81,7 @@ export interface AnalysisData {
   schoolEnrollment: SchoolEnrollmentDataPoint[];
   aspectAnalysis: AspectAnalysis;
   reuseTypes: ReuseType[]; // 再利用類型建議, same values as the 再利用類型方向 filter
+  connectivity?: ConnectivityOption[]; // 區位與生活機能, same values as the 社區連結 filter
 }
 
 // --- Search Filters ---
