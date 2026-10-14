@@ -1,6 +1,6 @@
 import type { AnalysisData, PopulationStructure } from '../types';
 import type { PropertyMarker } from '../mocks/properties';
-import { estimateReuseTypes, mockCondition, mockConnectivity } from '../mocks/houseAttributes';
+import { estimateAspectAnalysis, estimateReuseTypes, mockCondition, mockConnectivity } from '../mocks/houseAttributes';
 
 const CSV_URL =
   'https://docs.google.com/spreadsheets/d/e/2PACX-1vTsaWfKW2CrtMoHJ3F_M0gV4C5dCg6FdPGSNTkI00MwDrr99okfDYt6TpZPyO3X8w/pub?gid=318668856&single=true&output=csv';
@@ -308,5 +308,6 @@ export function buildAnalysisDataForRecord(base: AnalysisData, record: VillageHo
       ? record.populationHistory.map((p) => ({ year: p.year, population: p.population, households: p.households }))
       : base.cityPopulation,
     populationStructure: record.populationStructure,
+    aspectAnalysis: estimateAspectAnalysis(record),
   };
 }

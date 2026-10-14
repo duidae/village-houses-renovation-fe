@@ -27,11 +27,10 @@ export const mockAnalysisData: AnalysisData = {
     { year: 2020, studentCount: 180 },
     { year: 2025, studentCount: 150 },
   ],
-  fiveForcesAnalysis: {
-    industryRivalry: { score: 3, analysis: '同類社區照護服務數量穩定。' },
-    threatOfNewEntrants: { score: 2, analysis: '補助門檻較高，新進者有限。' },
-    bargainingPowerOfBuyers: { score: 4, analysis: '需求端集中且重視品質。' },
-    bargainingPowerOfSuppliers: { score: 3, analysis: '地方人力與材料供應穩定。' },
-    threatOfSubstituteProducts: { score: 3, analysis: '其他照護方案存在，但本案具在地優勢。' },
+  aspectAnalysis: {
+    communityConnection: { score: 6, analysis: '鄰近**社區活動中心**，步行可達。' },
+    buildingCondition: { score: 7, analysis: '主體**結構狀態良好**，部分屋瓦需修繕。' },
+    historicalValue: { score: 7, analysis: '傳統**三合院**格局保存完整。' },
+    courtyardLayout: { score: 9, analysis: '**三合院**具完整中庭，適合作為公共活動空間。' },
   },
 };

@@ -48,17 +48,17 @@ export interface SchoolEnrollmentDataPoint {
 
 // --- New Strategic Analysis Framework ---
 
-export interface ForceItem {
-  score: number;
-  analysis: string;
+export interface AspectItem {
+  score: number; // 0-10, higher is better
+  analysis: string; // **keyword** marks highlighted text
 }
 
-export interface FiveForcesAnalysis {
-  industryRivalry: ForceItem;
-  threatOfNewEntrants: ForceItem;
-  bargainingPowerOfBuyers: ForceItem;
-  bargainingPowerOfSuppliers: ForceItem;
-  threatOfSubstituteProducts: ForceItem;
+// 宅院面向分析
+export interface AspectAnalysis {
+  communityConnection: AspectItem; // 社區連結
+  buildingCondition: AspectItem; // 建築物狀況
+  historicalValue: AspectItem; // 歷史價值
+  courtyardLayout: AspectItem; // 院落配置
 }
 
 
@@ -69,7 +69,7 @@ export interface AnalysisData {
   cityPopulation: PopulationDataPoint[];
   populationStructure?: PopulationStructure | null;
   schoolEnrollment: SchoolEnrollmentDataPoint[];
-  fiveForcesAnalysis: FiveForcesAnalysis;
+  aspectAnalysis: AspectAnalysis;
 }
 
 // --- Search Filters ---

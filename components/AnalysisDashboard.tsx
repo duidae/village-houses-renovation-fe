@@ -2,7 +2,7 @@
 
 import React, { FC, useEffect, useState } from 'react';
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip, LineChart, Line, XAxis, YAxis, CartesianGrid, Legend, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
-import { AnalysisData, PopulationDataPoint, PopulationStructure, SchoolEnrollmentDataPoint, FiveForcesAnalysis } from '../types';
+import { AnalysisData, PopulationDataPoint, PopulationStructure, SchoolEnrollmentDataPoint, AspectAnalysis } from '../types';
 import { BuildingIcon, MountainIcon, HistoryIcon, UsersIcon, TrendingUpIcon, ShieldIcon, MapPinIcon, SparklesIcon, BuildingOffice2Icon, LeafIcon, UserGroupIcon, ClipboardListIcon, ListBulletIcon, AreaIcon, GlobeIcon, ChartBarIcon } from './icons';
 
 const LABEL_STYLE = 'bg-teal-500/10 text-teal-700 ring-1 ring-teal-500/20';
@@ -231,22 +231,14 @@ const SchoolEnrollmentChart: React.FC<{ data: SchoolEnrollmentDataPoint[] }> = (
     );
 };
 
-const FiveForcesAnalysisChart: React.FC<{ data: FiveForcesAnalysis }> = ({ data }) => {
-    const chartData = [
-        { subject: '同業競爭', score: data.industryRivalry.score, fullMark: 10 },
-        { subject: '新進者威脅', score: data.threatOfNewEntrants.score, fullMark: 10 },
-        { subject: '買家議價力', score: data.bargainingPowerOfBuyers.score, fullMark: 10 },
-        { subject: '供應商議價力', score: data.bargainingPowerOfSuppliers.score, fullMark: 10 },
-        { subject: '替代品威脅', score: data.threatOfSubstituteProducts.score, fullMark: 10 },
+const AspectAnalysisChart: React.FC<{ data: AspectAnalysis }> = ({ data }) => {
+    const aspects = [
+        { name: '社區連結', ...data.communityConnection },
+        { name: '建築物狀況', ...data.buildingCondition },
+        { name: '歷史價值', ...data.historicalValue },
+        { name: '院落配置', ...data.courtyardLayout },
     ];
-    
-    const forceDetails = [
-      { name: '同業競爭', ...data.industryRivalry },
-      { name: '新進者威脅', ...data.threatOfNewEntrants },
-      { name: '買家議價力', ...data.bargainingPowerOfBuyers },
-      { name: '供應商議價力', ...data.bargainingPowerOfSuppliers },
-      { name: '替代品威脅', ...data.threatOfSubstituteProducts },
-    ];
+    const chartData = aspects.map(({ name, score }) => ({ subject: name, score, fullMark: 10 }));
 
     return (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-center">
@@ -255,19 +247,19 @@ const FiveForcesAnalysisChart: React.FC<{ data: FiveForcesAnalysis }> = ({ data 
                     <RadarChart cx="50%" cy="50%" outerRadius="80%" data={chartData}>
                         <PolarGrid stroke="#cbd5e1"/>
                         <PolarAngleAxis dataKey="subject" stroke="#94a3b8" tick={{ fill: '#475569', fontSize: 14 }} />
-                        <PolarRadiusAxis angle={30} domain={[0, 10]} stroke="#94a3b8" />
-                        <Radar name="威脅分數" dataKey="score" stroke="#14b8a6" fill="#14b8a6" fillOpacity={0.6} />
+                        <PolarRadiusAxis angle={45} domain={[0, 10]} stroke="#94a3b8" />
+                        <Radar name="評分" dataKey="score" stroke="#14b8a6" fill="#14b8a6" fillOpacity={0.6} />
                          <Tooltip contentStyle={{ backgroundColor: '#f8fafc', borderColor: '#cbd5e1', color: '#0f172a' }}/>
                     </RadarChart>
                 </ResponsiveContainer>
             </div>
             <div className="space-y-3">
-                {forceDetails.map(force => (
-                    <div key={force.name}>
+                {aspects.map(aspect => (
+                    <div key={aspect.name}>
                         <p className="font-semibold text-brand-text">
-                            {force.name}: <span className="font-bold text-brand-accent">{force.score} / 10</span>
+                            {aspect.name}: <span className="font-bold text-brand-accent">{aspect.score} / 10</span>
                         </p>
-                        <p className="text-sm text-brand-subtext leading-relaxed"><HighlightedText text={force.analysis} /></p>
+                        <p className="text-sm text-brand-subtext leading-relaxed"><HighlightedText text={aspect.analysis} /></p>
                     </div>
                 ))}
             </div>
@@ -288,7 +280,7 @@ const Section: React.FC<{title: string, icon: React.ReactNode, children: React.R
 export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id, hideMap = false }) => {
   const {
       basicInfo, environmentalAnalysis, potentialIndex, cityPopulation, populationStructure, schoolEnrollment,
-      fiveForcesAnalysis,
+      aspectAnalysis,
   } = data;
   const mapLink = `https://www.openstreetmap.org/?mlat=${basicInfo.latitude}&mlon=${basicInfo.longitude}#map=18/${basicInfo.latitude}/${basicInfo.longitude}`;
   const mapContainerId = `analysis-map-${id || 'default'}`;
@@ -439,7 +431,7 @@ export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id, 
         </div>
       </div>
     )},
-    { condition: true, component: <Section title="宅院面向分析" icon={<ShieldIcon className="w-6 h-6"/>}><FiveForcesAnalysisChart data={fiveForcesAnalysis} /></Section> },
+    { condition: true, component: <Section title="宅院面向分析" icon={<ShieldIcon className="w-6 h-6"/>}><AspectAnalysisChart data={aspectAnalysis} /></Section> },
     { condition: cityPopulation && cityPopulation.length > 0, component: (
         <Section title="宅院區域人口結構" icon={<UsersIcon className="w-6 h-6"/>}>
             <PopulationSummary data={cityPopulation} structure={populationStructure} />
