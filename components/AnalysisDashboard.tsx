@@ -141,7 +141,7 @@ const ContextMap: React.FC<{ lat: number; lng: number; area: string; mode: Conte
             const L = await loadLeaflet().catch(() => null);
             if (cancelled || !L || !containerRef.current) return;
 
-            map = L.map(containerRef.current, { zoomControl: true, scrollWheelZoom: false }).setView([lat, lng], 15);
+            map = L.map(containerRef.current, { zoomControl: true, scrollWheelZoom: true }).setView([lat, lng], 15);
             resizeObserver = new ResizeObserver(() => map?.invalidateSize({ pan: false }));
             resizeObserver.observe(containerRef.current);
             requestAnimationFrame(() => map?.invalidateSize({ pan: false }));
