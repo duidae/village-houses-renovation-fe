@@ -175,7 +175,13 @@ const ContextMap: React.FC<{ lat: number; lng: number; area: string; mode: Conte
                 }
             }
 
-            L.circleMarker([lat, lng], { radius: 8, color: '#facc15', weight: 3, fillColor: '#fde047', fillOpacity: 1 })
+            const houseIcon = L.divIcon({
+                className: '',
+                html: '<div style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border:3px solid white;border-radius:50%;background:#eab308;box-shadow:0 2px 6px rgba(0,0,0,.45);font-size:19px;line-height:1" title="個宅">🏠</div>',
+                iconSize: [34, 34],
+                iconAnchor: [17, 17],
+            });
+            L.marker([lat, lng], { icon: houseIcon, zIndexOffset: 1000 })
                 .bindTooltip('個宅')
                 .addTo(map);
         })();
@@ -187,7 +193,7 @@ const ContextMap: React.FC<{ lat: number; lng: number; area: string; mode: Conte
     }, [lat, lng, area, mode]);
 
     const legend = [
-        { label: '個宅', swatch: <span className="inline-block h-3 w-3 flex-shrink-0 rounded-full border-2 border-yellow-400 bg-yellow-300" /> },
+        { label: '個宅', swatch: <span className="inline-flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full bg-yellow-500 text-[10px] leading-none">🏠</span> },
         ...MAP_LEGENDS[mode],
         { label: '社區範圍', swatch: <span className="inline-block h-3 w-3 flex-shrink-0 border-2 border-dashed border-yellow-400" /> },
     ];
