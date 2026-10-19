@@ -140,7 +140,7 @@ const ContextMap: React.FC<{ lat: number; lng: number; area: string; mode: Conte
             const L = await loadLeaflet().catch(() => null);
             if (cancelled || !L || !containerRef.current) return;
 
-            map = L.map(containerRef.current, { zoomControl: false, scrollWheelZoom: false }).setView([lat, lng], 15);
+            map = L.map(containerRef.current, { zoomControl: true, scrollWheelZoom: false }).setView([lat, lng], 15);
             L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
                 attribution: 'Tiles © Esri',
                 maxZoom: 19,
