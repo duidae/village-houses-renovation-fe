@@ -135,12 +135,16 @@ const ContextMap: React.FC<{ lat: number; lng: number; area: string; mode: Conte
     useEffect(() => {
         let cancelled = false;
         let map: any = null;
+        let resizeObserver: ResizeObserver | null = null;
 
         (async () => {
             const L = await loadLeaflet().catch(() => null);
             if (cancelled || !L || !containerRef.current) return;
 
             map = L.map(containerRef.current, { zoomControl: true, scrollWheelZoom: false }).setView([lat, lng], 15);
+            resizeObserver = new ResizeObserver(() => map?.invalidateSize({ pan: false }));
+            resizeObserver.observe(containerRef.current);
+            requestAnimationFrame(() => map?.invalidateSize({ pan: false }));
             L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
                 attribution: 'Tiles © Esri',
                 maxZoom: 19,
@@ -175,6 +179,9 @@ const ContextMap: React.FC<{ lat: number; lng: number; area: string; mode: Conte
                 }
             }
 
+            map.invalidateSize({ pan: false });
+            map.setView([lat, lng], map.getZoom(), { animate: false });
+
             const houseIcon = L.divIcon({
                 className: '',
                 html: '<div style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border:3px solid white;border-radius:50%;background:#eab308;box-shadow:0 2px 6px rgba(0,0,0,.45);font-size:19px;line-height:1" title="個宅">🏠</div>',
@@ -188,6 +195,7 @@ const ContextMap: React.FC<{ lat: number; lng: number; area: string; mode: Conte
 
         return () => {
             cancelled = true;
+            resizeObserver?.disconnect();
             map?.remove();
         };
     }, [lat, lng, area, mode]);
