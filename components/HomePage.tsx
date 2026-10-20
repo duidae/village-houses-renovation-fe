@@ -128,7 +128,8 @@ const HomePage: React.FC<HomePageProps> = ({
         display: 'flex',
         flexDirection: 'column',
         minHeight: 0,
-        overflowY: !isHouseSelected ? 'hidden' : 'auto',
+        // Desktop locks the unselected view to the viewport; mobile always scrolls.
+        overflowY: !isHouseSelected ? { xs: 'auto', md: 'hidden' } : 'auto',
       }}
     >
       {isLoading && <LoadingSpinner />}
@@ -139,7 +140,7 @@ const HomePage: React.FC<HomePageProps> = ({
         </Alert>
       )}
 
-      <Card sx={{ position: 'relative', overflow: !isHouseSelected ? 'hidden' : 'visible', bgcolor: 'background.paper', boxShadow: 5, borderRadius: 4, p: 3, mb: 1, flex: !isHouseSelected ? 1 : '0 0 auto', display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+      <Card sx={{ position: 'relative', overflow: !isHouseSelected ? { xs: 'visible', md: 'hidden' } : 'visible', bgcolor: 'background.paper', boxShadow: 5, borderRadius: 4, p: 3, mb: 1, flex: !isHouseSelected ? { xs: '0 0 auto', md: 1 } : '0 0 auto', display: 'flex', flexDirection: 'column', minHeight: 0 }}>
           <CardContent sx={{ position: 'relative', py: 2, flexShrink: 0 }}>
             <Grid container spacing={4} alignItems="flex-start">
               <Grid item xs={12} md={6} sx={{ position: 'relative', zIndex: 2 }}>
@@ -396,7 +397,7 @@ const HomePage: React.FC<HomePageProps> = ({
           <Box
             sx={{
               flex: !isHouseSelected
-                ? 1
+                ? { xs: '0 0 auto', md: 1 }
                 : { xs: '0 0 auto', md: '0 0 max(24rem, min(70vh, calc(100dvh - 22.5rem)))' },
               minHeight: 0,
             }}
