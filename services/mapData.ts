@@ -5,6 +5,7 @@ const LEAFLET_JS = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet
 const LEAFLET_CSS = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css';
 const VILLAGE_BOUNDARIES_URL = '/village-boundaries.geojson';
 const PUBLIC_FACILITIES_URL = '/layers/public-20260912T112511Z-1-001.zip';
+const TRANSIT_FACILITIES_URL = '/public-facilities.geojson';
 
 let leafletPromise: Promise<any> | null = null;
 
@@ -73,4 +74,18 @@ export function fetchPublicFacilities(): Promise<any> {
     });
   }
   return publicFacilitiesPromise;
+}
+
+let transitFacilitiesPromise: Promise<any> | null = null;
+
+export function fetchTransitFacilities(): Promise<any> {
+  if (!transitFacilitiesPromise) {
+    transitFacilitiesPromise = fetch(TRANSIT_FACILITIES_URL)
+      .then((res) => res.json())
+      .catch((error: unknown) => {
+        transitFacilitiesPromise = null;
+        throw error;
+      });
+  }
+  return transitFacilitiesPromise;
 }

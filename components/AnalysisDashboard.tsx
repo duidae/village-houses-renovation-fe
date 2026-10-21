@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line, XAxis, YAxis, CartesianGrid, Legend, Tooltip, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
 import type { AnalysisData, AspectAnalysis, ConnectivityOption, PopulationDataPoint, PopulationStructure, ReuseType } from '../types';
-import { fetchPublicFacilities, fetchVillageBoundaries, findVillageBoundary, loadLeaflet } from '../services/mapData';
+import { fetchPublicFacilities, fetchTransitFacilities, fetchVillageBoundaries, findVillageBoundary, loadLeaflet } from '../services/mapData';
 import { ChartBarIcon, DownloadIcon, ExternalLinkIcon, HomeIcon, LightbulbIcon, PuzzleIcon, UsersIcon } from './icons';
 
 interface AnalysisDashboardProps {
@@ -121,7 +121,10 @@ type ContextMapMode = 'environment' | 'road' | 'transit' | 'facilities';
 const MAP_LEGENDS: Record<ContextMapMode, { label: string; swatch: React.ReactNode }[]> = {
     environment: [],
     road: [],
-    transit: [{ label: '半徑300m', swatch: <span className="inline-block h-3 w-3 flex-shrink-0 rounded-full border-2 border-dashed border-orange-500" /> }],
+    transit: [
+        { label: '交通設施', swatch: <span className="inline-block h-3 w-3 flex-shrink-0 rounded-full border-2 border-[#9333ea] bg-white" /> },
+        { label: '半徑300m', swatch: <span className="inline-block h-3 w-3 flex-shrink-0 rounded-full border-2 border-dashed border-orange-500" /> },
+    ],
     facilities: [
         { label: '迎毗設施', swatch: <span className="inline-block h-3 w-3 flex-shrink-0 rounded-sm bg-[#f5deb3]" /> },
         { label: '鄰避設施', swatch: <span className="inline-block h-3 w-3 flex-shrink-0 rounded-sm bg-red-500" /> },
@@ -145,7 +148,7 @@ const ContextMap: React.FC<{ lat: number; lng: number; area: string; mode: Conte
             resizeObserver = new ResizeObserver(() => map?.invalidateSize({ pan: false }));
             resizeObserver.observe(containerRef.current);
             requestAnimationFrame(() => map?.invalidateSize({ pan: false }));
-            const baseTiles = mode === 'road'
+            const baseTiles = mode === 'road' || mode === 'transit'
                 ? { url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', attribution: '© OpenStreetMap contributors' }
                 : { url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', attribution: 'Tiles © Esri' };
             L.tileLayer(baseTiles.url, {
@@ -164,6 +167,22 @@ const ContextMap: React.FC<{ lat: number; lng: number; area: string; mode: Conte
             const boundary = findVillageBoundary(boundaries, area);
             if (boundary) {
                 L.geoJSON(boundary, { style: { color: '#facc15', weight: 3, dashArray: '8 6', fill: false } }).addTo(map);
+            }
+
+            if (mode === 'transit') {
+                const transit = await fetchTransitFacilities().catch(() => null);
+                if (cancelled) return;
+                if (transit) {
+                    const color = '#9333ea';
+                    L.geoJSON(transit, {
+                        style: { color, fillColor: color, fillOpacity: 0.12, opacity: 0.8, weight: 2 },
+                        pointToLayer: (_feature: any, latLng: any) =>
+                            L.circleMarker(latLng, { radius: 5, color, fillColor: '#ffffff', fillOpacity: 0.9, weight: 2 }),
+                        onEachFeature: (feature: any, layer: any) => {
+                            if (feature?.properties?.name) layer.bindTooltip(feature.properties.name);
+                        },
+                    }).addTo(map);
+                }
             }
 
             if (mode === 'facilities') {
