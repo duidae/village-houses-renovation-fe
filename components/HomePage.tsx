@@ -155,7 +155,7 @@ const HomePage: React.FC<HomePageProps> = ({
                     sx={{ width: 56, height: 56, borderRadius: 2, objectFit: 'contain' }}
                   />
                   <Typography variant="h3" component="h1" sx={{ fontWeight: 800 }}>
-                    農村好宅##
+                    農村好宅
                   </Typography>
                 </Box>
                 <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 700 }}>
