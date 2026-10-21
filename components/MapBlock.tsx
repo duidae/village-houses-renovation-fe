@@ -28,7 +28,7 @@ const mapLayerSources = [
   },
   {
     id: 'public-facilities-geojson',
-    label: '公共設施資料',
+    label: '交通設施',
     url: '/public-facilities.geojson',
     color: '#9333ea',
     type: 'geojson' as const,

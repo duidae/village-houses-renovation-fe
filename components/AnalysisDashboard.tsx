@@ -145,8 +145,11 @@ const ContextMap: React.FC<{ lat: number; lng: number; area: string; mode: Conte
             resizeObserver = new ResizeObserver(() => map?.invalidateSize({ pan: false }));
             resizeObserver.observe(containerRef.current);
             requestAnimationFrame(() => map?.invalidateSize({ pan: false }));
-            L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-                attribution: 'Tiles © Esri',
+            const baseTiles = mode === 'road'
+                ? { url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', attribution: '© OpenStreetMap contributors' }
+                : { url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', attribution: 'Tiles © Esri' };
+            L.tileLayer(baseTiles.url, {
+                attribution: baseTiles.attribution,
                 maxZoom: 19,
                 crossOrigin: 'anonymous', // lets the PDF export capture the tiles
             }).addTo(map);
