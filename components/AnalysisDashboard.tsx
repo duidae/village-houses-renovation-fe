@@ -29,15 +29,19 @@ const TOOLTIP_STYLE = { backgroundColor: '#f8fafc', borderColor: '#cbd5e1', colo
 
 // --- Layout primitives -------------------------------------------------------
 
-const ReportSection: React.FC<{ title: string; icon: React.ReactNode; children: React.ReactNode; className?: string }> = ({ title, icon, children, className = '' }) => (
+const ReportSection: React.FC<{ title: string; icon: React.ReactNode; children: React.ReactNode; className?: string; titleAction?: React.ReactNode }> = ({ title, icon, children, className = '', titleAction }) => (
     <section className={`bg-white rounded-[28px] border border-slate-300 p-4 sm:p-6 ${className}`}>
         <h3 className="flex items-center gap-3 mb-4 text-2xl sm:text-3xl font-bold text-report-olive">
             <span className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-report-olive text-white">{icon}</span>
             {title}
+            {titleAction}
         </h3>
         {children}
     </section>
 );
+
+// TODO: replace with the real 評估結果 explanation page.
+const ASSESSMENT_GUIDE_URL = '#';
 
 const SubCard: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className = '' }) => (
     <div className={`rounded-2xl border border-slate-200 bg-white p-4 shadow-sm ${className}`}>{children}</div>
@@ -618,7 +622,21 @@ export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id }
         </ReportSection>
 
         {/* 評估結果 */}
-        <ReportSection title="評估結果" icon={<ChartBarIcon className="h-6 w-6" />}>
+        <ReportSection
+            title="評估結果"
+            icon={<ChartBarIcon className="h-6 w-6" />}
+            titleAction={
+                <a
+                    href={ASSESSMENT_GUIDE_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1 text-base font-normal text-brand-subtext underline-offset-4 hover:underline"
+                >
+                    說明
+                    <ExternalLinkIcon className="h-4 w-4" />
+                </a>
+            }
+        >
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_2.5fr] lg:divide-x lg:divide-slate-200">
                 <div>
                     <SubHeading className="mb-4">整建潛能分數</SubHeading>
