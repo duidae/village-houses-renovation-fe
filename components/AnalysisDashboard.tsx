@@ -109,7 +109,7 @@ const CpiGauge: React.FC<{ score: number }> = ({ score }) => {
                     <span className="text-lg text-brand-text">/100</span>
                 </p>
             </div>
-            <p className="mt-3 text-sm text-brand-subtext">說明: 分數越高代表越需要進行整建</p>
+            <p className="mt-3 text-center text-sm text-brand-subtext">說明: 分數越高代表越需要進行整建</p>
         </div>
     );
 };
@@ -354,14 +354,14 @@ const AspectAnalysisChart: React.FC<{ data: AspectAnalysis }> = ({ data }) => {
     ];
 
     return (
-        <div className="grid grid-cols-1 items-center gap-4 md:grid-cols-[minmax(0,18rem)_1fr]">
-            <div className="h-64 w-full">
+        <div className="grid grid-cols-1 items-center gap-4 md:grid-cols-[minmax(0,24rem)_1fr]">
+            <div className="h-80 w-full md:h-96">
                 <ResponsiveContainer width="100%" height="100%">
-                    <RadarChart cx="50%" cy="50%" outerRadius="65%" startAngle={135} endAngle={-225} data={chartData}>
+                    <RadarChart cx="50%" cy="50%" outerRadius="72%" startAngle={135} endAngle={-225} data={chartData}>
                         <PolarGrid gridType="polygon" stroke="#cbd5e1" />
-                        <PolarAngleAxis dataKey="subject" tick={{ fill: '#a8552f', fontSize: 14 }} />
+                        <PolarAngleAxis dataKey="subject" tick={{ fill: '#a8552f', fontSize: 16 }} />
                         <PolarRadiusAxis domain={[0, 10]} tick={false} axisLine={false} />
-                        <Radar name="評分" dataKey="score" stroke="#f0b02b" fill="#f6d9a8" fillOpacity={0.7} dot={{ r: 3, fill: '#f0b02b' }} isAnimationActive={false} />
+                        <Radar name="評分" dataKey="score" stroke="#f0b02b" fill="#f6d9a8" fillOpacity={0.7} dot={{ r: 4, fill: '#f0b02b' }} isAnimationActive={false} />
                         <Tooltip contentStyle={TOOLTIP_STYLE} />
                     </RadarChart>
                 </ResponsiveContainer>
