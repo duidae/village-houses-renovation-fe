@@ -5,7 +5,7 @@ const LEAFLET_JS = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet
 const LEAFLET_CSS = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css';
 const VILLAGE_BOUNDARIES_URL = '/village-boundaries.geojson';
 const PUBLIC_FACILITIES_URL = '/layers/public-20260912T112511Z-1-001.zip';
-const TRANSIT_FACILITIES_URL = '/public-facilities.geojson';
+const TRANSIT_FACILITIES_URL = '/transportation.geojson';
 
 let leafletPromise: Promise<any> | null = null;
 
