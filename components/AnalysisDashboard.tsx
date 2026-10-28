@@ -40,8 +40,7 @@ const ReportSection: React.FC<{ title: string; icon: React.ReactNode; children: 
     </section>
 );
 
-// TODO: replace with the real 評估結果 explanation page.
-const ASSESSMENT_GUIDE_URL = '#';
+const ASSESSMENT_GUIDE_URL = 'https://docs.google.com/document/d/19RjWxky9DvdTtIVWzR-XBuVeqrhD7n1dbijQmvmQCAI/edit?usp=sharing';
 
 const SubCard: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className = '' }) => (
     <div className={`rounded-2xl border border-slate-200 bg-white p-4 shadow-sm ${className}`}>{children}</div>
