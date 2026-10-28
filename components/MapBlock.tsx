@@ -40,6 +40,19 @@ const mapLayerSources = [
     color: '#dc2626',
     type: 'geojson' as const,
   },
+  {
+    id: 'soil-liquefaction',
+    label: '土壤液化潛勢',
+    url: '/layers/soil-liquefaction.geojson',
+    color: '#ea580c',
+    type: 'geojson' as const,
+    categoryField: 'type',
+    categoryColors: {
+      高潛勢: '#c2410c',
+      中潛勢: '#f59e0b',
+      低潛勢: '#facc15',
+    } as Record<string, string>,
+  },
 ];
 
 const VILLAGE_BOUNDARIES_URL = '/village-boundaries.geojson';
@@ -212,17 +225,23 @@ const MapBlock: React.FC<MapBlockProps> = ({
       await Promise.all(
         mapLayerSources.map(async ({ id, url, color, type, ...source }) => {
           const labelField = 'labelField' in source ? source.labelField : undefined;
+          const categoryField = 'categoryField' in source ? source.categoryField : undefined;
+          const categoryColors = 'categoryColors' in source ? source.categoryColors : undefined;
           try {
             const geoJson = type === 'geojson' ? await fetch(url).then((res) => res.json()) : await shp(url);
             if (layersCancelled) return;
 
             const layer = L.geoJSON(geoJson, {
-              style: {
-                color,
-                fillColor: color,
-                fillOpacity: 0.12,
-                opacity: 0.8,
-                weight: 2,
+              style: (feature: { properties?: Record<string, unknown> }) => {
+                const category = categoryField ? feature?.properties?.[categoryField] : undefined;
+                const featureColor = (typeof category === 'string' && categoryColors?.[category]) || color;
+                return {
+                  color: featureColor,
+                  fillColor: featureColor,
+                  fillOpacity: categoryColors ? 0.35 : 0.12,
+                  opacity: 0.8,
+                  weight: 2,
+                };
               },
               pointToLayer: (_feature: unknown, latLng: unknown) =>
                 L.circleMarker(latLng, {
@@ -368,23 +387,38 @@ const MapBlock: React.FC<MapBlockProps> = ({
           <fieldset className="absolute right-3 top-3 z-[500] m-0 rounded-lg border border-slate-200 bg-white/95 p-3 shadow-md backdrop-blur-sm">
             <legend className="px-1 text-xs font-semibold text-slate-700">圖層</legend>
             <div className="space-y-2">
-              {mapLayerSources.map(({ id, label, color }) => (
-                <label key={id} className="flex cursor-pointer items-center gap-2 text-xs text-slate-700">
-                  <input
-                    type="checkbox"
-                    checked={enabledMapLayers[id]}
-                    onChange={() =>
-                      setEnabledMapLayers((current) => ({
-                        ...current,
-                        [id]: !current[id],
-                      }))
-                    }
-                    className="h-3.5 w-3.5 accent-emerald-600"
-                  />
-                  <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: color }} />
-                  <span>{label}</span>
-                </label>
-              ))}
+              {mapLayerSources.map(({ id, label, color, ...source }) => {
+                const categoryColors = 'categoryColors' in source ? source.categoryColors : undefined;
+                return (
+                  <div key={id}>
+                    <label className="flex cursor-pointer items-center gap-2 text-xs text-slate-700">
+                      <input
+                        type="checkbox"
+                        checked={enabledMapLayers[id]}
+                        onChange={() =>
+                          setEnabledMapLayers((current) => ({
+                            ...current,
+                            [id]: !current[id],
+                          }))
+                        }
+                        className="h-3.5 w-3.5 accent-emerald-600"
+                      />
+                      <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: color }} />
+                      <span>{label}</span>
+                    </label>
+                    {categoryColors && enabledMapLayers[id] && (
+                      <div className="ml-6 mt-1 flex gap-2">
+                        {Object.entries(categoryColors).map(([category, categoryColor]) => (
+                          <span key={category} className="flex items-center gap-1 text-[10px] text-slate-600">
+                            <span className="h-2 w-2 rounded-sm" style={{ backgroundColor: categoryColor }} />
+                            {category}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </fieldset>
         </div>
