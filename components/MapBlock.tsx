@@ -53,6 +53,23 @@ const mapLayerSources = [
       低潛勢: '#facc15',
     } as Record<string, string>,
   },
+  {
+    // 24hr / 500mm scenario, clipped to within 2km of the research villages
+    id: 'flood-potential',
+    label: '淹水潛勢 (24hr 500mm)',
+    url: '/layers/flood-potential-24h500mm.geojson',
+    color: '#3b82f6',
+    type: 'geojson' as const,
+    weight: 0,
+    categoryField: 'depth',
+    categoryColors: {
+      '0.3-0.5': '#bfdbfe',
+      '0.5-1': '#60a5fa',
+      '1-2': '#2563eb',
+      '2-3': '#1e40af',
+      '>3': '#172554',
+    } as Record<string, string>,
+  },
 ];
 
 const VILLAGE_BOUNDARIES_URL = '/village-boundaries.geojson';
@@ -227,6 +244,7 @@ const MapBlock: React.FC<MapBlockProps> = ({
           const labelField = 'labelField' in source ? source.labelField : undefined;
           const categoryField = 'categoryField' in source ? source.categoryField : undefined;
           const categoryColors = 'categoryColors' in source ? source.categoryColors : undefined;
+          const weight = 'weight' in source ? source.weight : 2;
           try {
             const geoJson = type === 'geojson' ? await fetch(url).then((res) => res.json()) : await shp(url);
             if (layersCancelled) return;
@@ -240,7 +258,7 @@ const MapBlock: React.FC<MapBlockProps> = ({
                   fillColor: featureColor,
                   fillOpacity: categoryColors ? 0.35 : 0.12,
                   opacity: 0.8,
-                  weight: 2,
+                  weight,
                 };
               },
               pointToLayer: (_feature: unknown, latLng: unknown) =>
@@ -407,7 +425,7 @@ const MapBlock: React.FC<MapBlockProps> = ({
                       <span>{label}</span>
                     </label>
                     {categoryColors && enabledMapLayers[id] && (
-                      <div className="ml-6 mt-1 flex gap-2">
+                      <div className="ml-6 mt-1 flex max-w-[11rem] flex-wrap gap-x-2 gap-y-0.5">
                         {Object.entries(categoryColors).map(([category, categoryColor]) => (
                           <span key={category} className="flex items-center gap-1 text-[10px] text-slate-600">
                             <span className="h-2 w-2 rounded-sm" style={{ backgroundColor: categoryColor }} />
