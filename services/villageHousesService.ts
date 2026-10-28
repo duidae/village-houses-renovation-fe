@@ -36,6 +36,19 @@ export interface VillageHouseRecord {
   streetViewUrl: string;
   populationHistory: { year: number; population: number; households?: number }[];
   populationStructure: PopulationStructure | null;
+  // 宅院面向分析 radar values (A-D雷達值), 0-100.
+  aspectScores: {
+    communityConnection: number;
+    buildingCondition: number;
+    historicalValue: number;
+    courtyardLayout: number;
+  } | null;
+}
+
+function toScore(value: string | undefined): number | null {
+  if (!value?.trim()) return null;
+  const score = Number(value);
+  return Number.isNaN(score) ? null : score;
 }
 
 // Handles quoted fields (with embedded commas/newlines) and "" escaping, since
@@ -138,6 +151,10 @@ export function parseVillageHouses(csvText: string): VillageHouseRecord[] {
   const idxElderly = col('社會-人口結構-老年人口(65UP)');
   const idxMale = col('社會-性別(男)');
   const idxFemale = col('社會-性別(女)');
+  const idxCommunityScore = col('A雷達值');
+  const idxBuildingScore = col('B雷達值');
+  const idxHistoryScore = col('C雷達值');
+  const idxLayoutScore = col('D雷達值');
 
   const records: VillageHouseRecord[] = [];
   for (let i = headerIndex + 1; i < rows.length; i++) {
@@ -162,6 +179,20 @@ export function parseVillageHouses(csvText: string): VillageHouseRecord[] {
       elderly: toCount(r[idxElderly]),
     };
     const hasStructure = Object.values(structure).some((v) => v > 0);
+
+    const communityScore = toScore(r[idxCommunityScore]);
+    const buildingScore = toScore(r[idxBuildingScore]);
+    const historyScore = toScore(r[idxHistoryScore]);
+    const layoutScore = toScore(r[idxLayoutScore]);
+    const aspectScores =
+      communityScore !== null && buildingScore !== null && historyScore !== null && layoutScore !== null
+        ? {
+            communityConnection: communityScore,
+            buildingCondition: buildingScore,
+            historicalValue: historyScore,
+            courtyardLayout: layoutScore,
+          }
+        : null;
 
     records.push({
       id: r[idxId],
@@ -196,6 +227,7 @@ export function parseVillageHouses(csvText: string): VillageHouseRecord[] {
         }))
         .filter((p) => p.population > 0),
       populationStructure: hasStructure ? structure : null,
+      aspectScores,
     });
   }
   return records;

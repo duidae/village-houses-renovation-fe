@@ -116,35 +116,43 @@ const LAYOUT_SCORES: { pattern: RegExp; layout: number; history: number; note: s
   { pattern: /水泥連棟/, layout: 3, history: 2, note: '連棟式建築缺乏院落，戶外空間有限' },
 ];
 
-// 宅院面向分析: 社區連結 and 建築物狀況 are derived from the mock values above;
-// 歷史價值 and 院落配置 come from the sheet's 建築型態 and 文資身分.
+// The sheet's A-D雷達值 are 0-100; the radar chart uses 0-10.
+const toTenPointScale = (score: number) => Math.round(score) / 10;
+
+// 宅院面向分析: scores come from the sheet's A-D雷達值 when present, otherwise
+// 社區連結 and 建築物狀況 are derived from the mock values above and 歷史價值 and
+// 院落配置 from the sheet's 建築型態 and 文資身分. The analysis text is always
+// derived that way.
 export function estimateAspectAnalysis(record: VillageHouseRecord): AspectAnalysis {
   const connectivity = mockConnectivity(record);
   const condition = mockCondition(record);
   const layout = LAYOUT_SCORES.find(({ pattern }) => pattern.test(record.buildingType));
   const buildingType = record.buildingType || '未分類';
+  const sheetScores = record.aspectScores;
 
   return {
     communityConnection: {
-      score: 4 + connectivity.length * 2,
+      score: sheetScores ? toTenPointScale(sheetScores.communityConnection) : 4 + connectivity.length * 2,
       analysis: connectivity.length > 0
         ? `${connectivity.map((option) => `**${CONNECTIVITY_LABELS[option]}**`).join('、')}。`
         : '未位於主幹道，周邊**公共設施與大眾運輸**皆較遠。',
     },
     buildingCondition: {
-      score: 4 + condition.length * 3,
+      score: sheetScores ? toTenPointScale(sheetScores.buildingCondition) : 4 + condition.length * 3,
       analysis: condition.length > 0
         ? `${condition.map((option) => `**${option}**`).join('、')}${condition.length < 2 ? '，其餘項目需進一步評估' : ''}。`
         : '結構與維護狀態**皆待改善**，整建前需詳細調查。',
     },
     historicalValue: {
-      score: Math.min(10, (layout?.history ?? 4) + (record.isHeritage ? 3 : 0)),
+      score: sheetScores
+        ? toTenPointScale(sheetScores.historicalValue)
+        : Math.min(10, (layout?.history ?? 4) + (record.isHeritage ? 3 : 0)),
       analysis: record.isHeritage
         ? `具**文化資產身分**，建築型態為**${buildingType}**。`
         : `建築型態為**${buildingType}**，尚未具文資身分。`,
     },
     courtyardLayout: {
-      score: layout?.layout ?? 4,
+      score: sheetScores ? toTenPointScale(sheetScores.courtyardLayout) : layout?.layout ?? 4,
       analysis: `**${buildingType}**格局，${layout?.note ?? '院落配置需現地確認'}。`,
     },
   };

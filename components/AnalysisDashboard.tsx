@@ -405,11 +405,11 @@ const describeHouse = (aspects: AspectAnalysis): string => {
     const { historicalValue, buildingCondition, courtyardLayout, communityConnection } = aspects;
     const traits = [
         historicalValue.score >= 7 ? '具有歷史文化價值' : historicalValue.score >= 5 ? '具一定的傳統建築特色' : '歷史價值較為有限',
-        buildingCondition.score >= 10 ? '建築物狀況良好' : buildingCondition.score >= 7 ? '建築物狀況尚可、部分項目需維護' : '建築物狀況需加強維護管理',
-        courtyardLayout.score >= 9 ? '院落空間完整' : courtyardLayout.score >= 5 ? '院落空間具有一定的完整度' : '院落空間較為有限',
+        buildingCondition.score >= 8.5 ? '建築物狀況良好' : buildingCondition.score >= 7 ? '建築物狀況尚可、部分項目需維護' : '建築物狀況需加強維護管理',
+        courtyardLayout.score >= 7 ? '院落空間完整' : courtyardLayout.score >= 5 ? '院落空間具有一定的完整度' : '院落空間較為有限',
         communityConnection.score >= 8 ? '周邊交通與生活機能便利' : communityConnection.score >= 6 ? '周邊交通與生活機能普通' : '周邊交通與生活機能較為不便',
     ];
-    const first = buildingCondition.score >= 10 ? '建議可直接規劃活化使用' : '建議先進行簡易整修';
+    const first = buildingCondition.score >= 8.5 ? '建議可直接規劃活化使用' : '建議先進行簡易整修';
     const next = courtyardLayout.score >= 5 ? '後續可向外發展為戶外活動使用' : '後續以室內活動空間為主';
     return `${traits.join('、')}，因此${first}，${next}。`;
 };
