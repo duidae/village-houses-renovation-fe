@@ -33,6 +33,13 @@ const mapLayerSources = [
     color: '#9333ea',
     type: 'geojson' as const,
   },
+  {
+    id: 'meishan-fault',
+    label: '梅山斷層地質敏感區',
+    url: '/layers/meishan-fault.geojson',
+    color: '#dc2626',
+    type: 'geojson' as const,
+  },
 ];
 
 const VILLAGE_BOUNDARIES_URL = '/village-boundaries.geojson';
