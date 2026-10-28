@@ -36,6 +36,8 @@ export interface VillageHouseRecord {
   streetViewUrl: string;
   populationHistory: { year: number; population: number; households?: number }[];
   populationStructure: PopulationStructure | null;
+  // 整建潛能總分, 0-100.
+  potentialScore: number | null;
   // 宅院面向分析 radar values (A-D雷達值), 0-100.
   aspectScores: {
     communityConnection: number;
@@ -155,6 +157,7 @@ export function parseVillageHouses(csvText: string): VillageHouseRecord[] {
   const idxBuildingScore = col('B雷達值');
   const idxHistoryScore = col('C雷達值');
   const idxLayoutScore = col('D雷達值');
+  const idxPotentialScore = col('整建潛能總分');
 
   const records: VillageHouseRecord[] = [];
   for (let i = headerIndex + 1; i < rows.length; i++) {
@@ -227,6 +230,7 @@ export function parseVillageHouses(csvText: string): VillageHouseRecord[] {
         }))
         .filter((p) => p.population > 0),
       populationStructure: hasStructure ? structure : null,
+      potentialScore: toScore(r[idxPotentialScore]),
       aspectScores,
     });
   }
@@ -256,11 +260,14 @@ function houseLabel(record: VillageHouseRecord): string {
   return `${record.community} 第${suffix}號宅院`;
 }
 
-// The source sheet has no renovation-potential score or market price, so both
-// are derived here from the signals that do exist (building type, heritage
-// status, rural-revitalization designation, population trend). These are
-// heuristic placeholders, not measured/reported values.
+// The renovation-potential score comes from the sheet's 整建潛能總分. When that
+// is blank, it and the market price (which the sheet doesn't have at all) are
+// derived from the signals that do exist (building type, heritage status,
+// rural-revitalization designation, population trend). These are heuristic
+// placeholders, not measured/reported values.
 function estimateScore(record: VillageHouseRecord): number {
+  if (record.potentialScore !== null) return Math.round(record.potentialScore * 10) / 10;
+
   let score = 50;
   if (record.isHeritage) score += 20;
   if (record.isRuralRevitalizationCommunity) score += 10;
