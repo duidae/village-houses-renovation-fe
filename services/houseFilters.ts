@@ -25,7 +25,7 @@ export function matchesFilters(house: PropertyMarker, filters: HouseFilters): bo
     (filters.potential === '全部' || getPotentialLevel(house.score) === filters.potential) &&
     (filters.reuse === '全部' || house.reuseTypes.includes(filters.reuse)) &&
     (filters.connectivity === '全部' || house.connectivity.includes(filters.connectivity)) &&
-    (filters.condition === '全部' || house.condition.includes(filters.condition))
+    (filters.condition === '全部' || house.condition === filters.condition)
   );
 }
 

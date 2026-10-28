@@ -113,7 +113,7 @@ export const CONNECTIVITY_OPTIONS = [
 ] as const;
 export type ConnectivityOption = (typeof CONNECTIVITY_OPTIONS)[number];
 
-export const CONDITION_OPTIONS = ['結構狀態良好', '維護狀態良好'] as const;
+export const CONDITION_OPTIONS = ['高', '中', '低'] as const;
 export type ConditionOption = (typeof CONDITION_OPTIONS)[number];
 
 // Every filter is single-select and independent; a house must satisfy all of

@@ -1,6 +1,6 @@
-import type { AnalysisData, PopulationStructure } from '../types';
+import { CONDITION_OPTIONS, type AnalysisData, type ConditionOption, type PopulationStructure } from '../types';
 import type { PropertyMarker } from '../mocks/properties';
-import { estimateAspectAnalysis, estimateReuseTypes, mockCondition, mockConnectivity } from '../mocks/houseAttributes';
+import { estimateAspectAnalysis, estimateReuseTypes, mockConnectivity } from '../mocks/houseAttributes';
 
 const CSV_URL =
   'https://docs.google.com/spreadsheets/d/e/2PACX-1vTsaWfKW2CrtMoHJ3F_M0gV4C5dCg6FdPGSNTkI00MwDrr99okfDYt6TpZPyO3X8w/pub?gid=318668856&single=true&output=csv';
@@ -36,6 +36,7 @@ export interface VillageHouseRecord {
   streetViewUrl: string;
   populationHistory: { year: number; population: number; households?: number }[];
   populationStructure: PopulationStructure | null;
+  buildingCondition: ConditionOption | null; // 建築物狀況 (高/中/低)
   // 整建潛能總分, 0-100.
   potentialScore: number | null;
   // 宅院面向分析 radar values (A-D雷達值), 0-100.
@@ -45,6 +46,11 @@ export interface VillageHouseRecord {
     historicalValue: number;
     courtyardLayout: number;
   } | null;
+}
+
+function toConditionLevel(value: string | undefined): ConditionOption | null {
+  const level = value?.trim();
+  return CONDITION_OPTIONS.find((option) => option === level) ?? null;
 }
 
 function toScore(value: string | undefined): number | null {
@@ -158,6 +164,7 @@ export function parseVillageHouses(csvText: string): VillageHouseRecord[] {
   const idxHistoryScore = col('C雷達值');
   const idxLayoutScore = col('D雷達值');
   const idxPotentialScore = col('整建潛能總分');
+  const idxBuildingCondition = col('建築物狀況');
 
   const records: VillageHouseRecord[] = [];
   for (let i = headerIndex + 1; i < rows.length; i++) {
@@ -230,6 +237,7 @@ export function parseVillageHouses(csvText: string): VillageHouseRecord[] {
         }))
         .filter((p) => p.population > 0),
       populationStructure: hasStructure ? structure : null,
+      buildingCondition: toConditionLevel(r[idxBuildingCondition]),
       potentialScore: toScore(r[idxPotentialScore]),
       aspectScores,
     });
@@ -305,7 +313,7 @@ export function toPropertyMarker(record: VillageHouseRecord): PropertyMarker {
     isRuralRevitalizationCommunity: record.isRuralRevitalizationCommunity,
     reuseTypes: estimateReuseTypes(record),
     connectivity: mockConnectivity(record),
-    condition: mockCondition(record),
+    condition: record.buildingCondition,
   };
 }
 

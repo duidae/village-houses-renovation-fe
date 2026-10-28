@@ -1,8 +1,8 @@
 import type { AspectAnalysis, ConditionOption, ConnectivityOption, ReuseType } from '../types';
 import type { VillageHouseRecord } from '../services/villageHousesService';
 
-// MOCK DATA: the source sheet has no reuse-type, road/transit/amenity or
-// building-condition data yet (the 公共服務設施-* columns exist but are empty).
+// MOCK DATA: the source sheet has no reuse-type or road/transit/amenity data
+// yet (the 公共服務設施-* columns exist but are empty).
 // These placeholders let the filters work end to end; replace each function
 // with the real column once the sheet has it.
 
@@ -94,12 +94,12 @@ export function mockConnectivity(record: VillageHouseRecord): ConnectivityOption
   return options;
 }
 
-export function mockCondition(record: VillageHouseRecord): ConditionOption[] {
-  const options: ConditionOption[] = [];
-  if (hashUnit(record.id, 'structure') < 0.6) options.push('結構狀態良好');
-  if (hashUnit(record.id, 'maintenance') < 0.5) options.push('維護狀態良好');
-  return options;
-}
+// 建築物狀況 text and fallback score for the sheet's 高/中/低 level.
+const CONDITION_ASPECTS: Record<ConditionOption, { score: number; analysis: string }> = {
+  高: { score: 9, analysis: '建築物狀況評估為**高**，結構與維護狀態良好。' },
+  中: { score: 6.5, analysis: '建築物狀況評估為**中**，部分項目需維護。' },
+  低: { score: 4, analysis: '建築物狀況評估為**低**，整建前需詳細調查。' },
+};
 
 const CONNECTIVITY_LABELS: Record<ConnectivityOption, string> = {
   '地點佳，主幹道上': '位於主幹道上',
@@ -120,12 +120,12 @@ const LAYOUT_SCORES: { pattern: RegExp; layout: number; history: number; note: s
 const toTenPointScale = (score: number) => Math.round(score) / 10;
 
 // 宅院面向分析: scores come from the sheet's A-D雷達值 when present, otherwise
-// 社區連結 and 建築物狀況 are derived from the mock values above and 歷史價值 and
-// 院落配置 from the sheet's 建築型態 and 文資身分. The analysis text is always
-// derived that way.
+// 社區連結 is derived from the mock values above, 建築物狀況 from the sheet's
+// 建築物狀況 level, and 歷史價值 and 院落配置 from the sheet's 建築型態 and
+// 文資身分. The analysis text is always derived that way.
 export function estimateAspectAnalysis(record: VillageHouseRecord): AspectAnalysis {
   const connectivity = mockConnectivity(record);
-  const condition = mockCondition(record);
+  const condition = record.buildingCondition ? CONDITION_ASPECTS[record.buildingCondition] : null;
   const layout = LAYOUT_SCORES.find(({ pattern }) => pattern.test(record.buildingType));
   const buildingType = record.buildingType || '未分類';
   const sheetScores = record.aspectScores;
@@ -138,10 +138,8 @@ export function estimateAspectAnalysis(record: VillageHouseRecord): AspectAnalys
         : '未位於主幹道，周邊**公共設施與大眾運輸**皆較遠。',
     },
     buildingCondition: {
-      score: sheetScores ? toTenPointScale(sheetScores.buildingCondition) : 4 + condition.length * 3,
-      analysis: condition.length > 0
-        ? `${condition.map((option) => `**${option}**`).join('、')}${condition.length < 2 ? '，其餘項目需進一步評估' : ''}。`
-        : '結構與維護狀態**皆待改善**，整建前需詳細調查。',
+      score: sheetScores ? toTenPointScale(sheetScores.buildingCondition) : condition?.score ?? 5,
+      analysis: condition?.analysis ?? '建築物狀況**待評估**，整建前需現地調查。',
     },
     historicalValue: {
       score: sheetScores

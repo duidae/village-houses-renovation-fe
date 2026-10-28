@@ -16,5 +16,5 @@ export interface PropertyMarker {
   isRuralRevitalizationCommunity?: boolean; // 是否為農村再生社區
   reuseTypes: ReuseType[]; // 建議再利用類型 (rule-based estimate)
   connectivity: ConnectivityOption[]; // 社區連結 (mock)
-  condition: ConditionOption[]; // 建築物狀況 (mock)
+  condition: ConditionOption | null; // 建築物狀況
 }
