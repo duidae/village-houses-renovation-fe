@@ -120,6 +120,12 @@ const MapBlock: React.FC<MapBlockProps> = ({
     () => Object.fromEntries(mapLayerSources.map(({ id }) => [id, false]))
   );
   const enabledMapLayersRef = useRef(enabledMapLayers);
+  const enabledLayerCount = Object.values(enabledMapLayers).filter(Boolean).length;
+  // The layer panel covers most of the map on phones, so it starts collapsed
+  // below the md breakpoint.
+  const [isLayerPanelOpen, setIsLayerPanelOpen] = useState(
+    () => typeof window === 'undefined' || window.matchMedia('(min-width: 768px)').matches
+  );
   const mapRef = useRef<any>(null);
   const mapLayerGroupsRef = useRef<Record<string, any>>({});
 
@@ -402,43 +408,69 @@ const MapBlock: React.FC<MapBlockProps> = ({
             id="map-container"
             className="w-full h-96 md:h-full rounded-lg border border-slate-200 overflow-hidden bg-slate-50"
           />
-          <fieldset className="absolute right-3 top-3 z-[500] m-0 rounded-lg border border-slate-200 bg-white/95 p-3 shadow-md backdrop-blur-sm">
-            <legend className="px-1 text-xs font-semibold text-slate-700">圖層</legend>
-            <div className="space-y-2">
-              {mapLayerSources.map(({ id, label, color, ...source }) => {
-                const categoryColors = 'categoryColors' in source ? source.categoryColors : undefined;
-                return (
-                  <div key={id}>
-                    <label className="flex cursor-pointer items-center gap-2 text-xs text-slate-700">
-                      <input
-                        type="checkbox"
-                        checked={enabledMapLayers[id]}
-                        onChange={() =>
-                          setEnabledMapLayers((current) => ({
-                            ...current,
-                            [id]: !current[id],
-                          }))
-                        }
-                        className="h-3.5 w-3.5 accent-emerald-600"
-                      />
-                      <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: color }} />
-                      <span>{label}</span>
-                    </label>
-                    {categoryColors && enabledMapLayers[id] && (
-                      <div className="ml-6 mt-1 flex max-w-[11rem] flex-wrap gap-x-2 gap-y-0.5">
-                        {Object.entries(categoryColors).map(([category, categoryColor]) => (
-                          <span key={category} className="flex items-center gap-1 text-[10px] text-slate-600">
-                            <span className="h-2 w-2 rounded-sm" style={{ backgroundColor: categoryColor }} />
-                            {category}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </fieldset>
+          <div className="absolute right-3 top-3 z-[500] rounded-lg border border-slate-200 bg-white/95 shadow-md backdrop-blur-sm">
+            <button
+              type="button"
+              onClick={() => setIsLayerPanelOpen((open) => !open)}
+              aria-expanded={isLayerPanelOpen}
+              aria-controls="map-layer-panel"
+              className="flex w-full items-center justify-between gap-2 px-3 py-2 text-xs font-semibold text-slate-700"
+            >
+              <span className="flex items-center gap-1.5">
+                圖層
+                {!isLayerPanelOpen && enabledLayerCount > 0 && (
+                  <span className="rounded-full bg-emerald-600 px-1.5 text-[10px] leading-4 text-white">{enabledLayerCount}</span>
+                )}
+              </span>
+              <svg
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                aria-hidden="true"
+                className={`h-3.5 w-3.5 transition-transform ${isLayerPanelOpen ? 'rotate-180' : ''}`}
+              >
+                <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.17l3.71-3.94a.75.75 0 1 1 1.08 1.04l-4.25 4.5a.75.75 0 0 1-1.08 0l-4.25-4.5a.75.75 0 0 1 .02-1.06Z" clipRule="evenodd" />
+              </svg>
+            </button>
+            {isLayerPanelOpen && (
+            <fieldset id="map-layer-panel" className="m-0 border-0 px-3 pb-3 pt-0">
+              <legend className="sr-only">圖層</legend>
+              <div className="space-y-2">
+                {mapLayerSources.map(({ id, label, color, ...source }) => {
+                  const categoryColors = 'categoryColors' in source ? source.categoryColors : undefined;
+                  return (
+                    <div key={id}>
+                      <label className="flex cursor-pointer items-center gap-2 text-xs text-slate-700">
+                        <input
+                          type="checkbox"
+                          checked={enabledMapLayers[id]}
+                          onChange={() =>
+                            setEnabledMapLayers((current) => ({
+                              ...current,
+                              [id]: !current[id],
+                            }))
+                          }
+                          className="h-3.5 w-3.5 accent-emerald-600"
+                        />
+                        <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: color }} />
+                        <span>{label}</span>
+                      </label>
+                      {categoryColors && enabledMapLayers[id] && (
+                        <div className="ml-6 mt-1 flex max-w-[11rem] flex-wrap gap-x-2 gap-y-0.5">
+                          {Object.entries(categoryColors).map(([category, categoryColor]) => (
+                            <span key={category} className="flex items-center gap-1 text-[10px] text-slate-600">
+                              <span className="h-2 w-2 rounded-sm" style={{ backgroundColor: categoryColor }} />
+                              {category}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </fieldset>
+            )}
+          </div>
         </div>
 
         {/* Right Panel - Selected Property Details */}
