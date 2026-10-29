@@ -255,9 +255,9 @@ const describeLocation = (tab: LocationTab, connectivity: ConnectivityOption[]):
         case '道路系統':
             return connectivity.includes('地點佳，主幹道上') ? '個宅位於主幹道上' : '個宅未位於主幹道上';
         case '公共運輸站點':
-            return connectivity.includes('交通佳，至最近公共運輸站點的直線距離<=300m')
-                ? '個宅至最近公共運輸站點的直線距離 ≤ 300公尺'
-                : '個宅周邊300公尺範圍內無公共運輸站點';
+            return connectivity.includes('交通佳，300m內有公共運輸站點或500m內有火車站')
+                ? '個宅300公尺內有公共運輸站點，或500公尺內有火車站'
+                : '個宅周邊300公尺內無公共運輸站點，且500公尺內無火車站';
         case '公共服務設施':
             return connectivity.includes('有公共設施，方圓半徑300公尺內有迎毗設施')
                 ? '周邊300公尺範圍內有迎毗公共設施'

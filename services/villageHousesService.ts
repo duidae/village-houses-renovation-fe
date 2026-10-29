@@ -1,6 +1,6 @@
 import { CONDITION_OPTIONS, type AnalysisData, type ConditionOption, type PopulationStructure } from '../types';
 import type { PropertyMarker } from '../mocks/properties';
-import { estimateAspectAnalysis, estimateReuseTypes, mockConnectivity } from '../mocks/houseAttributes';
+import { estimateAspectAnalysis, estimateReuseTypes, getConnectivity } from '../mocks/houseAttributes';
 
 const CSV_URL =
   'https://docs.google.com/spreadsheets/d/e/2PACX-1vTsaWfKW2CrtMoHJ3F_M0gV4C5dCg6FdPGSNTkI00MwDrr99okfDYt6TpZPyO3X8w/pub?gid=318668856&single=true&output=csv';
@@ -37,6 +37,10 @@ export interface VillageHouseRecord {
   populationHistory: { year: number; population: number; households?: number }[];
   populationStructure: PopulationStructure | null;
   buildingCondition: ConditionOption | null; // 建築物狀況 (高/中/低)
+  // 公共服務設施 grades (1/3/5, higher is better).
+  roadAccess: number | null; // 道路系統
+  publicFacilities: number | null; // 公共服務設施
+  transitAccess: number | null; // 公共運輸站點
   // 整建潛能總分, 0-100.
   potentialScore: number | null;
   // 宅院面向分析 radar values (A-D雷達值), 0-100.
@@ -165,6 +169,9 @@ export function parseVillageHouses(csvText: string): VillageHouseRecord[] {
   const idxLayoutScore = col('D雷達值');
   const idxPotentialScore = col('整建潛能總分');
   const idxBuildingCondition = col('建築物狀況');
+  const idxRoadAccess = col('公共服務設施-道路系統(距離數字區間)');
+  const idxPublicFacilities = col('公共服務設施-公共服務設施');
+  const idxTransitAccess = col('公共服務設施-公共運輸站點(距離數字區間)');
 
   const records: VillageHouseRecord[] = [];
   for (let i = headerIndex + 1; i < rows.length; i++) {
@@ -238,6 +245,9 @@ export function parseVillageHouses(csvText: string): VillageHouseRecord[] {
         .filter((p) => p.population > 0),
       populationStructure: hasStructure ? structure : null,
       buildingCondition: toConditionLevel(r[idxBuildingCondition]),
+      roadAccess: toScore(r[idxRoadAccess]),
+      publicFacilities: toScore(r[idxPublicFacilities]),
+      transitAccess: toScore(r[idxTransitAccess]),
       potentialScore: toScore(r[idxPotentialScore]),
       aspectScores,
     });
@@ -312,7 +322,7 @@ export function toPropertyMarker(record: VillageHouseRecord): PropertyMarker {
     isInKeyArea: record.isInKeyArea,
     isRuralRevitalizationCommunity: record.isRuralRevitalizationCommunity,
     reuseTypes: estimateReuseTypes(record),
-    connectivity: mockConnectivity(record),
+    connectivity: getConnectivity(record),
     condition: record.buildingCondition,
   };
 }
@@ -379,6 +389,6 @@ export function buildAnalysisDataForRecord(base: AnalysisData, record: VillageHo
     populationStructure: record.populationStructure,
     aspectAnalysis: estimateAspectAnalysis(record),
     reuseTypes: estimateReuseTypes(record),
-    connectivity: mockConnectivity(record),
+    connectivity: getConnectivity(record),
   };
 }

@@ -109,7 +109,7 @@ export type PotentialLevel = (typeof POTENTIAL_LEVELS)[number];
 export const CONNECTIVITY_OPTIONS = [
   '地點佳，主幹道上',
   '有公共設施，方圓半徑300公尺內有迎毗設施',
-  '交通佳，至最近公共運輸站點的直線距離<=300m',
+  '交通佳，300m內有公共運輸站點或500m內有火車站',
 ] as const;
 export type ConnectivityOption = (typeof CONNECTIVITY_OPTIONS)[number];
 

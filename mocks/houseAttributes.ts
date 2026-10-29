@@ -1,10 +1,9 @@
 import type { AspectAnalysis, ConditionOption, ConnectivityOption, ReuseType } from '../types';
 import type { VillageHouseRecord } from '../services/villageHousesService';
 
-// MOCK DATA: the source sheet has no reuse-type or road/transit/amenity data
-// yet (the 公共服務設施-* columns exist but are empty).
-// These placeholders let the filters work end to end; replace each function
-// with the real column once the sheet has it.
+// MOCK DATA: the source sheet has no reuse-type data yet. This placeholder
+// lets the filter work end to end; replace it with the real column once the
+// sheet has it.
 
 const REUSE_RULES: { type: ReuseType; pattern: RegExp; fields: (r: VillageHouseRecord) => string }[] = [
   {
@@ -75,22 +74,16 @@ export function estimateReuseTypes(record: VillageHouseRecord): ReuseType[] {
   return [...types];
 }
 
-// Stable pseudo-random value in [0, 1) per house + key, so mock values don't
-// change between reloads.
-function hashUnit(id: string, key: string): number {
-  let hash = 2166136261;
-  for (const char of `${id}:${key}`) {
-    hash ^= char.charCodeAt(0);
-    hash = Math.imul(hash, 16777619);
-  }
-  return (hash >>> 0) / 2 ** 32;
-}
-
-export function mockConnectivity(record: VillageHouseRecord): ConnectivityOption[] {
+// 社區連結 from the sheet's 公共服務設施-* columns (1/3/5). Each option is that
+// column's top grade (5):
+// - 道路系統: <=30m from a main road (鄉道/縣道)
+// - 公共服務設施: a welcomed facility (圖書館、學校、社區活動中心) within 300m
+// - 公共運輸站點: <=300m to a public transport stop, or <=500m to a train station
+export function getConnectivity(record: VillageHouseRecord): ConnectivityOption[] {
   const options: ConnectivityOption[] = [];
-  if (hashUnit(record.id, 'mainRoad') < 0.4) options.push('地點佳，主幹道上');
-  if (hashUnit(record.id, 'amenity') < 0.5) options.push('有公共設施，方圓半徑300公尺內有迎毗設施');
-  if (hashUnit(record.id, 'transit') < 0.3) options.push('交通佳，至最近公共運輸站點的直線距離<=300m');
+  if (record.roadAccess === 5) options.push('地點佳，主幹道上');
+  if (record.publicFacilities === 5) options.push('有公共設施，方圓半徑300公尺內有迎毗設施');
+  if (record.transitAccess === 5) options.push('交通佳，300m內有公共運輸站點或500m內有火車站');
   return options;
 }
 
@@ -104,7 +97,7 @@ const CONDITION_ASPECTS: Record<ConditionOption, { score: number; analysis: stri
 const CONNECTIVITY_LABELS: Record<ConnectivityOption, string> = {
   '地點佳，主幹道上': '位於主幹道上',
   '有公共設施，方圓半徑300公尺內有迎毗設施': '300公尺內有迎毗設施',
-  '交通佳，至最近公共運輸站點的直線距離<=300m': '300公尺內有公共運輸站點',
+  '交通佳，300m內有公共運輸站點或500m內有火車站': '300公尺內有公共運輸站點或500公尺內有火車站',
 };
 
 // Courtyard layout and historical value follow the building type, from most to
@@ -120,11 +113,11 @@ const LAYOUT_SCORES: { pattern: RegExp; layout: number; history: number; note: s
 const toTenPointScale = (score: number) => Math.round(score) / 10;
 
 // 宅院面向分析: scores come from the sheet's A-D雷達值 when present, otherwise
-// 社區連結 is derived from the mock values above, 建築物狀況 from the sheet's
+// 社區連結 is derived from the 公共服務設施 grades above, 建築物狀況 from the sheet's
 // 建築物狀況 level, and 歷史價值 and 院落配置 from the sheet's 建築型態 and
 // 文資身分. The analysis text is always derived that way.
 export function estimateAspectAnalysis(record: VillageHouseRecord): AspectAnalysis {
-  const connectivity = mockConnectivity(record);
+  const connectivity = getConnectivity(record);
   const condition = record.buildingCondition ? CONDITION_ASPECTS[record.buildingCondition] : null;
   const layout = LAYOUT_SCORES.find(({ pattern }) => pattern.test(record.buildingType));
   const buildingType = record.buildingType || '未分類';
