@@ -23,7 +23,9 @@ export function matchesFilters(house: PropertyMarker, filters: HouseFilters): bo
   return (
     (filters.area === '全部' || researchAreaLabel(house) === filters.area) &&
     (filters.potential === '全部' || getPotentialLevel(house.score) === filters.potential) &&
-    (filters.reuse === '全部' || house.reuseTypes.includes(filters.reuse)) &&
+    (filters.reuse === '全部' ||
+      house.reuseSuggestion.primary.includes(filters.reuse) ||
+      house.reuseSuggestion.other.includes(filters.reuse)) &&
     (filters.connectivity === '全部' || house.connectivity.includes(filters.connectivity)) &&
     (filters.condition === '全部' || house.condition === filters.condition)
   );

@@ -1,4 +1,4 @@
-import type { ConditionOption, ConnectivityOption, ReuseType } from '../types';
+import type { ConditionOption, ConnectivityOption, ReuseSuggestion } from '../types';
 
 export interface PropertyMarker {
   id: string;
@@ -14,7 +14,7 @@ export interface PropertyMarker {
   village: string;
   isInKeyArea?: boolean; // 是否位在農村發展重點區
   isRuralRevitalizationCommunity?: boolean; // 是否為農村再生社區
-  reuseTypes: ReuseType[]; // 建議再利用類型 (rule-based estimate)
+  reuseSuggestion: ReuseSuggestion; // 再利用類型建議
   connectivity: ConnectivityOption[]; // 社區連結
   condition: ConditionOption | null; // 建築物狀況
 }

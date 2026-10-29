@@ -43,3 +43,19 @@ export function getAspectLevel(score: number): 1 | 2 | 3 | 4 | 5 {
 export function describeAspectLevel(aspect: keyof AspectAnalysis, score: number): string {
   return ASPECT_LEVEL_DESCRIPTIONS[aspect][getAspectLevel(score) - 1];
 }
+
+// 高/中/低 grade of a 0-100 score, as used by the 再利用類型 rules. Same cut-offs
+// as the sheet's 建築物狀況 column (高 >= 80, 中 >= 60).
+export const ASPECT_GRADES = ['低', '中', '高'] as const;
+export type AspectGrade = (typeof ASPECT_GRADES)[number];
+
+export function getAspectGrade(score: number): AspectGrade {
+  if (score >= 80) return '高';
+  if (score >= 60) return '中';
+  return '低';
+}
+
+// Whether a grade meets a minimum, e.g. 中以上 is atLeast(grade, '中').
+export function atLeast(grade: AspectGrade, minimum: AspectGrade): boolean {
+  return ASPECT_GRADES.indexOf(grade) >= ASPECT_GRADES.indexOf(minimum);
+}

@@ -1,6 +1,7 @@
 import { CONDITION_OPTIONS, type AnalysisData, type ConditionOption, type PopulationStructure } from '../types';
 import type { PropertyMarker } from '../mocks/properties';
-import { estimateAspectAnalysis, estimateReuseTypes, getConnectivity } from '../mocks/houseAttributes';
+import { estimateAspectAnalysis, getConnectivity } from '../mocks/houseAttributes';
+import { suggestReuseTypes } from './reuseTypes';
 
 const CSV_URL =
   'https://docs.google.com/spreadsheets/d/e/2PACX-1vTsaWfKW2CrtMoHJ3F_M0gV4C5dCg6FdPGSNTkI00MwDrr99okfDYt6TpZPyO3X8w/pub?gid=318668856&single=true&output=csv';
@@ -43,7 +44,8 @@ export interface VillageHouseRecord {
   transitAccess: number | null; // 公共運輸站點
   // 整建潛能總分, 0-100.
   potentialScore: number | null;
-  // 宅院面向分析 radar values (A-D雷達值), 0-100.
+  // 宅院面向分析 radar values, 0-100: A雷達值 社區連結, B 歷史價值, C 建築物狀況
+  // (the 建築物狀況 column is C cut at 80/60), D 院落配置.
   aspectScores: {
     communityConnection: number;
     buildingCondition: number;
@@ -164,8 +166,8 @@ export function parseVillageHouses(csvText: string): VillageHouseRecord[] {
   const idxMale = col('社會-性別(男)');
   const idxFemale = col('社會-性別(女)');
   const idxCommunityScore = col('A雷達值');
-  const idxBuildingScore = col('B雷達值');
-  const idxHistoryScore = col('C雷達值');
+  const idxBuildingScore = col('C雷達值');
+  const idxHistoryScore = col('B雷達值');
   const idxLayoutScore = col('D雷達值');
   const idxPotentialScore = col('整建潛能總分');
   const idxBuildingCondition = col('建築物狀況');
@@ -321,7 +323,7 @@ export function toPropertyMarker(record: VillageHouseRecord): PropertyMarker {
     village: record.village,
     isInKeyArea: record.isInKeyArea,
     isRuralRevitalizationCommunity: record.isRuralRevitalizationCommunity,
-    reuseTypes: estimateReuseTypes(record),
+    reuseSuggestion: suggestReuseTypes(record.aspectScores),
     connectivity: getConnectivity(record),
     condition: record.buildingCondition,
   };
@@ -388,7 +390,7 @@ export function buildAnalysisDataForRecord(base: AnalysisData, record: VillageHo
       : base.cityPopulation,
     populationStructure: record.populationStructure,
     aspectAnalysis: estimateAspectAnalysis(record),
-    reuseTypes: estimateReuseTypes(record),
+    reuseSuggestion: suggestReuseTypes(record.aspectScores),
     connectivity: getConnectivity(record),
   };
 }

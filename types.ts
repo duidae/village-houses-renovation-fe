@@ -80,7 +80,7 @@ export interface AnalysisData {
   populationStructure?: PopulationStructure | null;
   schoolEnrollment: SchoolEnrollmentDataPoint[];
   aspectAnalysis: AspectAnalysis;
-  reuseTypes: ReuseType[]; // 再利用類型建議, same values as the 再利用類型方向 filter
+  reuseSuggestion: ReuseSuggestion; // 再利用類型建議, same values as the 再利用類型方向 filter
   connectivity?: ConnectivityOption[]; // 區位與生活機能, same values as the 社區連結 filter
 }
 
@@ -102,6 +102,11 @@ export const REUSE_TYPES = [
 
 export type ReuseType = (typeof REUSE_TYPES)[number];
 export type ReuseFilter = '全部' | ReuseType;
+
+export interface ReuseSuggestion {
+  primary: ReuseType[]; // 主要建議 (組合條件)
+  other: ReuseType[]; // 其他適合方向 (單一條件), excluding primary
+}
 
 export const POTENTIAL_LEVELS = ['高', '中', '低'] as const;
 export type PotentialLevel = (typeof POTENTIAL_LEVELS)[number];

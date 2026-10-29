@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line, XAxis, YAxis, CartesianGrid, Legend, Tooltip, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
-import type { AnalysisData, AspectAnalysis, ConnectivityOption, PopulationDataPoint, PopulationStructure, ReuseType } from '../types';
+import type { AnalysisData, AspectAnalysis, ConnectivityOption, PopulationDataPoint, PopulationStructure, ReuseSuggestion } from '../types';
 import { describeAspectLevel } from '../services/aspectLevels';
+import { REUSE_TYPE_INFO } from '../services/reuseTypes';
 import { fetchPublicFacilities, fetchTransitFacilities, fetchVillageBoundaries, findVillageBoundary, loadLeaflet } from '../services/mapData';
 import { ChartBarIcon, DownloadIcon, ExternalLinkIcon, HomeIcon, LightbulbIcon, PuzzleIcon, UsersIcon } from './icons';
 
@@ -385,33 +386,61 @@ const AspectAnalysisChart: React.FC<{ data: AspectAnalysis }> = ({ data }) => {
 
 // --- 再利用類型建議 -------------------------------------------------------------
 
-const REUSE_TYPE_DESCRIPTIONS: Record<ReuseType, string> = {
-    '照顧療育服務型': '作為長者關懷據點或照顧服務空間，延續社區共餐、送餐等照護能量。',
-    '社區生活共享型': '轉為社區客廳或共享空間，提供居民聚會、交流與志工活動場域。',
-    '文化保存展示型': '保存傳統建築特色，作為地方文史展示或文化導覽據點。',
-    '地方技藝培育型': '作為手工藝、傳統技藝的教學與傳承工坊。',
-    '食農教育體驗型': '結合在地農產，發展食農教育、農事體驗與產地餐桌活動。',
-    '產業加工營運型': '作為在地農產品加工、包裝或品牌營運基地。',
-    '青年創業共創型': '提供青年返鄉創業、共同工作或微型商業空間。',
-    '農遊體驗服務型': '結合休閒農業與觀光資源，作為遊客服務或體驗據點。',
-    '社區安全韌性型': '作為防災避難、物資整備或社區巡守據點。',
-    '兒少/數位共學服務型': '作為兒少課後陪伴、數位學習與共學空間。',
-    '社區健康促進型': '作為健康促進、延緩失能課程與運動保健活動場所。',
-};
-
-// One-paragraph summary of the house built from the four aspect scores.
+// One-paragraph summary of the house built from the four aspect scores (0-10),
+// using the same 高 (>= 8) / 中 (>= 6) / 低 grades as the reuse-type rules.
 const describeHouse = (aspects: AspectAnalysis): string => {
     const { historicalValue, buildingCondition, courtyardLayout, communityConnection } = aspects;
     const traits = [
-        historicalValue.score >= 7 ? '具有歷史文化價值' : historicalValue.score >= 5 ? '具一定的傳統建築特色' : '歷史價值較為有限',
-        buildingCondition.score >= 8.5 ? '建築物狀況良好' : buildingCondition.score >= 7 ? '建築物狀況尚可、部分項目需維護' : '建築物狀況需加強維護管理',
-        courtyardLayout.score >= 7 ? '院落空間完整' : courtyardLayout.score >= 5 ? '院落空間具有一定的完整度' : '院落空間較為有限',
+        historicalValue.score >= 8 ? '具有歷史文化價值' : historicalValue.score >= 6 ? '具一定的傳統建築特色' : '歷史價值較為有限',
+        buildingCondition.score >= 8 ? '建築物狀況良好' : buildingCondition.score >= 6 ? '建築物狀況尚可、部分項目需維護' : '建築物狀況需加強維護管理',
+        courtyardLayout.score >= 8 ? '院落空間完整' : courtyardLayout.score >= 6 ? '院落空間具有一定的完整度' : '院落空間較為有限',
         communityConnection.score >= 8 ? '周邊交通與生活機能便利' : communityConnection.score >= 6 ? '周邊交通與生活機能普通' : '周邊交通與生活機能較為不便',
     ];
-    const first = buildingCondition.score >= 8.5 ? '建議可直接規劃活化使用' : '建議先進行簡易整修';
-    const next = courtyardLayout.score >= 5 ? '後續可向外發展為戶外活動使用' : '後續以室內活動空間為主';
+    const first = buildingCondition.score >= 8 ? '建議可直接規劃活化使用' : '建議先進行簡易整修';
+    const next = courtyardLayout.score >= 6 ? '後續可向外發展為戶外活動使用' : '後續以室內活動空間為主';
     return `${traits.join('、')}，因此${first}，${next}。`;
 };
+
+const ReuseSuggestionPanel: React.FC<{ suggestion: ReuseSuggestion }> = ({ suggestion: { primary, other } }) => (
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[2fr_1fr] lg:divide-x lg:divide-slate-200">
+        <div>
+            <SubHeading className="mb-3">主要建議再利用類型</SubHeading>
+            {primary.length > 0 ? (
+                <ul className="space-y-4 px-3">
+                    {primary.map(type => (
+                        <li key={type}>
+                            <p className="flex flex-wrap items-baseline gap-x-3">
+                                <span className="text-lg font-bold text-brand-text">{type}</span>
+                                <span className="text-sm text-brand-subtext">{REUSE_TYPE_INFO[type].function}</span>
+                            </p>
+                            <div className="mt-2 flex flex-wrap gap-1.5">
+                                {REUSE_TYPE_INFO[type].examples.map(example => (
+                                    <span key={example} className="rounded-full bg-report-sage px-3 py-0.5 text-sm text-brand-text">{example}</span>
+                                ))}
+                            </div>
+                        </li>
+                    ))}
+                </ul>
+            ) : (
+                <div className="px-3">
+                    <p className="text-lg font-bold text-brand-text">–</p>
+                    {other.length > 0 && (
+                        <p className="mt-2 text-sm text-slate-400">
+                            本宅院目前尚無符合多面向組合條件的主要建議類型，仍可參考其他適合方向，並依實際空間條件及後續整建需求進一步評估。
+                        </p>
+                    )}
+                </div>
+            )}
+        </div>
+        <div className="lg:pl-6">
+            <SubHeading className="mb-3">其他適合方向</SubHeading>
+            <p className="px-3 text-lg font-bold text-brand-text">{other.length > 0 ? other.join('、') : '–'}</p>
+        </div>
+        {primary.length === 0 && other.length === 0 && (
+            <p className="px-3 text-sm text-slate-400 lg:col-span-2">依目前四大面向評估結果，本宅院尚無符合設定條件的再利用類型。</p>
+        )}
+    </div>
+);
 
 // --- PDF export ---------------------------------------------------------------
 
@@ -449,7 +478,7 @@ async function downloadReportPdf(element: HTMLElement, fileName: string) {
 export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id }) => {
   const {
       basicInfo, environmentalAnalysis, potentialIndex, cityPopulation, populationStructure,
-      aspectAnalysis, reuseTypes, connectivity = [],
+      aspectAnalysis, reuseSuggestion, connectivity = [],
   } = data;
   const [locationTab, setLocationTab] = useState<LocationTab>('道路系統');
   const [socialTab, setSocialTab] = useState<SocialTab>('人口/戶數');
@@ -530,7 +559,9 @@ export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id }
             <div className="lg:pl-6">
                 <p className="mb-2 text-lg font-bold text-brand-text">建議再利用類型</p>
                 <div className="flex flex-wrap gap-2">
-                    {reuseTypes.length > 0 ? reuseTypes.map(type => <Chip key={type}>{type}</Chip>) : <span className="text-brand-subtext">未提供</span>}
+                    {reuseSuggestion.primary.length > 0
+                        ? reuseSuggestion.primary.map(type => <Chip key={type}>{type}</Chip>)
+                        : <span className="text-brand-subtext">–</span>}
                 </div>
             </div>
         </section>
@@ -649,23 +680,15 @@ export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id }
 
         {/* 再利用類型建議 */}
         <ReportSection title="再利用類型建議" icon={<LightbulbIcon className="h-6 w-6" />}>
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_2fr] lg:divide-x lg:divide-slate-200">
+            <div className="space-y-6">
                 <div>
                     <SubHeading className="mb-3">宅院特性</SubHeading>
                     <p className="leading-relaxed text-brand-subtext px-3">{describeHouse(aspectAnalysis)}</p>
                 </div>
-                <div className="lg:pl-6">
-                    <SubHeading className="mb-3">再利用類型</SubHeading>
-                    <ul className="space-y-3 px-3">
-                        {reuseTypes.map(type => (
-                            <li key={type} className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
-                                <Chip className="text-lg">{type}</Chip>
-                                <span className="text-brand-subtext">{REUSE_TYPE_DESCRIPTIONS[type]}</span>
-                            </li>
-                        ))}
-                    </ul>
-                    <p className="mt-3 px-3 text-xs text-slate-400">依建築型態、在地產業、地方文化與社區組織運作狀況推估，僅供參考。</p>
-                </div>
+                <ReuseSuggestionPanel suggestion={reuseSuggestion} />
+                <p className="px-3 text-xs text-slate-400">
+                    「主要建議」依兩項以上面向之組合條件判定；「其他適合方向」依單一面向條件篩選，並排除已列為主要建議之類型。面向分數 80 以上為高、60 以上為中。
+                </p>
             </div>
         </ReportSection>
     </div>

@@ -27,7 +27,7 @@ export const mockAnalysisData: AnalysisData = {
     { year: 2020, studentCount: 180 },
     { year: 2025, studentCount: 150 },
   ],
-  reuseTypes: ['文化保存展示型', '食農教育體驗型'],
+  reuseSuggestion: { primary: ['文化保存展示型', '食農教育體驗型'], other: [] },
   aspectAnalysis: {
     communityConnection: { score: 6, analysis: '鄰近**社區活動中心**，步行可達。' },
     buildingCondition: { score: 7, analysis: '主體**結構狀態良好**，部分屋瓦需修繕。' },

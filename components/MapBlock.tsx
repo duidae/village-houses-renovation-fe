@@ -493,12 +493,24 @@ const MapBlock: React.FC<MapBlockProps> = ({
                 )}
 
                 {/* Suggested reuse types */}
-                {selectedProperty.reuseTypes.length > 0 && (
+                {selectedProperty.reuseSuggestion.primary.length > 0 && (
                   <div>
-                    <p className="text-xs text-slate-500 uppercase mb-1">建議再利用類型（推估）</p>
+                    <p className="text-xs text-slate-500 uppercase mb-1">主要建議再利用類型</p>
                     <div className="flex flex-wrap gap-1.5">
-                      {selectedProperty.reuseTypes.map((type) => (
+                      {selectedProperty.reuseSuggestion.primary.map((type) => (
                         <span key={type} className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800">
+                          {type}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {selectedProperty.reuseSuggestion.other.length > 0 && (
+                  <div>
+                    <p className="text-xs text-slate-500 uppercase mb-1">其他適合方向</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {selectedProperty.reuseSuggestion.other.map((type) => (
+                        <span key={type} className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-700">
                           {type}
                         </span>
                       ))}
