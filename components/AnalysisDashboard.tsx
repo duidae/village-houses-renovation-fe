@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line, XAxis, YAxis, CartesianGrid, Legend, Tooltip, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
 import type { AnalysisData, AspectAnalysis, ConnectivityOption, PopulationDataPoint, PopulationStructure, ReuseType } from '../types';
+import { describeAspectLevel } from '../services/aspectLevels';
 import { fetchPublicFacilities, fetchTransitFacilities, fetchVillageBoundaries, findVillageBoundary, loadLeaflet } from '../services/mapData';
 import { ChartBarIcon, DownloadIcon, ExternalLinkIcon, HomeIcon, LightbulbIcon, PuzzleIcon, UsersIcon } from './icons';
 
@@ -21,9 +22,6 @@ const getScoreLevelText = (score: number) => {
     if (score >= 60) return '中';
     return '低';
 };
-
-// Aspect analyses mark keywords with **…**; the report shows them as plain text.
-const stripMarkup = (text: string) => text.replace(/\*\*/g, '');
 
 const TOOLTIP_STYLE = { backgroundColor: '#f8fafc', borderColor: '#cbd5e1', color: '#0f172a' };
 
@@ -376,7 +374,8 @@ const AspectAnalysisChart: React.FC<{ data: AspectAnalysis }> = ({ data }) => {
                             <span className="h-5 w-1 bg-report-sage-dark" />
                             {name}
                         </dt>
-                        <dd className="text-brand-subtext self-center">{stripMarkup(data[key].analysis)}</dd>
+                        {/* Scores are 0-10 here; the level bands are defined on 0-100. */}
+                        <dd className="text-brand-subtext self-center">{describeAspectLevel(key, data[key].score * 10)}</dd>
                     </React.Fragment>
                 ))}
             </dl>
