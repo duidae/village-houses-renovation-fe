@@ -120,10 +120,12 @@ const CpiGauge: React.FC<{ score: number }> = ({ score }) => {
 
 type ContextMapMode = 'environment' | 'road' | 'transit' | 'facilities';
 
-const MAP_LEGENDS: Record<ContextMapMode, { label: string; swatch: React.ReactNode }[]> = {
-    environment: ENVIRONMENT_LAYER_SOURCES.map(({ label, color, ...source }) => {
+// Each entry's id names the Leaflet layer it toggles on the map.
+const MAP_LEGENDS: Record<ContextMapMode, { id: string; label: string; swatch: React.ReactNode }[]> = {
+    environment: ENVIRONMENT_LAYER_SOURCES.map(({ id, label, color, ...source }) => {
         const categoryColors = 'categoryColors' in source ? source.categoryColors : undefined;
         return {
+            id,
             label,
             swatch: categoryColors ? (
                 <span className="inline-flex flex-shrink-0">
@@ -138,13 +140,13 @@ const MAP_LEGENDS: Record<ContextMapMode, { label: string; swatch: React.ReactNo
     }),
     road: [],
     transit: [
-        { label: '交通設施', swatch: <span className="inline-block h-3 w-3 flex-shrink-0 rounded-full border-2 border-[#9333ea] bg-white" /> },
-        { label: '半徑300m', swatch: <span className="inline-block h-3 w-3 flex-shrink-0 rounded-full border-2 border-dashed border-orange-500" /> },
+        { id: 'transit', label: '交通設施', swatch: <span className="inline-block h-3 w-3 flex-shrink-0 rounded-full border-2 border-[#9333ea] bg-white" /> },
+        { id: 'buffer', label: '半徑300m', swatch: <span className="inline-block h-3 w-3 flex-shrink-0 rounded-full border-2 border-dashed border-orange-500" /> },
     ],
     facilities: [
-        { label: '迎毗設施', swatch: <span className="inline-block h-3 w-3 flex-shrink-0 rounded-sm bg-[#f5deb3]" /> },
-        { label: '鄰避設施', swatch: <span className="inline-block h-3 w-3 flex-shrink-0 rounded-sm bg-red-500" /> },
-        { label: '半徑300m', swatch: <span className="inline-block h-3 w-3 flex-shrink-0 rounded-full border-2 border-dashed border-orange-500" /> },
+        { id: 'welcome-facilities', label: '迎毗設施', swatch: <span className="inline-block h-3 w-3 flex-shrink-0 rounded-sm bg-[#f5deb3]" /> },
+        { id: 'nimby-facilities', label: '鄰避設施', swatch: <span className="inline-block h-3 w-3 flex-shrink-0 rounded-sm bg-red-500" /> },
+        { id: 'buffer', label: '半徑300m', swatch: <span className="inline-block h-3 w-3 flex-shrink-0 rounded-full border-2 border-dashed border-orange-500" /> },
     ],
 };
 
@@ -154,6 +156,28 @@ const ContextMap: React.FC<{ lat: number; lng: number; area: string; mode: Conte
     const [isLegendOpen, setIsLegendOpen] = useState(
         () => typeof window === 'undefined' || window.matchMedia('(min-width: 640px)').matches
     );
+    const [hiddenLayers, setHiddenLayers] = useState<Set<string>>(() => new Set());
+    const hiddenLayersRef = useRef(hiddenLayers);
+    const mapRef = useRef<any>(null);
+    const toggleableLayersRef = useRef<Record<string, any>>({});
+
+    const toggleLayer = (id: string) =>
+        setHiddenLayers(current => {
+            const next = new Set(current);
+            if (next.has(id)) next.delete(id);
+            else next.add(id);
+            return next;
+        });
+
+    useEffect(() => {
+        hiddenLayersRef.current = hiddenLayers;
+        const map = mapRef.current;
+        if (!map) return;
+        Object.entries(toggleableLayersRef.current).forEach(([id, layer]) => {
+            if (hiddenLayers.has(id)) layer.removeFrom(map);
+            else layer.addTo(map);
+        });
+    }, [hiddenLayers]);
 
     useEffect(() => {
         let cancelled = false;
@@ -165,6 +189,12 @@ const ContextMap: React.FC<{ lat: number; lng: number; area: string; mode: Conte
             if (cancelled || !L || !containerRef.current) return;
 
             map = L.map(containerRef.current, { zoomControl: true, scrollWheelZoom: true }).setView([lat, lng], 15);
+            mapRef.current = map;
+            // Layers listed in the legend are added here, unless the viewer has unchecked them.
+            const addToggleable = (id: string, layer: any) => {
+                toggleableLayersRef.current[id] = layer;
+                if (!hiddenLayersRef.current.has(id)) layer.addTo(map);
+            };
             resizeObserver = new ResizeObserver(() => map?.invalidateSize({ pan: false }));
             resizeObserver.observe(containerRef.current);
             requestAnimationFrame(() => map?.invalidateSize({ pan: false }));
@@ -178,8 +208,8 @@ const ContextMap: React.FC<{ lat: number; lng: number; area: string; mode: Conte
             }).addTo(map);
 
             if (mode === 'transit' || mode === 'facilities') {
-                const buffer = L.circle([lat, lng], { radius: 300, color: '#f97316', weight: 2, dashArray: '6 6', fill: false }).addTo(map);
-                map.fitBounds(buffer.getBounds(), { padding: [12, 12] });
+                addToggleable('buffer', L.circle([lat, lng], { radius: 300, color: '#f97316', weight: 2, dashArray: '6 6', fill: false }));
+                map.fitBounds(L.latLng(lat, lng).toBounds(600), { padding: [12, 12] });
             }
 
             const boundaries = await fetchVillageBoundaries().catch(() => null);
@@ -196,11 +226,11 @@ const ContextMap: React.FC<{ lat: number; lng: number; area: string; mode: Conte
                 if (cancelled) return;
                 layers.forEach((geoJson, index) => {
                     if (!geoJson) return;
-                    const { color, ...source } = ENVIRONMENT_LAYER_SOURCES[index];
+                    const { id, color, ...source } = ENVIRONMENT_LAYER_SOURCES[index];
                     const categoryField = 'categoryField' in source ? source.categoryField : undefined;
                     const categoryColors = 'categoryColors' in source ? source.categoryColors : undefined;
                     const weight = 'weight' in source ? source.weight : 2;
-                    L.geoJSON(geoJson, {
+                    addToggleable(id, L.geoJSON(geoJson, {
                         style: (feature: any) => {
                             const category = categoryField ? feature?.properties?.[categoryField] : undefined;
                             const featureColor = (typeof category === 'string' && categoryColors?.[category]) || color;
@@ -208,10 +238,10 @@ const ContextMap: React.FC<{ lat: number; lng: number; area: string; mode: Conte
                         },
                         onEachFeature: (feature: any, layer: any) => {
                             const category = categoryField ? feature?.properties?.[categoryField] : undefined;
-                            const suffix = typeof category === 'string' ? `：${category}${source.id === 'flood-potential' ? ' m' : ''}` : '';
+                            const suffix = typeof category === 'string' ? `：${category}${id === 'flood-potential' ? ' m' : ''}` : '';
                             layer.bindTooltip(`${source.label}${suffix}`, { sticky: true });
                         },
-                    }).addTo(map);
+                    }));
                 });
             }
 
@@ -220,14 +250,14 @@ const ContextMap: React.FC<{ lat: number; lng: number; area: string; mode: Conte
                 if (cancelled) return;
                 if (transit) {
                     const color = '#9333ea';
-                    L.geoJSON(transit, {
+                    addToggleable('transit', L.geoJSON(transit, {
                         style: { color, fillColor: color, fillOpacity: 0.12, opacity: 0.8, weight: 2 },
                         pointToLayer: (_feature: any, latLng: any) =>
                             L.circleMarker(latLng, { radius: 5, color, fillColor: '#ffffff', fillOpacity: 0.9, weight: 2 }),
                         onEachFeature: (feature: any, layer: any) => {
                             if (feature?.properties?.name) layer.bindTooltip(feature.properties.name);
                         },
-                    }).addTo(map);
+                    }));
                 }
             }
 
@@ -235,15 +265,20 @@ const ContextMap: React.FC<{ lat: number; lng: number; area: string; mode: Conte
                 const facilities = await fetchPublicFacilities().catch(() => null);
                 if (cancelled) return;
                 if (facilities) {
-                    L.geoJSON(facilities, {
-                        style: (feature: any) => {
-                            const color = feature?.properties?.Impact === '鄰避設施' ? '#ef4444' : '#f5deb3';
-                            return { color, fillColor: color, weight: 2, fillOpacity: 0.6 };
-                        },
-                        onEachFeature: (feature: any, layer: any) => {
-                            if (feature?.properties?.Name) layer.bindTooltip(feature.properties.Name);
-                        },
-                    }).addTo(map);
+                    // Split by Impact so 迎毗 and 鄰避 can be toggled separately.
+                    const isNimby = (feature: any) => feature?.properties?.Impact === '鄰避設施';
+                    const facilityLayer = (nimby: boolean) => {
+                        const color = nimby ? '#ef4444' : '#f5deb3';
+                        return L.geoJSON(facilities, {
+                            filter: (feature: any) => isNimby(feature) === nimby,
+                            style: { color, fillColor: color, weight: 2, fillOpacity: 0.6 },
+                            onEachFeature: (feature: any, layer: any) => {
+                                if (feature?.properties?.Name) layer.bindTooltip(feature.properties.Name);
+                            },
+                        });
+                    };
+                    addToggleable('welcome-facilities', facilityLayer(false));
+                    addToggleable('nimby-facilities', facilityLayer(true));
                 }
             }
 
@@ -264,11 +299,13 @@ const ContextMap: React.FC<{ lat: number; lng: number; area: string; mode: Conte
         return () => {
             cancelled = true;
             resizeObserver?.disconnect();
+            mapRef.current = null;
+            toggleableLayersRef.current = {};
             map?.remove();
         };
     }, [lat, lng, area, mode]);
 
-    const legend = [
+    const legend: { id?: string; label: string; swatch: React.ReactNode }[] = [
         { label: '個宅', swatch: <span className="inline-flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full bg-yellow-500 text-[10px] leading-none">🏠</span> },
         { label: '社區範圍', swatch: <span className="inline-block h-3 w-3 flex-shrink-0 border-2 border-dashed border-yellow-400" /> },
         ...MAP_LEGENDS[mode],
@@ -296,8 +333,26 @@ const ContextMap: React.FC<{ lat: number; lng: number; area: string; mode: Conte
                 </button>
                 {isLegendOpen && (
                     <ul className="space-y-1 px-2 pb-1.5">
-                        {legend.map(({ label, swatch }) => (
-                            <li key={label} className="flex items-center gap-1.5 whitespace-nowrap">{swatch}{label}</li>
+                        {legend.map(({ id, label, swatch }) => (
+                            <li key={label}>
+                                {id ? (
+                                    <label className="flex cursor-pointer items-center gap-1.5 whitespace-nowrap">
+                                        <input
+                                            type="checkbox"
+                                            checked={!hiddenLayers.has(id)}
+                                            onChange={() => toggleLayer(id)}
+                                            className="h-3 w-3 accent-emerald-600"
+                                        />
+                                        {swatch}{label}
+                                    </label>
+                                ) : (
+                                    <span className="flex items-center gap-1.5 whitespace-nowrap">
+                                        {/* keeps fixed rows aligned with the checkbox rows */}
+                                        <span className="inline-block w-3 flex-shrink-0" />
+                                        {swatch}{label}
+                                    </span>
+                                )}
+                            </li>
                         ))}
                     </ul>
                 )}
