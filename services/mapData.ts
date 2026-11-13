@@ -89,3 +89,60 @@ export function fetchTransitFacilities(): Promise<any> {
   }
   return transitFacilitiesPromise;
 }
+
+// Environmental-sensitivity layers, shared by the overview map (MapBlock) and
+// the 環境面 context map in the case report.
+export const ENVIRONMENT_LAYER_SOURCES = [
+  {
+    id: 'meishan-fault',
+    label: '梅山斷層地質敏感區',
+    url: '/layers/meishan-fault.geojson',
+    color: '#dc2626',
+    type: 'geojson' as const,
+  },
+  {
+    id: 'soil-liquefaction',
+    label: '土壤液化潛勢',
+    url: '/layers/soil-liquefaction.geojson',
+    color: '#ea580c',
+    type: 'geojson' as const,
+    categoryField: 'type',
+    categoryColors: {
+      高潛勢: '#c2410c',
+      中潛勢: '#f59e0b',
+      低潛勢: '#facc15',
+    } as Record<string, string>,
+  },
+  {
+    // 24hr / 500mm scenario, clipped to within 2km of the research villages
+    id: 'flood-potential',
+    label: '淹水潛勢 (24hr 500mm)',
+    url: '/layers/flood-potential-24h500mm.geojson',
+    color: '#3b82f6',
+    type: 'geojson' as const,
+    weight: 0,
+    categoryField: 'depth',
+    categoryColors: {
+      '0.3-0.5': '#bfdbfe',
+      '0.5-1': '#60a5fa',
+      '1-2': '#2563eb',
+      '2-3': '#1e40af',
+      '>3': '#172554',
+    } as Record<string, string>,
+  },
+];
+
+const geoJsonPromises: Record<string, Promise<any>> = {};
+
+// Cached per URL so several maps on one page share a single download.
+export function fetchGeoJson(url: string): Promise<any> {
+  if (!geoJsonPromises[url]) {
+    geoJsonPromises[url] = fetch(url)
+      .then((res) => res.json())
+      .catch((error: unknown) => {
+        delete geoJsonPromises[url];
+        throw error;
+      });
+  }
+  return geoJsonPromises[url];
+}

@@ -2,6 +2,7 @@ import React, { useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import shp from 'shpjs';
 import type { PropertyMarker } from '../mocks/properties';
+import { ENVIRONMENT_LAYER_SOURCES } from '../services/mapData';
 import { fetchProperties } from '../services/propertiesService';
 import { researchAreaLabel } from '../services/villageHousesService';
 import { DEFAULT_FILTERS, hasActiveCriteria, matchesFilters } from '../services/houseFilters';
@@ -33,43 +34,7 @@ const mapLayerSources = [
     color: '#9333ea',
     type: 'geojson' as const,
   },
-  {
-    id: 'meishan-fault',
-    label: '梅山斷層地質敏感區',
-    url: '/layers/meishan-fault.geojson',
-    color: '#dc2626',
-    type: 'geojson' as const,
-  },
-  {
-    id: 'soil-liquefaction',
-    label: '土壤液化潛勢',
-    url: '/layers/soil-liquefaction.geojson',
-    color: '#ea580c',
-    type: 'geojson' as const,
-    categoryField: 'type',
-    categoryColors: {
-      高潛勢: '#c2410c',
-      中潛勢: '#f59e0b',
-      低潛勢: '#facc15',
-    } as Record<string, string>,
-  },
-  {
-    // 24hr / 500mm scenario, clipped to within 2km of the research villages
-    id: 'flood-potential',
-    label: '淹水潛勢 (24hr 500mm)',
-    url: '/layers/flood-potential-24h500mm.geojson',
-    color: '#3b82f6',
-    type: 'geojson' as const,
-    weight: 0,
-    categoryField: 'depth',
-    categoryColors: {
-      '0.3-0.5': '#bfdbfe',
-      '0.5-1': '#60a5fa',
-      '1-2': '#2563eb',
-      '2-3': '#1e40af',
-      '>3': '#172554',
-    } as Record<string, string>,
-  },
+  ...ENVIRONMENT_LAYER_SOURCES,
 ];
 
 const VILLAGE_BOUNDARIES_URL = '/village-boundaries.geojson';

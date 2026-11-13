@@ -4,7 +4,7 @@ import { ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line, XAxis, YAxis
 import type { AnalysisData, AspectAnalysis, ConnectivityOption, PopulationDataPoint, PopulationStructure, ReuseSuggestion } from '../types';
 import { describeAspectLevel } from '../services/aspectLevels';
 import { REUSE_TYPE_INFO } from '../services/reuseTypes';
-import { fetchPublicFacilities, fetchTransitFacilities, fetchVillageBoundaries, findVillageBoundary, loadLeaflet } from '../services/mapData';
+import { ENVIRONMENT_LAYER_SOURCES, fetchGeoJson, fetchPublicFacilities, fetchTransitFacilities, fetchVillageBoundaries, findVillageBoundary, loadLeaflet } from '../services/mapData';
 import { ChartBarIcon, DownloadIcon, ExternalLinkIcon, HomeIcon, LightbulbIcon, PuzzleIcon, UsersIcon } from './icons';
 
 interface AnalysisDashboardProps {
@@ -121,7 +121,21 @@ const CpiGauge: React.FC<{ score: number }> = ({ score }) => {
 type ContextMapMode = 'environment' | 'road' | 'transit' | 'facilities';
 
 const MAP_LEGENDS: Record<ContextMapMode, { label: string; swatch: React.ReactNode }[]> = {
-    environment: [],
+    environment: ENVIRONMENT_LAYER_SOURCES.map(({ label, color, ...source }) => {
+        const categoryColors = 'categoryColors' in source ? source.categoryColors : undefined;
+        return {
+            label,
+            swatch: categoryColors ? (
+                <span className="inline-flex flex-shrink-0">
+                    {Object.values(categoryColors).map(categoryColor => (
+                        <span key={categoryColor} className="inline-block h-3 w-1.5" style={{ backgroundColor: categoryColor }} />
+                    ))}
+                </span>
+            ) : (
+                <span className="inline-block h-3 w-3 flex-shrink-0 rounded-sm border-2" style={{ borderColor: color, backgroundColor: `${color}33` }} />
+            ),
+        };
+    }),
     road: [],
     transit: [
         { label: '交通設施', swatch: <span className="inline-block h-3 w-3 flex-shrink-0 rounded-full border-2 border-[#9333ea] bg-white" /> },
@@ -136,6 +150,10 @@ const MAP_LEGENDS: Record<ContextMapMode, { label: string; swatch: React.ReactNo
 
 const ContextMap: React.FC<{ lat: number; lng: number; area: string; mode: ContextMapMode }> = ({ lat, lng, area, mode }) => {
     const containerRef = useRef<HTMLDivElement>(null);
+    // The legend covers much of the small map on phones, so it starts collapsed there.
+    const [isLegendOpen, setIsLegendOpen] = useState(
+        () => typeof window === 'undefined' || window.matchMedia('(min-width: 640px)').matches
+    );
 
     useEffect(() => {
         let cancelled = false;
@@ -169,6 +187,32 @@ const ContextMap: React.FC<{ lat: number; lng: number; area: string; mode: Conte
             const boundary = findVillageBoundary(boundaries, area);
             if (boundary) {
                 L.geoJSON(boundary, { style: { color: '#facc15', weight: 3, dashArray: '8 6', fill: false } }).addTo(map);
+            }
+
+            if (mode === 'environment') {
+                const layers = await Promise.all(
+                    ENVIRONMENT_LAYER_SOURCES.map(source => fetchGeoJson(source.url).catch(() => null))
+                );
+                if (cancelled) return;
+                layers.forEach((geoJson, index) => {
+                    if (!geoJson) return;
+                    const { color, ...source } = ENVIRONMENT_LAYER_SOURCES[index];
+                    const categoryField = 'categoryField' in source ? source.categoryField : undefined;
+                    const categoryColors = 'categoryColors' in source ? source.categoryColors : undefined;
+                    const weight = 'weight' in source ? source.weight : 2;
+                    L.geoJSON(geoJson, {
+                        style: (feature: any) => {
+                            const category = categoryField ? feature?.properties?.[categoryField] : undefined;
+                            const featureColor = (typeof category === 'string' && categoryColors?.[category]) || color;
+                            return { color: featureColor, fillColor: featureColor, fillOpacity: categoryColors ? 0.4 : 0.15, opacity: 0.8, weight };
+                        },
+                        onEachFeature: (feature: any, layer: any) => {
+                            const category = categoryField ? feature?.properties?.[categoryField] : undefined;
+                            const suffix = typeof category === 'string' ? `：${category}${source.id === 'flood-potential' ? ' m' : ''}` : '';
+                            layer.bindTooltip(`${source.label}${suffix}`, { sticky: true });
+                        },
+                    }).addTo(map);
+                });
             }
 
             if (mode === 'transit') {
@@ -226,18 +270,38 @@ const ContextMap: React.FC<{ lat: number; lng: number; area: string; mode: Conte
 
     const legend = [
         { label: '個宅', swatch: <span className="inline-flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full bg-yellow-500 text-[10px] leading-none">🏠</span> },
-        ...MAP_LEGENDS[mode],
         { label: '社區範圍', swatch: <span className="inline-block h-3 w-3 flex-shrink-0 border-2 border-dashed border-yellow-400" /> },
+        ...MAP_LEGENDS[mode],
     ];
 
     return (
         <div className="relative h-56 sm:h-64 overflow-hidden rounded-lg bg-slate-200">
             <div ref={containerRef} className="h-full w-full" />
-            <ul className="absolute bottom-6 right-2 z-[400] space-y-1 rounded bg-white/90 px-2 py-1.5 text-xs leading-4 text-slate-700 shadow">
-                {legend.map(({ label, swatch }) => (
-                    <li key={label} className="flex items-center gap-1.5 whitespace-nowrap">{swatch}{label}</li>
-                ))}
-            </ul>
+            <div className="absolute bottom-6 right-2 z-[400] rounded bg-white/90 text-xs leading-4 text-slate-700 shadow">
+                <button
+                    type="button"
+                    onClick={() => setIsLegendOpen(open => !open)}
+                    aria-expanded={isLegendOpen}
+                    className="flex w-full items-center justify-between gap-2 px-2 py-1.5 font-semibold"
+                >
+                    圖例
+                    <svg
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                        aria-hidden="true"
+                        className={`h-3.5 w-3.5 transition-transform ${isLegendOpen ? '' : 'rotate-180'}`}
+                    >
+                        <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.17l3.71-3.94a.75.75 0 1 1 1.08 1.04l-4.25 4.5a.75.75 0 0 1-1.08 0l-4.25-4.5a.75.75 0 0 1 .02-1.06Z" clipRule="evenodd" />
+                    </svg>
+                </button>
+                {isLegendOpen && (
+                    <ul className="space-y-1 px-2 pb-1.5">
+                        {legend.map(({ label, swatch }) => (
+                            <li key={label} className="flex items-center gap-1.5 whitespace-nowrap">{swatch}{label}</li>
+                        ))}
+                    </ul>
+                )}
+            </div>
         </div>
     );
 };
