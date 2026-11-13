@@ -740,7 +740,7 @@ export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data, id }
                     <SubCard className="space-y-3">
                         <h4 className="text-xl font-bold text-brand-text">環境面</h4>
                         <ContextMap lat={basicInfo.latitude} lng={basicInfo.longitude} area={area} mode="environment" />
-                        <p className="text-brand-text">{basicInfo.environmentalSensitivity || '環境敏感條件資料尚未提供'}</p>
+                        <p className="text-brand-text">{basicInfo.environmentalSensitivity || ''}</p>
                     </SubCard>
                     <SubCard className="space-y-3">
                         <div className="flex flex-wrap items-center gap-3">
