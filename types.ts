@@ -115,6 +115,8 @@ export const CONNECTIVITY_OPTIONS = [
   '地點佳，主幹道上',
   '有公共設施，方圓半徑300公尺內有迎毗設施',
   '交通佳，300m內有公共運輸站點或500m內有火車站',
+  '交通普通，300-500m內有公共運輸站點',
+  '交通不便，500m內無公共運輸站點',
 ] as const;
 export type ConnectivityOption = (typeof CONNECTIVITY_OPTIONS)[number];
 

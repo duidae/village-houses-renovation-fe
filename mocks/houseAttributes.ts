@@ -5,14 +5,34 @@ import type { VillageHouseRecord } from '../services/villageHousesService';
 // column's top grade (5):
 // - 道路系統: <=30m from a main road (鄉道/縣道)
 // - 公共服務設施: a welcomed facility (圖書館、學校、社區活動中心) within 300m
-// - 公共運輸站點: <=300m to a public transport stop, or <=500m to a train station
+// 公共運輸站點 has an option for each of its three grades:
+// - 5: <=300m to a public transport stop, or <=500m to a train station
+// - 3: 300-500m to a public transport stop
+// - 1: >500m to a public transport stop
+const TRANSIT_OPTIONS: Record<number, ConnectivityOption> = {
+  5: '交通佳，300m內有公共運輸站點或500m內有火車站',
+  3: '交通普通，300-500m內有公共運輸站點',
+  1: '交通不便，500m內無公共運輸站點',
+};
+
 export function getConnectivity(record: VillageHouseRecord): ConnectivityOption[] {
   const options: ConnectivityOption[] = [];
   if (record.roadAccess === 5) options.push('地點佳，主幹道上');
   if (record.publicFacilities === 5) options.push('有公共設施，方圓半徑300公尺內有迎毗設施');
-  if (record.transitAccess === 5) options.push('交通佳，300m內有公共運輸站點或500m內有火車站');
+  const transitOption = record.transitAccess === null ? undefined : TRANSIT_OPTIONS[record.transitAccess];
+  if (transitOption) options.push(transitOption);
   return options;
 }
+
+// Fallback 社區連結 score (0-10): 4, plus 2 for each top-graded column, with
+// 公共運輸站點 grade 3 worth 1.
+const CONNECTIVITY_POINTS: Record<ConnectivityOption, number> = {
+  '地點佳，主幹道上': 2,
+  '有公共設施，方圓半徑300公尺內有迎毗設施': 2,
+  '交通佳，300m內有公共運輸站點或500m內有火車站': 2,
+  '交通普通，300-500m內有公共運輸站點': 1,
+  '交通不便，500m內無公共運輸站點': 0,
+};
 
 // 建築物狀況 text and fallback score for the sheet's 高/中/低 level.
 const CONDITION_ASPECTS: Record<ConditionOption, { score: number; analysis: string }> = {
@@ -25,6 +45,8 @@ const CONNECTIVITY_LABELS: Record<ConnectivityOption, string> = {
   '地點佳，主幹道上': '位於主幹道上',
   '有公共設施，方圓半徑300公尺內有迎毗設施': '300公尺內有迎毗設施',
   '交通佳，300m內有公共運輸站點或500m內有火車站': '300公尺內有公共運輸站點或500公尺內有火車站',
+  '交通普通，300-500m內有公共運輸站點': '300-500公尺內有公共運輸站點',
+  '交通不便，500m內無公共運輸站點': '500公尺內無公共運輸站點',
 };
 
 // Courtyard layout and historical value follow the building type, from most to
@@ -52,7 +74,8 @@ export function estimateAspectAnalysis(record: VillageHouseRecord): AspectAnalys
 
   return {
     communityConnection: {
-      score: sheetScores ? toTenPointScale(sheetScores.communityConnection) : 4 + connectivity.length * 2,
+      score: sheetScores ? toTenPointScale(sheetScores.communityConnection)
+        : connectivity.reduce((score, option) => score + CONNECTIVITY_POINTS[option], 4),
       analysis: connectivity.length > 0
         ? `${connectivity.map((option) => `**${CONNECTIVITY_LABELS[option]}**`).join('、')}。`
         : '未位於主幹道，周邊**公共設施與大眾運輸**皆較遠。',
